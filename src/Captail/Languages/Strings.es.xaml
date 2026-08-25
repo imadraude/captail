@@ -143,6 +143,7 @@
   <sys:String x:Key="L.Audio.Codec">Códec de audio</sys:String>
   <sys:String x:Key="L.Help.MicBoost">Aumenta la ganancia del micrófono antes de codificar. Úselo cuando el volumen al 100% aún esté en silencio. Demasiado impulso también genera ruido y puede distorsionar el habla alta.</sys:String>
   <sys:String x:Key="L.Help.AudioTracks">La pista mixta funciona en todas partes y es la más fácil de compartir. Las pistas separadas mantienen independientes el audio del juego/sistema y el micrófono para editar; algunos reproductores solo reproducen una pista a la vez.</sys:String>
+  <sys:String x:Key="L.Help.ApplicationAudio">Elige qué aplicaciones graba Captail y asigna cada una a una pista. Las aplicaciones no marcadas se excluyen. El número de pistas depende del códec de audio seleccionado.</sys:String>
   <sys:String x:Key="L.Help.AudioCodec">AAC guarda como MP4 y funciona con casi todos los reproductores y editores. Opus es eficiente y suena bien a velocidades de bits más bajas, pero usa MKV y puede necesitar un editor moderno.</sys:String>
 
   <sys:String x:Key="L.Storage.ReplayFolder">Carpeta de repeticiones</sys:String>
@@ -263,6 +264,10 @@
   <sys:String x:Key="L.Notify.RecoveryTitle">Recuperando la repetición instantánea</sys:String>
   <sys:String x:Key="L.Notify.RecoveryFailedTitle">No se pudo recuperar la repetición instantánea</sys:String>
   <sys:String x:Key="L.Notify.RecoveryUnavailableTitle">La repetición no está disponible temporalmente</sys:String>
+  <sys:String x:Key="L.Notify.ProcessAudioRecovering">La captura de audio de la aplicación se está recuperando. La grabación continúa.</sys:String>
+  <sys:String x:Key="L.Notify.ProcessAudioRecovered">La captura de audio de la aplicación se recuperó.</sys:String>
+  <sys:String x:Key="L.Notify.ProcessAudioConflictTitle">Enrutamiento de audio ajustado</sys:String>
+  <sys:String x:Key="L.Notify.ProcessAudioConflict">Las aplicaciones relacionadas usan pistas distintas. Captail priorizó la aplicación secundaria para evitar audio duplicado.</sys:String>
   <sys:String x:Key="L.Notify.RetryIn">Vuelva a intentarlo en {0} seg.</sys:String>
   <sys:String x:Key="L.Notify.ReasonRetry">{0} Reintentando en {1} seg.</sys:String>
   <sys:String x:Key="L.Notify.CaptureFailed">La captura no comenzó</sys:String>
@@ -308,6 +313,8 @@
   <sys:String x:Key="L.Engine.MonitorMissing">Monitor de captura no encontrado.</sys:String>
   <sys:String x:Key="L.Engine.VideoFailed">El subsistema de vídeo no pudo iniciarse: código {0}.</sys:String>
   <sys:String x:Key="L.Engine.AudioFailed">El subsistema de audio no pudo iniciarse.</sys:String>
+  <sys:String x:Key="L.Engine.ProcessAudioUnsupportedWindows">El enrutamiento avanzado de audio por aplicación requiere Windows 10 versión 2004 o posterior.</sys:String>
+  <sys:String x:Key="L.Engine.ProcessAudioSourceUnavailable">La fuente avanzada de audio de aplicaciones no está disponible. Reinstala o actualiza Captail.</sys:String>
   <sys:String x:Key="L.Engine.NoEncoder">No se encontró ningún codificador de vídeo de hardware compatible. Actualice el controlador de gráficos.</sys:String>
   <sys:String x:Key="L.Engine.CodecFallback">{0} no está disponible en {1}; seleccionado {2}.</sys:String>
   <sys:String x:Key="L.Engine.VideoSourceFailed">No se pudo crear la fuente de video.</sys:String>
@@ -325,4 +332,30 @@
   <sys:String x:Key="L.Unit.Seconds">{0} segundo</sys:String>
   <sys:String x:Key="L.Unit.Minutes">{0} minutos</sys:String>
   <sys:String x:Key="L.Unit.GB">{0}GB</sys:String>
+  <sys:String x:Key="L.Audio.PerAppRouting">Por aplicación</sys:String>
+  <sys:String x:Key="L.Audio.ConfigureRouting">Configurar</sys:String>
+  <sys:String x:Key="L.Audio.NoAppsSelected">Ninguna aplicación seleccionada</sys:String>
+  <sys:String x:Key="L.Audio.RoutingSummary">{0} aplicaciones · {1} pistas</sys:String>
+  <sys:String x:Key="L.Audio.ApplicationAudio">Audio de aplicaciones</sys:String>
+  <sys:String x:Key="L.Help.AdvancedRouting">Envía el audio de cada aplicación a pistas de grabación independientes.</sys:String>
+  <sys:String x:Key="L.AdvancedAudio.Title">Enrutamiento de audio por aplicación</sys:String>
+  <sys:String x:Key="L.AdvancedAudio.Search">Buscar aplicaciones o procesos</sys:String>
+  <sys:String x:Key="L.AdvancedAudio.TrackFormat">Pista {0}</sys:String>
+  <sys:String x:Key="L.AdvancedAudio.FormatSummary">{0} · {1} · hasta {2} pistas</sys:String>
+  <sys:String x:Key="L.AdvancedAudio.SelectionSummary">{0} aplicaciones · {1} pistas</sys:String>
+  <sys:String x:Key="L.AdvancedAudio.Selected">SELECCIONADAS</sys:String>
+  <sys:String x:Key="L.AdvancedAudio.Available">REPRODUCIENDO AUDIO</sys:String>
+  <sys:String x:Key="L.AdvancedAudio.OtherProcesses">OTROS PROCESOS</sys:String>
+  <sys:String x:Key="L.AdvancedAudio.Loading">Buscando aplicaciones con audio...</sys:String>
+  <sys:String x:Key="L.AdvancedAudio.EmptyTitle">No se encontraron sesiones de audio</sys:String>
+  <sys:String x:Key="L.AdvancedAudio.EmptyDetail">Reproduce sonido en una aplicación y aparecerá aquí.</sys:String>
+  <sys:String x:Key="L.AdvancedAudio.UnavailableTitle">Sesiones de audio no disponibles</sys:String>
+  <sys:String x:Key="L.AdvancedAudio.UnavailableDetail">Comprueba el servicio de audio de Windows e inténtalo de nuevo.</sys:String>
+  <sys:String x:Key="L.AdvancedAudio.MicrophoneEnabled">Elige la pista del micrófono</sys:String>
+  <sys:String x:Key="L.AdvancedAudio.MicrophoneDisabled">Activa el micrófono en ajustes para enrutarlo</sys:String>
+  <sys:String x:Key="L.AdvancedAudio.UnassignedHint">Las aplicaciones sin marcar no se graban.</sys:String>
+  <sys:String x:Key="L.AdvancedAudio.SelectAtLeastOne">Selecciona una aplicación o activa el micrófono.</sys:String>
+  <sys:String x:Key="L.AdvancedAudio.ProcessCount">{0} procesos</sys:String>
+  <sys:String x:Key="L.Error.AdvancedAudioTitle">Audio de aplicaciones</sys:String>
+  <sys:String x:Key="L.Error.AdvancedAudioEmpty">Selecciona una aplicación o activa el micrófono antes de guardar.</sys:String>
 </ResourceDictionary>

@@ -88,10 +88,21 @@ public sealed class FfmpegAdapter
                 ? channelCount.GetInt32()
                 : 0;
             string? title = null;
-            if (stream.TryGetProperty("tags", out JsonElement tags) &&
-                tags.TryGetProperty("title", out JsonElement titleElement))
+            if (stream.TryGetProperty("tags", out JsonElement tags))
             {
-                title = titleElement.GetString();
+                foreach (string tagName in new[] { "title", "name", "handler_name" })
+                {
+                    if (!tags.TryGetProperty(tagName, out JsonElement titleElement))
+                        continue;
+                    string? candidate = titleElement.GetString();
+                    if (string.IsNullOrWhiteSpace(candidate) ||
+                        candidate.Equals("SoundHandler", StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+                    title = candidate;
+                    break;
+                }
             }
             tracks.Add(new AudioTrackInfo(
                 streamIndex,

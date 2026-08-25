@@ -1,6 +1,6 @@
 {
   "SchemaVersion": 1,
-  "ReleaseVersion": "0.2.1",
+  "ReleaseVersion": "0.2.2",
   "Screenshots": [
     {
       "Source": "images/captail-main.png",
@@ -13,6 +13,10 @@
     {
       "Source": "images/captail-settings-audio.png",
       "FileName": "captail-settings-audio.png"
+    },
+    {
+      "Source": "images/captail-audio-routing.png",
+      "FileName": "captail-audio-routing.png"
     },
     {
       "Source": "images/captail-player.png",
@@ -35,6 +39,7 @@
         "AV1, HEVC, and H.264 hardware encoder detection",
         "30–240 FPS and output resolutions up to 4K",
         "System or game audio plus microphone capture",
+        "Per-application audio routing with independent track assignments",
         "Optional separate audio tracks, volume controls, and microphone boost",
         "Replay duration and file-size limits",
         "Recent replay library with fast built-in player",
@@ -44,7 +49,7 @@
         "Per-game replay folders",
         "Eleven interface languages"
       ],
-      "ReleaseNotes": "Captail 0.2.1 adds a fast replay player with seeking, fullscreen controls, keyboard shortcuts, and playback-speed adjustment. Recent replays can now be previewed before trimming. New replay-off game reminders and an unsaved-settings guard prevent missed recording and accidental settings loss. Game Capture uses fewer resources while no game is running. This update also cleans up secondary actions, improves replay-indicator contrast, prevents unrelated fullscreen apps from being treated as games, and fixes Microsoft Store taskbar icon assets.",
+      "ReleaseNotes": "Captail 0.2.2 adds per-application audio routing. Select running apps, view their icons and live audio levels, and assign each source or the microphone to a recording track supported by the chosen audio format. Routed sources can be toggled from the main window. The clip editor now shows every track in multi-track files with clearer labels and a layout that scales to larger track sets. This update also improves application-audio recovery, restores tray and replay-indicator startup reliability, and fixes shutdown crashes, clipped search text, hover flicker, and editor clipping.",
       "Keywords": [
         "instant replay",
         "game recorder",
@@ -69,6 +74,7 @@
         "Определение аппаратных кодировщиков AV1, HEVC и H.264",
         "30–240 FPS и разрешение записи до 4K",
         "Системный звук или звук игры вместе с микрофоном",
+        "Маршрутизация звука отдельных приложений по независимым дорожкам",
         "Раздельные аудиодорожки, громкость и усиление микрофона",
         "Ограничения длительности и размера повтора",
         "Библиотека повторов с быстрым встроенным плеером",
@@ -78,7 +84,7 @@
         "Раздельные папки для разных игр",
         "Одиннадцать языков интерфейса"
       ],
-      "ReleaseNotes": "В Captail 0.2.1 появился быстрый плеер повторов с перемоткой, полноэкранным режимом, управлением с клавиатуры и изменением скорости. Теперь недавний повтор можно посмотреть перед обрезкой. Новое напоминание сообщает о выключенном повторе при запуске игры, а защита несохранённых настроек предотвращает случайную потерю изменений. Game Capture потребляет меньше ресурсов, когда игра не запущена. Также упорядочены дополнительные действия, улучшена контрастность индикатора, исключено ошибочное определение обычных полноэкранных приложений как игр и исправлены значки панели задач для Microsoft Store.",
+      "ReleaseNotes": "В Captail 0.2.2 появилась маршрутизация звука отдельных приложений. Выбирайте запущенные программы, смотрите их значки и текущий уровень звука, назначайте каждый источник и микрофон на поддерживаемую форматом дорожку. Источники можно включать и выключать прямо в главном окне. Редактор теперь показывает все дорожки многодорожечных файлов, использует более понятные названия и расширяется для большого числа дорожек. Также улучшено восстановление звука приложений, возвращена надёжная загрузка значка в трее и индикатора повтора, исправлены сбой при выключении повтора, обрезанный поиск, мерцание наведения и обрезка элементов редактора.",
       "Keywords": [
         "мгновенный повтор",
         "запись игр",

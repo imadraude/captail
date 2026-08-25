@@ -4,6 +4,28 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-08-25
+
+### Added
+
+- **Per-application audio routing:** Select individual running applications, assign each one to a recording track, and route the microphone independently. Available track count follows the selected audio format.
+- **Useful process discovery:** The routing window keeps selected apps first, then shows applications currently producing audio and every other running process. Real application icons, search, process counts, and live level meters make sources easy to identify.
+- **Main-window source controls:** Routed applications and microphone appear as compact source buttons that can be enabled or disabled without reopening Settings.
+
+### Improved
+
+- **Multi-track editing:** The clip editor now displays every audio track found in a replay, uses recorded routing metadata for useful labels, expands for larger track sets, and keeps footer metadata readable.
+- **Application-audio recovery:** Routed capture sources recover after process exits or restarts without stopping the replay buffer.
+- **Localized guidance:** Per-application routing includes concise contextual help in every supported interface language.
+
+### Fixed
+
+- Prevented Instant Replay shutdown from accessing a disposed tray icon and crashing.
+- Restored the tray icon and replay-status indicator reliably after Windows startup.
+- Corrected swapped or misleading audio-track labels in ordinary and per-application recordings.
+- Prevented search text clipping and hover-animation flicker in the application routing window.
+- Prevented the last audio track and editor actions from being clipped when a replay contains several tracks.
+
 ## [0.2.1] - 2026-08-21
 
 ### Added

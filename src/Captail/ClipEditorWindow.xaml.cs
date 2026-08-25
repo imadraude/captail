@@ -25,6 +25,12 @@ public partial class ClipEditorWindow : Window
 {
     private const double MinimumSelectionSeconds = 0.25;
     private const int TimelineFrameCount = 12;
+    private const double TrimWindowBaseHeight = 790;
+    private const double AudioTrackRowHeight = 48;
+    private const int BaseVisibleAudioTracks = 1;
+    private const int MaximumVisibleAudioTracks = 6;
+    private static readonly TimeSpan BufferingIndicatorDelay =
+        TimeSpan.FromMilliseconds(180);
     private static readonly double[] PlaybackSpeeds =
         [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
     private static readonly TimeSpan FullscreenControlsTimeout = TimeSpan.FromSeconds(2.4);
@@ -62,6 +68,7 @@ public partial class ClipEditorWindow : Window
     private bool _previewMode;
     private bool _editorAssetsStarted;
     private int _playbackSpeedIndex = 3;
+    private DateTime? _bufferingSinceUtc;
 
     public ObservableCollection<AudioTrackRow> AudioTracks { get; } = [];
 
@@ -149,15 +156,31 @@ public partial class ClipEditorWindow : Window
             ? GridLength.Auto
             : new GridLength(1, GridUnitType.Star);
         ActionsRow.Height = _previewMode ? new GridLength(0) : GridLength.Auto;
+        PreviewRow.Height = _previewMode
+            ? new GridLength(1, GridUnitType.Star)
+            : new GridLength(390);
 
         if (!adjustWindow)
             return;
-        double targetHeight = _previewMode ? 720 : 790;
+        int visibleAudioTracks = Math.Clamp(
+            AudioTracks.Count,
+            BaseVisibleAudioTracks,
+            MaximumVisibleAudioTracks);
+        double preferredHeight = _previewMode
+            ? 736
+            : TrimWindowBaseHeight +
+              (visibleAudioTracks - BaseVisibleAudioTracks) * AudioTrackRowHeight;
+        Rect workArea = IsLoaded ? CurrentMonitorWorkArea() : SystemParameters.WorkArea;
+        double targetHeight = Math.Min(
+            preferredHeight,
+            Math.Max(560, workArea.Height - 16));
         if (IsLoaded)
         {
             double delta = targetHeight - ActualHeight;
-            Rect workArea = SystemParameters.WorkArea;
-            Top = Math.Clamp(Top - delta / 2, workArea.Top, workArea.Bottom - targetHeight);
+            Top = Math.Clamp(
+                Top - delta / 2,
+                workArea.Top + 8,
+                workArea.Bottom - targetHeight - 8);
         }
         Height = targetHeight;
         Dispatcher.BeginInvoke(DispatcherPriority.Render, () =>
@@ -373,6 +396,7 @@ public partial class ClipEditorWindow : Window
                 ? Visibility.Visible
                 : Visibility.Collapsed;
             UpdateMergeAudioState();
+            UpdateAudioTrackLayout(tracks.Count);
 
             if (loadWaveforms)
             {
@@ -390,6 +414,23 @@ public partial class ClipEditorWindow : Window
             NoAudioText.Visibility = Visibility.Visible;
             MergeAudioCheckBox.Visibility = Visibility.Collapsed;
         }
+    }
+
+    private void UpdateAudioTrackLayout(int trackCount)
+    {
+        int visibleTrackCount = Math.Min(trackCount, MaximumVisibleAudioTracks);
+        AudioTrackCountText.Text = trackCount.ToString();
+        AudioTrackCountBadge.Visibility = trackCount > 0
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+        AudioTrackScrollViewer.Height = visibleTrackCount * AudioTrackRowHeight;
+        AudioTrackScrollViewer.VerticalScrollBarVisibility =
+            trackCount > MaximumVisibleAudioTracks
+                ? ScrollBarVisibility.Auto
+                : ScrollBarVisibility.Disabled;
+
+        if (!_previewMode)
+            ApplyWindowModeLayout(adjustWindow: true);
     }
 
     private async Task LoadWaveformAsync(AudioTrackRow row)
@@ -472,7 +513,10 @@ public partial class ClipEditorWindow : Window
 
         _playbackPosition = Math.Clamp(position, _selectionStart, _selectionEnd);
         PreviewPlayer.SetAudioTracks(SelectedAudioTrackIds());
-        PreviewPlayer.Seek(_playbackPosition, exact: true);
+        // A seek to the position mpv is already paused on briefly reports
+        // buffering and creates a spinner flash on every resume.
+        if (Math.Abs(PreviewPlayer.PositionSeconds - _playbackPosition) > 0.05)
+            PreviewPlayer.Seek(_playbackPosition, exact: true);
         PreviewPlayer.Play();
         _playing = true;
         _playbackTimer.Start();
@@ -548,12 +592,22 @@ public partial class ClipEditorWindow : Window
         if (_playerLoading || !PreviewPlayer.IsReady)
             return;
         bool buffering = _playing && PreviewPlayer.IsBuffering;
-        PreviewLoadingOverlay.Visibility = buffering
+        if (!buffering)
+        {
+            _bufferingSinceUtc = null;
+            PreviewLoadingOverlay.Visibility = Visibility.Collapsed;
+            PreviewPlayer.Visibility = Visibility.Visible;
+            return;
+        }
+
+        _bufferingSinceUtc ??= DateTime.UtcNow;
+        bool sustained = DateTime.UtcNow - _bufferingSinceUtc >=
+                         BufferingIndicatorDelay;
+        PreviewLoadingOverlay.Visibility = sustained
             ? Visibility.Visible
             : Visibility.Collapsed;
-        PreviewPlayer.Visibility = buffering
-            ? Visibility.Collapsed
-            : Visibility.Visible;
+        // Keep the last decoded frame visible under the delayed overlay.
+        PreviewPlayer.Visibility = Visibility.Visible;
     }
 
     private void PauseForTimelineEdit()
@@ -1141,27 +1195,32 @@ public partial class ClipEditorWindow : Window
         exception is IOException &&
         (exception.HResult & 0xFFFF) is 32 or 33;
 
-    private static string AudioLabel(AudioTrackInfo track, int count)
+    internal static string AudioLabel(AudioTrackInfo track, int count)
     {
-        string title = track.Title ?? "";
-        if (title.Contains("microphone", StringComparison.OrdinalIgnoreCase) ||
-            title.Contains(" mic", StringComparison.OrdinalIgnoreCase))
+        int trackNumber = track.Ordinal + 1;
+        string title = track.Title?.Trim() ?? "";
+        if (!IsGenericAudioTitle(title))
         {
-            return Localization.Text("L.Library.MicrophoneTrack");
+            int separator = title.IndexOf(" - ", StringComparison.Ordinal);
+            if (title.StartsWith("Track ", StringComparison.OrdinalIgnoreCase) &&
+                separator > 0 && separator + 3 < title.Length)
+            {
+                return title[(separator + 3)..];
+            }
+            return title;
         }
-        if (title.Contains("system", StringComparison.OrdinalIgnoreCase) ||
-            title.Contains("game", StringComparison.OrdinalIgnoreCase))
-        {
-            return Localization.Text("L.Library.SystemGameTrack");
-        }
+
         if (count == 1)
             return Localization.Text("L.Library.MixedAudioTrack");
-        if (track.Ordinal == 0)
-            return Localization.Text("L.Library.SystemGameTrack");
-        if (track.Ordinal == 1)
-            return Localization.Text("L.Library.MicrophoneTrack");
-        return Localization.Format("L.Library.AudioTrackNumber", track.Ordinal + 1);
+        return Localization.Format("L.Library.AudioTrackNumber", trackNumber);
     }
+
+    private static bool IsGenericAudioTitle(string title) =>
+        string.IsNullOrWhiteSpace(title) ||
+        title.StartsWith("Captail Audio", StringComparison.OrdinalIgnoreCase) ||
+        title.Equals("SoundHandler", StringComparison.OrdinalIgnoreCase) ||
+        (title.StartsWith("Track ", StringComparison.OrdinalIgnoreCase) &&
+         !title.Contains(" - ", StringComparison.Ordinal));
 
     private void EnterFullscreen_Click(object sender, RoutedEventArgs e) =>
         EnterFullscreen();
@@ -1234,7 +1293,7 @@ public partial class ClipEditorWindow : Window
         ActionsRow.Height = GridLength.Auto;
         NormalPlaybackBar.Visibility = Visibility.Visible;
         WindowChrome.BorderThickness = new Thickness(1);
-        WindowChrome.CornerRadius = (CornerRadius)FindResource("RadiusWindow");
+        WindowChrome.CornerRadius = new CornerRadius(0);
         PreviewBorder.BorderThickness = new Thickness(1);
         PreviewBorder.CornerRadius = new CornerRadius(12);
 
@@ -1316,6 +1375,12 @@ public partial class ClipEditorWindow : Window
     }
 
     private Rect CurrentMonitorBounds()
+        => CurrentMonitorArea(useWorkArea: false);
+
+    private Rect CurrentMonitorWorkArea()
+        => CurrentMonitorArea(useWorkArea: true);
+
+    private Rect CurrentMonitorArea(bool useWorkArea)
     {
         nint window = new WindowInteropHelper(this).Handle;
         nint monitor = MonitorFromWindow(window, 2);
@@ -1325,8 +1390,9 @@ public partial class ClipEditorWindow : Window
 
         Matrix fromDevice = PresentationSource.FromVisual(this)?
                                 .CompositionTarget?.TransformFromDevice ?? Matrix.Identity;
-        Point topLeft = fromDevice.Transform(new Point(info.Monitor.Left, info.Monitor.Top));
-        Point bottomRight = fromDevice.Transform(new Point(info.Monitor.Right, info.Monitor.Bottom));
+        NativeRect area = useWorkArea ? info.WorkArea : info.Monitor;
+        Point topLeft = fromDevice.Transform(new Point(area.Left, area.Top));
+        Point bottomRight = fromDevice.Transform(new Point(area.Right, area.Bottom));
         return new Rect(topLeft, bottomRight);
     }
 

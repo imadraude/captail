@@ -20,6 +20,7 @@ $screenshots = @(
     "captail-main.png",
     "captail-settings-video.png",
     "captail-settings-audio.png",
+    "captail-audio-routing.png",
     "captail-player.png",
     "captail-editor.png"
 )
