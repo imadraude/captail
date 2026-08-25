@@ -38,6 +38,7 @@ internal static class Program
             Run("audio process group priority", AudioProcessGroupPriority);
             Run("audio route view refresh stability", AudioRouteViewRefreshStability);
             Run("process icon loading and caching", ProcessIconLoadingAndCaching);
+            Run("replay audio labels come from file metadata", ReplayAudioLabelsComeFromMetadata);
             Console.WriteLine($"PASS {_passed} process audio foundation tests");
             return 0;
         }
@@ -187,7 +188,8 @@ internal static class Program
             "chat.exe",
             "Chat",
             isSelected: false,
-            track: 1);
+            track: 1,
+            captureEnabled: true);
         item.UpdateSession(process);
         Equal(2, item.GroupOrder);
         item.UpdateSession(audio);
@@ -204,7 +206,8 @@ internal static class Program
             "chat.exe",
             "Chat",
             isSelected: false,
-            track: 1);
+            track: 1,
+            captureEnabled: true);
         var quiet = new ProcessAudioSessionSnapshot(
             "chat.exe",
             "Chat",
@@ -246,6 +249,50 @@ internal static class Program
         Equal(
             null,
             ProcessIconProvider.GetAsync(null).GetAwaiter().GetResult());
+    }
+
+    private static void ReplayAudioLabelsComeFromMetadata()
+    {
+        var advanced = new Config
+        {
+            AudioRoutingMode = "advanced",
+            CaptureMicrophone = true,
+            AdvancedMicrophoneTrack = 1,
+            ProcessAudioRoutes =
+            [
+                new ProcessAudioRoute
+                {
+                    Executable = "kingdomcome.exe",
+                    Track = 2,
+                    Enabled = true,
+                },
+                new ProcessAudioRoute
+                {
+                    Executable = "discord.exe",
+                    Track = 3,
+                    Enabled = false,
+                },
+            ],
+        };
+        Equal("Track 1 - Microphone", ObsReplayEngine.BuildAudioTrackName(advanced, 1));
+        Equal("Track 2 - kingdomcome", ObsReplayEngine.BuildAudioTrackName(advanced, 2));
+        Equal("Track 3", ObsReplayEngine.BuildAudioTrackName(advanced, 3));
+
+        Equal(
+            "kingdomcome",
+            ClipEditorWindow.AudioLabel(
+                new AudioTrackInfo(2, 1, "aac", "Track 2 - kingdomcome", 2),
+                2));
+        Equal(
+            "Mixed audio",
+            ClipEditorWindow.AudioLabel(
+                new AudioTrackInfo(1, 0, "aac", "Mixed audio", 2),
+                1));
+        Equal(
+            Localization.Format("L.Library.AudioTrackNumber", 1),
+            ClipEditorWindow.AudioLabel(
+                new AudioTrackInfo(1, 0, "aac", "Captail Audio 1", 2),
+                2));
     }
 
     private static void NativeFailureVisibilityAndRecovery()

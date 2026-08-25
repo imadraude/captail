@@ -49,6 +49,7 @@ public partial class ReplayStatusIndicatorWindow : Window
     private uint _lastForegroundProcessId;
     private bool _lastForegroundIsScreenCapture;
     private bool _gameDetected;
+    private bool _firstFrameRendered;
 #if DEBUG
     internal bool AllowCaptureForQa { get; set; }
 #endif
@@ -69,6 +70,7 @@ public partial class ReplayStatusIndicatorWindow : Window
         _transientTimer = new DispatcherTimer();
         _transientTimer.Tick += (_, _) => ResumeAfterTransient();
         SourceInitialized += (_, _) => ConfigureWindow();
+        ContentRendered += (_, _) => CompleteFirstFrame();
         Closing += (_, e) =>
         {
             if (!_allowClose)
@@ -301,15 +303,29 @@ public partial class ReplayStatusIndicatorWindow : Window
         if (previousStyles == 0 && error != 0)
             Log.Write($"Could not make recording indicator click-through: Win32 error {error}.");
 
-#if DEBUG
-        if (!AllowCaptureForQa)
-#endif
-            SetCaptureAffinity(hwnd, WdaExcludeFromCapture);
         PositionOnForegroundMonitor();
+    }
+
+    private void CompleteFirstFrame()
+    {
+        if (_firstFrameRendered)
+            return;
+
+        _firstFrameRendered = true;
+        BeginAnimation(OpacityProperty, null);
+        Opacity = 1;
+        if (_state is ReplayIndicatorState state)
+            ApplyState(state, force: true);
+        InvalidateVisual();
+        UpdateLayout();
+        UpdateCaptureAffinity();
     }
 
     private void UpdateCaptureAffinity()
     {
+        if (!_firstFrameRendered)
+            return;
+
         nint hwnd = new WindowInteropHelper(this).Handle;
         if (hwnd == 0)
             return;

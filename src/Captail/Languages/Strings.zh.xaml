@@ -146,6 +146,7 @@
   <sys:String x:Key="L.Audio.Codec">音频编码格式</sys:String>
   <sys:String x:Key="L.Help.MicBoost">在编码前提高麦克风增益。当音量调到 100% 仍然偏小的时候使用。增益过高也会放大噪声，并可能让大声说话时出现失真。</sys:String>
   <sys:String x:Key="L.Help.AudioTracks">混音音轨在任何设备上都能播放，也最容易分享。独立音轨将游戏/系统音频与麦克风分开保存，便于后期编辑；部分播放器一次只能播放一条音轨。</sys:String>
+  <sys:String x:Key="L.Help.ApplicationAudio">选择 Captail 要录制的应用，并为每个应用分配音轨。未勾选的应用不会被录制。可用音轨数量取决于所选音频编码器。</sys:String>
   <sys:String x:Key="L.Help.AudioCodec">AAC 保存为 MP4，几乎兼容所有播放器和剪辑软件。Opus 效率更高，在较低码率下音质也很好，但使用 MKV 容器，可能需要较新的剪辑软件。</sys:String>
 
   <sys:String x:Key="L.Storage.ReplayFolder">回放文件夹</sys:String>

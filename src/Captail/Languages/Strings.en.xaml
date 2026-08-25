@@ -146,6 +146,7 @@
   <sys:String x:Key="L.Audio.Codec">Audio codec</sys:String>
   <sys:String x:Key="L.Help.MicBoost">Raises microphone gain before encoding. Use it when 100% volume is still quiet. Too much boost also raises noise and can make loud speech distort.</sys:String>
   <sys:String x:Key="L.Help.AudioTracks">Mixed track plays everywhere and is easiest to share. Separate tracks keep game/system audio and microphone independent for editing; some players play only one track at a time.</sys:String>
+  <sys:String x:Key="L.Help.ApplicationAudio">Choose which apps Captail records and assign each one to a track. Unchecked apps are excluded. Available track count depends on the selected audio codec.</sys:String>
   <sys:String x:Key="L.Help.AudioCodec">AAC saves as MP4 and works with almost every player and editor. Opus is efficient and sounds good at lower bitrates, but uses MKV and may need a modern editor.</sys:String>
 
   <sys:String x:Key="L.Storage.ReplayFolder">Replay folder</sys:String>

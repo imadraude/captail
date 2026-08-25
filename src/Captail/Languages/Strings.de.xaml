@@ -143,6 +143,7 @@
   <sys:String x:Key="L.Audio.Codec">Audio-Codec</sys:String>
   <sys:String x:Key="L.Help.MicBoost">Erhöht die Mikrofonverstärkung vor der Kodierung. Verwenden Sie es, wenn 100 % Lautstärke noch leise ist. Eine zu starke Anhebung erhöht auch das Rauschen und kann zu Verzerrungen bei lauter Sprache führen.</sys:String>
   <sys:String x:Key="L.Help.AudioTracks">Eine gemischte Spur funktioniert überall und lässt sich am einfachsten teilen. Separate Spuren halten Spiel-/System-Audio und Mikrofon für die Bearbeitung getrennt; manche Player geben jeweils nur eine Spur wieder.</sys:String>
+  <sys:String x:Key="L.Help.ApplicationAudio">Wähle, welche Apps Captail aufnimmt, und weise jeder eine Spur zu. Nicht markierte Apps werden ausgeschlossen. Die verfügbare Spuranzahl hängt vom gewählten Audio-Codec ab.</sys:String>
   <sys:String x:Key="L.Help.AudioCodec">AAC speichert als MP4 und funktioniert mit fast jedem Player und Editor. Opus ist effizient und klingt bei niedrigeren Bitraten gut, verwendet jedoch MKV und benötigt möglicherweise einen modernen Editor.</sys:String>
 
   <sys:String x:Key="L.Storage.ReplayFolder">Replay-Ordner</sys:String>

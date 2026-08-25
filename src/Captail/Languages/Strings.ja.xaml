@@ -143,6 +143,7 @@
   <sys:String x:Key="L.Audio.Codec">オーディオコーデック</sys:String>
   <sys:String x:Key="L.Help.MicBoost">エンコード前にマイクゲインを上げます。音量を 100% にしても静かなときに使用してください。ブーストが多すぎるとノイズが発生し、大音量の音声が歪む可能性があります。</sys:String>
   <sys:String x:Key="L.Help.AudioTracks">ミックストラックはどこでも再生され、共有するのが最も簡単です。個別のトラックでは、ゲーム/システム オーディオとマイクを独立して編集できます。一部のプレーヤーは一度に 1 つのトラックだけを再生します。</sys:String>
+  <sys:String x:Key="L.Help.ApplicationAudio">Captail で録音するアプリを選び、それぞれにトラックを割り当てます。未選択のアプリは録音されません。利用できるトラック数は選択した音声コーデックによって変わります。</sys:String>
   <sys:String x:Key="L.Help.AudioCodec">AAC は MP4 として保存され、ほぼすべてのプレーヤーやエディターで動作します。 Opus は効率的で、低ビットレートでも優れたサウンドを実現しますが、MKV を使用するため、最新のエディタが必要になる場合があります。</sys:String>
 
   <sys:String x:Key="L.Storage.ReplayFolder">リプレイフォルダー</sys:String>

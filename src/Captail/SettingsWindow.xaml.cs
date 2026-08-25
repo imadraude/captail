@@ -21,6 +21,7 @@ public partial class SettingsWindow : Window
     private readonly Action _saveReplay;
     private readonly Func<bool, Task<bool>> _setReplayEnabled;
     private readonly Func<bool, bool, string, string, Task<bool>> _setAudioSources;
+    private readonly Func<string?, bool, Task<bool>> _setAdvancedAudioSourceEnabled;
     private readonly Func<Config, bool, Task<bool>> _applySettings;
     private readonly Func<bool, CancellationToken, Task<UpdateRelease?>>
         _checkForUpdates;
@@ -61,6 +62,11 @@ public partial class SettingsWindow : Window
     private readonly AdvancedProcessAudioAvailability _processAudioAvailability;
     private List<ProcessAudioRoute> _pendingProcessAudioRoutes;
     private int _pendingAdvancedMicrophoneTrack;
+    private readonly Dictionary<string, ToggleButton> _dashboardAudioButtons =
+        new(StringComparer.OrdinalIgnoreCase);
+    private string _dashboardAudioSignature = "";
+    private bool? _dashboardAdvancedAudio;
+    private int _dashboardAudioBuildVersion;
 
     public bool Applied { get; private set; }
 
@@ -70,6 +76,7 @@ public partial class SettingsWindow : Window
         Action saveReplay,
         Func<bool, Task<bool>> setReplayEnabled,
         Func<bool, bool, string, string, Task<bool>> setAudioSources,
+        Func<string?, bool, Task<bool>> setAdvancedAudioSourceEnabled,
         Func<Config, bool, Task<bool>> applySettings,
         EncoderCapabilities capabilities,
         AdvancedProcessAudioAvailability processAudioAvailability,
@@ -84,6 +91,7 @@ public partial class SettingsWindow : Window
         _saveReplay = saveReplay;
         _setReplayEnabled = setReplayEnabled;
         _setAudioSources = setAudioSources;
+        _setAdvancedAudioSourceEnabled = setAdvancedAudioSourceEnabled;
         _applySettings = applySettings;
         _capabilities = capabilities;
         _processAudioAvailability = processAudioAvailability;
@@ -456,7 +464,7 @@ public partial class SettingsWindow : Window
                     ? "L.Audio.GameSound"
                     : "L.Audio.SystemSound");
         bool hasPrimaryAudio = advancedAudio
-            ? _config.ProcessAudioRoutes.Count > 0
+            ? _config.ProcessAudioRoutes.Any(route => route.Enabled)
             : _config.CaptureSystemAudio;
         string audio = (hasPrimaryAudio, _config.CaptureMicrophone) switch
         {
@@ -499,6 +507,7 @@ public partial class SettingsWindow : Window
         SystemSourceChip.IsEnabled = !advancedAudio && _actionInProgress == 0;
         SystemSourceDot.Fill = FindBrush(hasPrimaryAudio ? "AccentBrush" : "TextMutedBrush");
         MicSourceDot.Fill = FindBrush(_config.CaptureMicrophone ? "AccentBrush" : "TextMutedBrush");
+        UpdateDashboardAudioSources(advancedAudio);
 
         string codec = FormatCodec(activeCodec ?? _config.Codec);
         CodecSummaryText.Text = $"{codec} · {FormatResolution(_config.RecordingResolution)}";
@@ -511,6 +520,286 @@ public partial class SettingsWindow : Window
                     : _config.BufferSeconds));
         HotkeySummaryText.Text = _config.Hotkey;
         OutputFolderSummaryText.Text = _config.OutputDirectory;
+    }
+
+    private void UpdateDashboardAudioSources(bool advancedAudio)
+    {
+        SwitchDashboardAudioMode(advancedAudio);
+        if (!advancedAudio)
+            return;
+
+        string signature = string.Join(
+            "|",
+            _config.ProcessAudioRoutes
+                .OrderBy(route => route.Track)
+                .ThenBy(route => route.Executable, StringComparer.OrdinalIgnoreCase)
+                .Select(route =>
+                    $"{route.Executable}:{route.Track}:{route.Enabled}")) +
+            $"|mic:{_config.AdvancedMicrophoneTrack}:{_config.CaptureMicrophone}";
+        if (!string.Equals(
+                signature,
+                _dashboardAudioSignature,
+                StringComparison.Ordinal))
+        {
+            _dashboardAudioSignature = signature;
+            RebuildDashboardAudioSources();
+        }
+
+        foreach (ProcessAudioRoute route in _config.ProcessAudioRoutes)
+        {
+            if (_dashboardAudioButtons.TryGetValue(route.Executable, out ToggleButton? button))
+            {
+                button.IsChecked = route.Enabled;
+                button.IsEnabled = _actionInProgress == 0;
+            }
+        }
+        if (_dashboardAudioButtons.TryGetValue("@microphone", out ToggleButton? mic))
+        {
+            mic.IsChecked = _config.CaptureMicrophone;
+            mic.IsEnabled = _actionInProgress == 0;
+        }
+    }
+
+    private void SwitchDashboardAudioMode(bool advancedAudio)
+    {
+        if (_dashboardAdvancedAudio == advancedAudio)
+            return;
+        _dashboardAdvancedAudio = advancedAudio;
+
+        FrameworkElement incoming = advancedAudio
+            ? PerAppAudioSourcePanel
+            : SimpleAudioSourcePanel;
+        FrameworkElement outgoing = advancedAudio
+            ? SimpleAudioSourcePanel
+            : PerAppAudioSourcePanel;
+        outgoing.BeginAnimation(OpacityProperty, null);
+        outgoing.Visibility = Visibility.Collapsed;
+        incoming.Visibility = Visibility.Visible;
+        incoming.Opacity = 0;
+        if (incoming.RenderTransform is TranslateTransform translate)
+        {
+            translate.Y = 4;
+            translate.BeginAnimation(
+                TranslateTransform.YProperty,
+                new DoubleAnimation(
+                    4,
+                    0,
+                    TimeSpan.FromMilliseconds(150))
+                {
+                    EasingFunction = new CubicEase
+                    {
+                        EasingMode = EasingMode.EaseOut,
+                    },
+                });
+        }
+        incoming.BeginAnimation(
+            OpacityProperty,
+            new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(130)));
+    }
+
+    private void RebuildDashboardAudioSources()
+    {
+        int buildVersion = ++_dashboardAudioBuildVersion;
+        PerAppAudioSourceItems.Children.Clear();
+        _dashboardAudioButtons.Clear();
+
+        foreach (ProcessAudioRoute route in _config.ProcessAudioRoutes
+                     .OrderBy(route => route.Track)
+                     .ThenBy(route => route.Executable, StringComparer.OrdinalIgnoreCase))
+        {
+            ToggleButton button = CreateDashboardAudioSourceButton(
+                route.Executable,
+                Path.GetFileNameWithoutExtension(route.Executable),
+                route.Track,
+                route.Enabled,
+                microphone: false);
+            _dashboardAudioButtons[route.Executable] = button;
+            PerAppAudioSourceItems.Children.Add(button);
+            _ = LoadDashboardProcessIconAsync(
+                button,
+                route.Executable,
+                buildVersion);
+        }
+
+        ToggleButton microphone = CreateDashboardAudioSourceButton(
+            "@microphone",
+            Localization.Text("L.Audio.Microphone"),
+            _config.AdvancedMicrophoneTrack,
+            _config.CaptureMicrophone,
+            microphone: true);
+        _dashboardAudioButtons["@microphone"] = microphone;
+        PerAppAudioSourceItems.Children.Add(microphone);
+    }
+
+    private ToggleButton CreateDashboardAudioSourceButton(
+        string key,
+        string displayName,
+        int track,
+        bool enabled,
+        bool microphone)
+    {
+        var content = new Grid { Width = 24, Height = 24 };
+        if (microphone)
+        {
+            content.Children.Add(new System.Windows.Shapes.Path
+            {
+                Data = (Geometry)FindResource("IconMic"),
+                Stroke = FindBrush("AccentBrush"),
+                StrokeThickness = 1.8,
+                Width = 17,
+                Height = 17,
+                Stretch = Stretch.Uniform,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+            });
+        }
+        else
+        {
+            content.Children.Add(new TextBlock
+            {
+                Text = BuildDashboardAudioInitials(displayName),
+                Foreground = FindBrush("AccentBrush"),
+                FontSize = 10.5,
+                FontWeight = FontWeights.ExtraBold,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+            });
+        }
+
+        var button = new ToggleButton
+        {
+            Style = (Style)FindResource("PerAppSourceChip"),
+            IsChecked = enabled,
+            Tag = new DashboardAudioSource(key, microphone),
+            ToolTip = $"{displayName} · " + Localization.Format(
+                "L.AdvancedAudio.TrackFormat",
+                track),
+            Content = content,
+        };
+        button.Click += PerAppAudioSource_Click;
+        return button;
+    }
+
+    private async Task LoadDashboardProcessIconAsync(
+        ToggleButton button,
+        string executable,
+        int buildVersion)
+    {
+        string? path = await Task.Run(() => FindRunningExecutablePath(executable));
+        ImageSource? icon = await ProcessIconProvider.GetAsync(path);
+        if (icon is null || buildVersion != _dashboardAudioBuildVersion ||
+            button.Content is not Grid content)
+        {
+            return;
+        }
+
+        content.Children.Clear();
+        content.Children.Add(new Image
+        {
+            Source = icon,
+            Width = 23,
+            Height = 23,
+            Stretch = Stretch.Uniform,
+            SnapsToDevicePixels = true,
+        });
+    }
+
+    private static string? FindRunningExecutablePath(string executable)
+    {
+        string processName = Path.GetFileNameWithoutExtension(executable);
+        foreach (Process process in Process.GetProcessesByName(processName))
+        {
+            using (process)
+            {
+                try
+                {
+                    string? path = process.MainModule?.FileName;
+                    if (!string.IsNullOrWhiteSpace(path))
+                        return path;
+                }
+                catch (Exception exception) when (
+                    exception is Win32Exception or InvalidOperationException or
+                        NotSupportedException)
+                {
+                    // Protected or already exited process; try another instance.
+                }
+            }
+        }
+        return null;
+    }
+
+    private static string BuildDashboardAudioInitials(string displayName)
+    {
+        string normalized = displayName.Trim();
+        if (normalized.Length == 0)
+            return "?";
+        return normalized.Length == 1
+            ? normalized.ToUpperInvariant()
+            : normalized[..2].ToUpperInvariant();
+    }
+
+    private async void PerAppAudioSource_Click(object sender, RoutedEventArgs e)
+    {
+        if (_updatingUi || sender is not ToggleButton button ||
+            button.Tag is not DashboardAudioSource source)
+        {
+            return;
+        }
+        if (!TryBeginAction())
+        {
+            UpdateRuntimeState(_runtimeActive);
+            return;
+        }
+
+        try
+        {
+            bool applied = await _setAdvancedAudioSourceEnabled(
+                source.Microphone ? null : source.Key,
+                button.IsChecked == true);
+            if (applied)
+            {
+                if (source.Microphone)
+                {
+                    _updatingUi = true;
+                    MicBox.IsChecked = _config.CaptureMicrophone;
+                    _updatingUi = false;
+                }
+                else
+                {
+                    ProcessAudioRoute? current = _config.ProcessAudioRoutes
+                        .FirstOrDefault(route => string.Equals(
+                            route.Executable,
+                            source.Key,
+                            StringComparison.OrdinalIgnoreCase));
+                    ProcessAudioRoute? pending = _pendingProcessAudioRoutes
+                        .FirstOrDefault(route => string.Equals(
+                            route.Executable,
+                            source.Key,
+                            StringComparison.OrdinalIgnoreCase));
+                    if (current is not null && pending is not null)
+                        pending.Enabled = current.Enabled;
+                }
+                RefreshSettingsDirtyState();
+            }
+            UpdateRuntimeState(_runtimeActive);
+            AnimatePress(button);
+            if (!applied)
+            {
+                ShowError(
+                    Localization.Text("L.Error.SourceTitle"),
+                    Localization.Text("L.Error.AudioSourceMessage"));
+            }
+        }
+        catch (Exception exception)
+        {
+            HandleUiActionError("Advanced audio source toggle", exception);
+            UpdateRuntimeState(_runtimeActive);
+        }
+        finally
+        {
+            EndAction();
+            UpdateDashboardAudioSources(advancedAudio: true);
+        }
     }
 
     public void UpdateRecoveryState(string detail)
@@ -791,6 +1080,7 @@ public partial class SettingsWindow : Window
             {
                 Executable = route.Executable,
                 Track = route.Track,
+                Enabled = route.Enabled,
             })
             .OrderBy(route => route.Executable, StringComparer.OrdinalIgnoreCase)
             .ToList();
@@ -804,6 +1094,7 @@ public partial class SettingsWindow : Window
         return leftRoutes.Length == rightRoutes.Length &&
                leftRoutes.Zip(rightRoutes).All(pair =>
                    pair.First.Track == pair.Second.Track &&
+                   pair.First.Enabled == pair.Second.Enabled &&
                    string.Equals(
                        pair.First.Executable,
                        pair.Second.Executable,
@@ -1555,6 +1846,24 @@ public partial class SettingsWindow : Window
         }
     }
 
+    private void Window_Deactivated(object? sender, EventArgs e)
+    {
+        if (AboutPopup.IsOpen)
+            AboutPopup.IsOpen = false;
+    }
+
+    private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (!AboutPopup.IsOpen ||
+            FindAncestor<ToggleButton>(e.OriginalSource as DependencyObject) ==
+                AboutButton)
+        {
+            return;
+        }
+
+        AboutPopup.IsOpen = false;
+    }
+
     private void UpdateAudioDeviceState()
     {
         bool game = GetSelectedTag(CaptureSourceBox, "desktop") == "game";
@@ -1933,6 +2242,8 @@ public partial class SettingsWindow : Window
         ReplayToggle.IsEnabled = false;
         SystemSourceChip.IsEnabled = false;
         MicSourceChip.IsEnabled = false;
+        foreach (ToggleButton button in _dashboardAudioButtons.Values)
+            button.IsEnabled = false;
         SettingsReplayToggle.IsEnabled = false;
         DoneButton.IsEnabled = false;
         CancelSettingsButton.IsEnabled = false;
@@ -1948,6 +2259,8 @@ public partial class SettingsWindow : Window
             "advanced",
             StringComparison.OrdinalIgnoreCase);
         MicSourceChip.IsEnabled = true;
+        foreach (ToggleButton button in _dashboardAudioButtons.Values)
+            button.IsEnabled = true;
         SettingsReplayToggle.IsEnabled = true;
         DoneButton.IsEnabled = true;
         CancelSettingsButton.IsEnabled = true;
@@ -2527,6 +2840,8 @@ public partial class SettingsWindow : Window
         string Duration,
         BitmapImage? Thumbnail,
         bool CanTrim);
+
+    private sealed record DashboardAudioSource(string Key, bool Microphone);
 
     private Brush FindBrush(string key) => (Brush)FindResource(key);
 }

@@ -143,6 +143,7 @@
   <sys:String x:Key="L.Audio.Codec">Kodek audio</sys:String>
   <sys:String x:Key="L.Help.MicBoost">Zwiększa wzmocnienie mikrofonu przed kodowaniem. Użyj go, gdy głośność 100% jest nadal cicha. Zbyt duże wzmocnienie zwiększa również hałas i może powodować zniekształcenie głośnej mowy.</sys:String>
   <sys:String x:Key="L.Help.AudioTracks">Mieszana ścieżka działa wszędzie i najłatwiej ją udostępnić. Oddzielne ścieżki zachowują niezależny dźwięk gry/systemu i mikrofonu do edycji; niektóre odtwarzacze odtwarzają tylko jedną ścieżkę naraz.</sys:String>
+  <sys:String x:Key="L.Help.ApplicationAudio">Wybierz aplikacje nagrywane przez Captail i przypisz każdą do ścieżki. Niezaznaczone aplikacje są pomijane. Liczba dostępnych ścieżek zależy od wybranego kodeka audio.</sys:String>
   <sys:String x:Key="L.Help.AudioCodec">AAC zapisuje jako MP4 i współpracuje z prawie każdym odtwarzaczem i edytorem. Opus jest wydajny i brzmi dobrze przy niższych przepływnościach, ale używa MKV i może wymagać nowoczesnego edytora.</sys:String>
 
   <sys:String x:Key="L.Storage.ReplayFolder">Folder powtórek</sys:String>

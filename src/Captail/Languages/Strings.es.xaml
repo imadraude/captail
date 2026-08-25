@@ -143,6 +143,7 @@
   <sys:String x:Key="L.Audio.Codec">Códec de audio</sys:String>
   <sys:String x:Key="L.Help.MicBoost">Aumenta la ganancia del micrófono antes de codificar. Úselo cuando el volumen al 100% aún esté en silencio. Demasiado impulso también genera ruido y puede distorsionar el habla alta.</sys:String>
   <sys:String x:Key="L.Help.AudioTracks">La pista mixta funciona en todas partes y es la más fácil de compartir. Las pistas separadas mantienen independientes el audio del juego/sistema y el micrófono para editar; algunos reproductores solo reproducen una pista a la vez.</sys:String>
+  <sys:String x:Key="L.Help.ApplicationAudio">Elige qué aplicaciones graba Captail y asigna cada una a una pista. Las aplicaciones no marcadas se excluyen. El número de pistas depende del códec de audio seleccionado.</sys:String>
   <sys:String x:Key="L.Help.AudioCodec">AAC guarda como MP4 y funciona con casi todos los reproductores y editores. Opus es eficiente y suena bien a velocidades de bits más bajas, pero usa MKV y puede necesitar un editor moderno.</sys:String>
 
   <sys:String x:Key="L.Storage.ReplayFolder">Carpeta de repeticiones</sys:String>

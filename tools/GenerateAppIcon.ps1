@@ -1,12 +1,19 @@
 param(
-    [string]$OutputPath = (Join-Path $PSScriptRoot '..\src\Captail\Assets\Captail.ico')
+    [string]$OutputPath = (Join-Path $PSScriptRoot '..\src\Captail\Assets\Captail.ico'),
+    [string]$Color = '#45C9A7'
 )
 
 $ErrorActionPreference = 'Stop'
-Add-Type -AssemblyName System.Drawing.Common
+try {
+    Add-Type -AssemblyName System.Drawing.Common
+}
+catch {
+    Add-Type -AssemblyName System.Drawing
+}
 
 $sizes = @(16, 20, 24, 32, 40, 48, 64, 128, 256)
 $pngImages = [System.Collections.Generic.List[byte[]]]::new()
+$iconColor = [System.Drawing.ColorTranslator]::FromHtml($Color)
 
 foreach ($size in $sizes) {
     $bitmap = [System.Drawing.Bitmap]::new($size, $size, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
@@ -16,9 +23,8 @@ foreach ($size in $sizes) {
         $graphics.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
         $graphics.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality
 
-        $mint = [System.Drawing.Color]::FromArgb(255, 69, 201, 167)
         $ringWidth = [single][Math]::Max(1.7, $size * 0.108)
-        $ringPen = [System.Drawing.Pen]::new($mint, $ringWidth)
+        $ringPen = [System.Drawing.Pen]::new($iconColor, $ringWidth)
         $ringPen.StartCap = [System.Drawing.Drawing2D.LineCap]::Round
         $ringPen.EndCap = [System.Drawing.Drawing2D.LineCap]::Round
         try {
@@ -31,7 +37,7 @@ foreach ($size in $sizes) {
         }
 
         $dotSize = [single][Math]::Max(2.2, $size * 0.145)
-        $dotBrush = [System.Drawing.SolidBrush]::new($mint)
+        $dotBrush = [System.Drawing.SolidBrush]::new($iconColor)
         try {
             $dotOffset = [single](($size - $dotSize) / 2)
             $graphics.FillEllipse($dotBrush, $dotOffset, $dotOffset, $dotSize, $dotSize)

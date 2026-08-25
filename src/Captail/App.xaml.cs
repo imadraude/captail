@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.IO.Pipes;
+using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,6 +21,7 @@ public partial class App : Application
     private string _boundHotkey = "";
     private string _boundToggleHotkey = "";
     private TaskbarIcon? _tray;
+    private bool? _trayActiveState;
     private MenuItem? _saveMenuItem;
     private MenuItem? _toggleMenuItem;
     private MenuItem? _openFolderMenuItem;
@@ -70,6 +72,7 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        ConfigureShellIdentity();
 
         try
         {
@@ -134,6 +137,9 @@ public partial class App : Application
             bool audioRoutingUiTest = e.Args.Contains(
                 "--qa-audio-routing-ui",
                 StringComparer.OrdinalIgnoreCase);
+            bool replayToggleTest = e.Args.Contains(
+                "--qa-replay-toggle",
+                StringComparer.OrdinalIgnoreCase);
             string? clipEditorTestPath = e.Args
                 .FirstOrDefault(argument => argument.StartsWith(
                     "--qa-clip-editor=",
@@ -188,6 +194,7 @@ public partial class App : Application
             const bool previewGeometryTest = false;
             const bool trimOverwriteTest = false;
             const bool audioRoutingUiTest = false;
+            const bool replayToggleTest = false;
 #endif
             bool backgroundLaunch = e.Args.Contains(
                     "--background",
@@ -205,7 +212,7 @@ public partial class App : Application
                     clipEditorTest || replayPlayerTest || audioMixTest || previewGeometryTest ||
                     fileRetryTest || trimOverwriteTest ||
                     automaticCapturePolicyTest || replayRoutingTest ||
-                    localizationTest || audioRoutingUiTest))
+                    localizationTest || audioRoutingUiTest || replayToggleTest))
             {
                 Shutdown();
                 return;
@@ -320,6 +327,11 @@ public partial class App : Application
             if (trimOverwriteTest)
             {
                 await RunTrimOverwriteTestAsync(trimOverwriteTestPath!);
+                return;
+            }
+            if (replayToggleTest)
+            {
+                await RunReplayToggleTestAsync();
                 return;
             }
 #endif
@@ -700,6 +712,9 @@ public partial class App : Application
         string destination = Path.Combine(
             Path.GetTempPath(),
             $"captail_audio_mix_{Guid.NewGuid():N}{Path.GetExtension(fullPath)}");
+        string selectedDestination = Path.Combine(
+            Path.GetTempPath(),
+            $"captail_audio_selected_{Guid.NewGuid():N}{Path.GetExtension(fullPath)}");
         try
         {
             var ffmpeg = new FfmpegAdapter();
@@ -722,7 +737,18 @@ public partial class App : Application
             IReadOnlyList<AudioTrackInfo> mixedTracks =
                 await ffmpeg.ReadAudioTracksAsync(destination);
             VideoStreamInfo? mixedVideo = await ffmpeg.ReadVideoInfoAsync(destination);
+            AudioTrackInfo selectedSource = sourceTracks[^1];
+            await ffmpeg.TrimCopyAsync(
+                fullPath,
+                selectedDestination,
+                TimeSpan.Zero,
+                duration,
+                [selectedSource.StreamIndex],
+                mergeAudioTracks: false);
+            IReadOnlyList<AudioTrackInfo> selectedTracks =
+                await ffmpeg.ReadAudioTracksAsync(selectedDestination);
             bool passed = mixedTracks.Count == 1 &&
+                selectedTracks.Count == 1 &&
                 mixedVideo is not null &&
                 mixedVideo.Codec.Equals(
                     sourceVideo.Codec,
@@ -732,6 +758,7 @@ public partial class App : Application
             Log.Write(
                 $"AUDIO_MIX_TEST {(passed ? "PASS" : "FAIL")}: " +
                 $"sourceTracks={sourceTracks.Count}, mixedTracks={mixedTracks.Count}, " +
+                $"selectedTracks={selectedTracks.Count}, " +
                 $"video={sourceVideo.Codec}/{mixedVideo?.Codec} " +
                 $"{sourceVideo.Width}x{sourceVideo.Height}/" +
                 $"{mixedVideo?.Width}x{mixedVideo?.Height}");
@@ -748,6 +775,8 @@ public partial class App : Application
             {
                 if (File.Exists(destination))
                     File.Delete(destination);
+                if (File.Exists(selectedDestination))
+                    File.Delete(selectedDestination);
             }
             catch (Exception exception)
             {
@@ -1572,10 +1601,10 @@ public partial class App : Application
             _capabilities = engine.Capabilities;
             _processAudioAvailability = engine.ProcessAudioAvailability;
             if (string.Equals(
-                    _config.AudioRoutingMode,
-                    "advanced",
-                    StringComparison.OrdinalIgnoreCase) &&
-                _config.ProcessAudioRoutes.Count > 0)
+                _config.AudioRoutingMode,
+                "advanced",
+                StringComparison.OrdinalIgnoreCase) &&
+                _config.ProcessAudioRoutes.Any(route => route.Enabled))
             {
                 _processAudioMonitor = new ProcessAudioMonitor(
                     ProcessSnapshot.Capture,
@@ -1668,6 +1697,37 @@ public partial class App : Application
         _processAudioMonitor = null;
         if (monitor is not null)
             await monitor.DisposeAsync();
+    }
+
+    private async Task RunReplayToggleTestAsync()
+    {
+        Config original = _config!.Clone();
+        try
+        {
+            CreateTrayIcon();
+            for (int cycle = 1; cycle <= 2; cycle++)
+            {
+                bool started = await SetReplayEnabledGuardedAsync(true);
+                if (!started)
+                    throw new InvalidOperationException($"Cycle {cycle} did not start replay.");
+                await Task.Delay(350);
+                bool stopped = await SetReplayEnabledGuardedAsync(false);
+                if (stopped || IsReplayRunning)
+                    throw new InvalidOperationException($"Cycle {cycle} did not stop replay.");
+            }
+            Log.Write("REPLAY_TOGGLE_TEST PASS: cycles=2");
+            Shutdown(0);
+        }
+        catch (Exception exception)
+        {
+            Log.Write($"REPLAY_TOGGLE_TEST FAIL: {exception}");
+            Shutdown(24);
+        }
+        finally
+        {
+            _config.CopyFrom(original);
+            _config.Save();
+        }
     }
 
     private void OnProcessAudioMonitorEvent(ProcessAudioMonitorEvent status)
@@ -2051,12 +2111,16 @@ public partial class App : Application
 
         _tray = new TaskbarIcon
         {
-            Icon = CreateIcon(),
+            Icon = CreateIcon("CaptailInactive.ico"),
             ToolTipText = Localization.Text("L.Brand"),
             ContextMenu = menu,
             DoubleClickCommand = new ActionCommand(OpenSettings),
         };
-        _tray.ForceCreate();
+        _trayActiveState = false;
+        // Captail performs continuous real-time capture. H.NotifyIcon enables
+        // Windows Efficiency Mode by default, which can throttle WPF rendering
+        // after background sign-in and leave shell surfaces stale.
+        _tray.ForceCreate(enablesEfficiencyMode: false);
         UpdateUiState();
     }
 
@@ -2112,6 +2176,7 @@ public partial class App : Application
             SaveReplay,
             SetReplayEnabledAsync,
             SetAudioSourcesAsync,
+            SetAdvancedAudioSourceEnabledAsync,
             ApplySettingsAsync,
             capabilities,
             _processAudioAvailability,
@@ -2393,6 +2458,71 @@ public partial class App : Application
         }
     }
 
+    private async Task<bool> SetAdvancedAudioSourceEnabledAsync(
+        string? executable,
+        bool enabled)
+    {
+        await _pipelineGate.WaitAsync();
+        Config previous = _config!.Clone();
+        bool wasRunning = IsReplayRunning;
+        try
+        {
+            if (string.IsNullOrWhiteSpace(executable))
+            {
+                if (_config.CaptureMicrophone == enabled)
+                    return true;
+                _config.CaptureMicrophone = enabled;
+            }
+            else
+            {
+                ProcessAudioRoute? route = _config.ProcessAudioRoutes
+                    .FirstOrDefault(candidate => string.Equals(
+                        candidate.Executable,
+                        executable,
+                        StringComparison.OrdinalIgnoreCase));
+                if (route is null)
+                    return false;
+                if (route.Enabled == enabled)
+                    return true;
+                route.Enabled = enabled;
+            }
+
+            _config.Normalize();
+            if (!wasRunning)
+            {
+                _config.Save();
+                UpdateUiState();
+                return true;
+            }
+
+            await StopPipelineCoreAsync();
+            if (await TryStartPipelineCoreAsync(showError: true))
+            {
+                _config.Save();
+                UpdateUiState();
+                return true;
+            }
+            throw new InvalidOperationException(
+                Localization.Text("L.Error.AudioSourceMessage"));
+        }
+        catch (Exception exception)
+        {
+            Log.Write($"Advanced audio source toggle failed; rolling back: {exception}");
+            if (IsReplayRunning)
+                await StopPipelineCoreAsync();
+            _config.CopyFrom(previous);
+            SaveRollbackConfig("advanced audio source toggle");
+            if (wasRunning)
+                await TryStartPipelineCoreAsync(showError: false);
+            UpdateUiState();
+            return false;
+        }
+        finally
+        {
+            _pipelineGate.Release();
+        }
+    }
+
     private async Task<bool> ApplySettingsAsync(
         Config candidate,
         bool autostartEnabled)
@@ -2549,6 +2679,12 @@ public partial class App : Application
             availableReplaySeconds);
         if (_tray is not null)
         {
+            if (_trayActiveState != active)
+            {
+                _tray.Icon = CreateIcon(
+                    active ? "Captail.ico" : "CaptailInactive.ico");
+                _trayActiveState = active;
+            }
             _tray.ToolTipText = active
                 ? Localization.Format(
                     "L.Tray.Active",
@@ -2937,13 +3073,31 @@ public partial class App : Application
             seconds < 60 ? "L.Unit.Seconds" : "L.Unit.Minutes",
             seconds < 60 ? seconds : seconds / 60);
 
-    private static Icon CreateIcon()
+    private static Icon CreateIcon(string assetName)
     {
         using Stream stream = GetResourceStream(
-            new Uri("Assets/Captail.ico", UriKind.Relative)).Stream;
+            new Uri($"Assets/{assetName}", UriKind.Relative)).Stream;
         using var icon = new Icon(stream);
         return (Icon)icon.Clone();
     }
+
+    private static void ConfigureShellIdentity()
+    {
+        if (AppDistribution.IsMicrosoftStore)
+            return;
+
+        int result = SetCurrentProcessExplicitAppUserModelID(
+            "FaulMit.Captail.Portable");
+        if (result != 0)
+        {
+            Log.Write(
+                $"Could not set portable shell identity: HRESULT 0x{result:X8}.");
+        }
+    }
+
+    [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
+    private static extern int SetCurrentProcessExplicitAppUserModelID(
+        string appId);
 
     private Task RunOnObsThreadAsync(Action action) =>
         Task.Factory.StartNew(
@@ -3026,6 +3180,8 @@ public partial class App : Application
         _settingsWindow?.Close();
         _hotkeys?.Dispose();
         _tray?.Dispose();
+        _tray = null;
+        _trayActiveState = null;
         bool gateHeld = false;
         try
         {

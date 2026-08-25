@@ -15,7 +15,7 @@
     <RootNamespace>Captail</RootNamespace>
     <ApplicationIcon>Assets\Captail.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>0.2.1</Version>
+    <Version>0.2.2</Version>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <DefineConstants Condition="'$(MicrosoftStoreBuild)' == 'true'">$(DefineConstants);MICROSOFT_STORE</DefineConstants>
   </PropertyGroup>
@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <Resource Include="Assets\Captail.ico" />
+    <Resource Include="Assets\CaptailInactive.ico" />
     <Content Include="..\..\LICENSE" Link="LICENSE">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

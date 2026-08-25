@@ -70,8 +70,10 @@ public partial class OverlayNotificationWindow : Window
         TitleText.Text = title;
         DetailText.Text = detail;
 
-        Left = SystemParameters.WorkArea.Right - Width - 24;
-        Top = SystemParameters.WorkArea.Top + 24;
+        // Card keeps 12 px of transparent room for its shadow. Position the
+        // visible card, rather than the layered window, 24 px from the edge.
+        Left = SystemParameters.WorkArea.Right - Width - 12;
+        Top = SystemParameters.WorkArea.Top + 12;
         _hideTimer.Stop();
         _hideTimer.Interval = TimeSpan.FromMilliseconds(durationMilliseconds);
         _hideTimer.Start();

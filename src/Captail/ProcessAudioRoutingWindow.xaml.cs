@@ -41,7 +41,8 @@ public partial class ProcessAudioRoutingWindow : Window
                 route.Executable,
                 Path.GetFileNameWithoutExtension(route.Executable),
                 isSelected: true,
-                Math.Clamp(route.Track, 1, capabilities.MaxTracks)));
+                Math.Clamp(route.Track, 1, capabilities.MaxTracks),
+                route.Enabled));
         }
 
         ApplicationsView = CollectionViewSource.GetDefaultView(_applications);
@@ -125,7 +126,8 @@ public partial class ProcessAudioRoutingWindow : Window
                     session.Executable,
                     session.DisplayName,
                     isSelected: false,
-                    NextDefaultTrack());
+                    NextDefaultTrack(),
+                    captureEnabled: true);
                 AddApplication(item);
                 refreshView = true;
             }
@@ -285,6 +287,7 @@ public partial class ProcessAudioRoutingWindow : Window
             {
                 Executable = item.Executable,
                 Track = item.Track,
+                Enabled = item.CaptureEnabled,
             })
             .OrderBy(route => route.Executable, StringComparer.OrdinalIgnoreCase)
             .ToArray();
@@ -341,6 +344,7 @@ internal sealed class ProcessAudioRouteItem : INotifyPropertyChanged
     private bool _isRunning;
     private bool _isActive;
     private bool _hasAudioSession;
+    private bool _captureEnabled;
     private int _processCount;
     private ImageSource? _icon;
     private string? _iconPath;
@@ -349,7 +353,8 @@ internal sealed class ProcessAudioRouteItem : INotifyPropertyChanged
         string executable,
         string displayName,
         bool isSelected,
-        int track)
+        int track,
+        bool captureEnabled)
     {
         Executable = executable;
         _displayName = string.IsNullOrWhiteSpace(displayName)
@@ -357,6 +362,7 @@ internal sealed class ProcessAudioRouteItem : INotifyPropertyChanged
             : displayName;
         _isSelected = isSelected;
         _track = track;
+        _captureEnabled = captureEnabled;
     }
 
     internal event Action<ProcessAudioRouteItem>? Changed;
@@ -391,10 +397,17 @@ internal sealed class ProcessAudioRouteItem : INotifyPropertyChanged
         {
             if (!SetField(ref _isSelected, value))
                 return;
+            if (value)
+                CaptureEnabled = true;
             OnPropertyChanged(nameof(GroupName));
             OnPropertyChanged(nameof(GroupOrder));
             Changed?.Invoke(this);
         }
+    }
+    public bool CaptureEnabled
+    {
+        get => _captureEnabled;
+        private set => SetField(ref _captureEnabled, value);
     }
     public int Track
     {

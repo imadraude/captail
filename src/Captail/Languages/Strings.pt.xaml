@@ -143,6 +143,7 @@
   <sys:String x:Key="L.Audio.Codec">Codec de áudio</sys:String>
   <sys:String x:Key="L.Help.MicBoost">Aumenta o ganho do microfone antes da codificação. Use-o quando o volume 100% ainda estiver baixo. Muito aumento também aumenta o ruído e pode distorcer a fala alta.</sys:String>
   <sys:String x:Key="L.Help.AudioTracks">A faixa mista funciona em qualquer lugar e é a mais fácil de compartilhar. Faixas separadas mantêm o áudio do jogo/sistema e o microfone independentes para edição; alguns reprodutores tocam apenas uma faixa por vez.</sys:String>
+  <sys:String x:Key="L.Help.ApplicationAudio">Escolha quais aplicativos o Captail grava e atribua cada um a uma faixa. Aplicativos não marcados são excluídos. O número de faixas depende do codec de áudio selecionado.</sys:String>
   <sys:String x:Key="L.Help.AudioCodec">AAC salva como MP4 e funciona com quase todos os reprodutores e editores. Opus é eficiente e soa bem em taxas de bits mais baixas, mas usa MKV e pode precisar de um editor moderno.</sys:String>
 
   <sys:String x:Key="L.Storage.ReplayFolder">Pasta de replays</sys:String>

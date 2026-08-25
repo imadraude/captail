@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Captail"
         Title="{DynamicResource L.Library.TrimTitle}"
-        Icon="Assets/Captail.ico"
+        Icon="pack://application:,,,/Captail;component/Assets/Captail.ico"
         Width="900" Height="790"
         WindowStartupLocation="CenterOwner"
         WindowStyle="None" ResizeMode="NoResize"
@@ -68,7 +68,7 @@
             </Setter>
         </Style>
         <Style x:Key="PlayerShortcutCell" TargetType="Border">
-            <Setter Property="Padding" Value="12,9"/>
+            <Setter Property="Padding" Value="12,7"/>
             <Setter Property="BorderBrush" Value="{StaticResource DividerBrush}"/>
         </Style>
         <Style x:Key="PlayerShortcutBadge" TargetType="Border">
@@ -102,7 +102,7 @@
     </Window.Resources>
     <Border x:Name="WindowChrome" Background="{StaticResource BgWindowGradient}"
             BorderBrush="{StaticResource WindowBorderBrush}" BorderThickness="1"
-            CornerRadius="{StaticResource RadiusWindow}">
+            CornerRadius="0">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition x:Name="HeaderRow" Height="56"/>
@@ -162,10 +162,37 @@
                 </Border>
 
                 <Grid x:Name="NormalPlaybackBar" Grid.Row="1" Margin="1,11,1,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
                     <TextBlock x:Name="PlaybackTimeText" Text="00:00 / 00:00"
                                FontFamily="{StaticResource FontMono}" FontSize="11.5"
                                Foreground="{StaticResource TextSecondaryBrush}"/>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <StackPanel x:Name="EditorTransportControls" Grid.Column="1"
+                                Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Style="{StaticResource ClipActionButton}" Click="Back_Click"
+                                ToolTip="{DynamicResource L.Library.Back5}">
+                            <Path Data="M15 5L8 12l7 7 M8 12h10"
+                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                  StrokeThickness="2" StrokeLineJoin="Round" Stretch="Uniform"/>
+                        </Button>
+                        <Button x:Name="PlayButton" Style="{StaticResource ClipActionButton}"
+                                Click="PlayPause_Click" ToolTip="{DynamicResource L.Library.Play}"
+                                Margin="6,0,0,0" IsEnabled="False">
+                            <Path x:Name="PlayIcon" Data="{StaticResource IconPlay}"
+                                  Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                  Stretch="Uniform"/>
+                        </Button>
+                        <Button Style="{StaticResource ClipActionButton}" Click="Forward_Click"
+                                ToolTip="{DynamicResource L.Library.Forward5}" Margin="6,0,0,0">
+                            <Path Data="M9 5l7 7-7 7 M6 12h10"
+                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                  StrokeThickness="2" StrokeLineJoin="Round" Stretch="Uniform"/>
+                        </Button>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
                         <TextBlock x:Name="RangeDurationText"
                                    FontFamily="{StaticResource FontMono}" FontSize="11.5"
                                    Foreground="{StaticResource TextSecondaryBrush}"
@@ -330,45 +357,67 @@
                     </Grid>
 
                     <Grid Margin="2,5,2,5">
-                        <TextBlock Text="{DynamicResource L.Library.AudioTracks}"
-                                   FontSize="11" FontWeight="Bold"
-                                   Foreground="{StaticResource TextMutedBrush}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{DynamicResource L.Library.AudioTracks}"
+                                       FontSize="11" FontWeight="Bold"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       VerticalAlignment="Center"/>
+                            <Border x:Name="AudioTrackCountBadge" Margin="7,0,0,0"
+                                    MinWidth="24" Height="18" Padding="6,0"
+                                    Background="{StaticResource AccentChipBgBrush}"
+                                    BorderBrush="{StaticResource AccentChipBorderBrush}"
+                                    BorderThickness="1" CornerRadius="6"
+                                    Visibility="Collapsed">
+                                <TextBlock x:Name="AudioTrackCountText" Text="0"
+                                           FontFamily="{StaticResource FontMono}"
+                                           FontSize="10" FontWeight="Bold"
+                                           Foreground="{StaticResource AccentBrush}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                        </StackPanel>
                         <TextBlock Text="{DynamicResource L.Library.AudioTrackHint}"
                                    HorizontalAlignment="Right" FontSize="10.5"
                                    Foreground="{StaticResource TextMutedBrush}"/>
                     </Grid>
-                    <ItemsControl x:Name="AudioTrackRows" ItemsSource="{Binding AudioTracks}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Height="42" Margin="0,0,0,6">
-                                    <Border Background="#FF101518" BorderBrush="{StaticResource DividerBrush}"
-                                            BorderThickness="1" CornerRadius="8" ClipToBounds="True">
-                                        <Grid>
-                                            <Image Source="{Binding Waveform}" Stretch="Fill" Opacity="0.66"/>
-                                            <Border Background="#5A101518"/>
-                                        </Grid>
-                                    </Border>
-                                    <ToggleButton IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                                  Tag="{Binding}" Click="AudioTrackToggle_Click"
-                                                  Style="{StaticResource SourceChip}"
-                                                  HorizontalAlignment="Left" Width="190" Height="34"
-                                                  Margin="4,0,0,0" VerticalAlignment="Center">
-                                        <Grid Width="164">
-                                            <StackPanel Orientation="Horizontal">
-                                                <Ellipse Width="7" Height="7" Fill="{StaticResource AccentBrush}"
-                                                         VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis"
-                                                           MaxWidth="116" VerticalAlignment="Center"/>
-                                            </StackPanel>
-                                            <TextBlock Text="{Binding Codec}" HorizontalAlignment="Right"
-                                                       VerticalAlignment="Center" FontSize="9.5"
-                                                       Foreground="{StaticResource TextMutedBrush}"/>
-                                        </Grid>
-                                    </ToggleButton>
-                                </Grid>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                    <ScrollViewer x:Name="AudioTrackScrollViewer" Height="96" MaxHeight="288"
+                                  VerticalScrollBarVisibility="Disabled"
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  PanningMode="VerticalOnly">
+                        <ItemsControl x:Name="AudioTrackRows" ItemsSource="{Binding AudioTracks}"
+                                      Margin="0,0,4,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Height="42" Margin="0,0,0,6">
+                                        <Border Background="#FF101518" BorderBrush="{StaticResource DividerBrush}"
+                                                BorderThickness="1" CornerRadius="8" ClipToBounds="True">
+                                            <Grid>
+                                                <Image Source="{Binding Waveform}" Stretch="Fill" Opacity="0.66"/>
+                                                <Border Background="#5A101518"/>
+                                            </Grid>
+                                        </Border>
+                                        <ToggleButton IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                      Tag="{Binding}" Click="AudioTrackToggle_Click"
+                                                      Style="{StaticResource SourceChip}"
+                                                      HorizontalAlignment="Left" Width="190" Height="34"
+                                                      Margin="4,0,0,0" VerticalAlignment="Center">
+                                            <Grid Width="164">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Ellipse Width="7" Height="7" Fill="{StaticResource AccentBrush}"
+                                                             VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                    <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis"
+                                                               MaxWidth="116" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                                <TextBlock Text="{Binding Codec}" HorizontalAlignment="Right"
+                                                           VerticalAlignment="Center" FontSize="9.5"
+                                                           Foreground="{StaticResource TextMutedBrush}"/>
+                                            </Grid>
+                                        </ToggleButton>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
                     <TextBlock x:Name="NoAudioText" Text="{DynamicResource L.Library.NoAudio}"
                                Style="{StaticResource SecondaryText}" Margin="2,4,0,7"
                                Visibility="Collapsed"/>
@@ -376,39 +425,20 @@
 
                 <Grid x:Name="EditorActionsPanel" Grid.Row="3" Margin="0,9,0,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="330"/>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0" Orientation="Horizontal">
-                        <Button Style="{StaticResource ClipActionButton}" Click="Back_Click"
-                                ToolTip="{DynamicResource L.Library.Back5}">
-                            <Path Data="M15 5L8 12l7 7 M8 12h10" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                  StrokeThickness="2" StrokeLineJoin="Round" Stretch="Uniform"/>
-                        </Button>
-                        <Button x:Name="PlayButton" Style="{StaticResource ClipActionButton}"
-                                Click="PlayPause_Click" ToolTip="{DynamicResource L.Library.Play}"
-                                Margin="6,0,0,0" IsEnabled="False">
-                            <Path x:Name="PlayIcon" Data="{StaticResource IconPlay}"
-                                  Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                  Stretch="Uniform"/>
-                        </Button>
-                        <Button Style="{StaticResource ClipActionButton}" Click="Forward_Click"
-                                ToolTip="{DynamicResource L.Library.Forward5}" Margin="6,0,0,0">
-                            <Path Data="M9 5l7 7-7 7 M6 12h10" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                  StrokeThickness="2" StrokeLineJoin="Round" Stretch="Uniform"/>
-                        </Button>
-                    </StackPanel>
-                    <StackPanel Grid.Column="1" Margin="14,0" VerticalAlignment="Center">
+                    <StackPanel Grid.Column="0" Margin="2,0,14,0" VerticalAlignment="Center">
                         <TextBlock x:Name="EditorStatusText" Style="{StaticResource SecondaryText}"
-                                   HorizontalAlignment="Right" TextAlignment="Right"
-                                   TextTrimming="CharacterEllipsis" MaxWidth="340" FontSize="10"/>
-                        <TextBlock x:Name="ClipInfoText" HorizontalAlignment="Right"
-                                   TextAlignment="Right" TextTrimming="CharacterEllipsis"
-                                   MaxWidth="340" FontFamily="{StaticResource FontMono}"
+                                   HorizontalAlignment="Left" TextAlignment="Left"
+                                   TextTrimming="CharacterEllipsis" FontSize="10"/>
+                        <TextBlock x:Name="ClipInfoText" HorizontalAlignment="Left"
+                                   TextAlignment="Left" TextTrimming="CharacterEllipsis"
+                                   FontFamily="{StaticResource FontMono}"
                                    FontSize="9.5" Foreground="{StaticResource TextMutedBrush}"/>
                     </StackPanel>
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <StackPanel Grid.Column="1" Orientation="Horizontal"
+                                HorizontalAlignment="Right" ClipToBounds="False">
                         <Button Content="{DynamicResource L.Library.Cancel}" Style="{StaticResource SubtleButton}"
                                 Padding="16,9" Click="Close_Click"/>
                         <Button x:Name="OverwriteButton" Margin="8,0,0,0"
@@ -624,7 +654,7 @@
 
             <Border x:Name="OverwriteConfirmOverlay" Grid.RowSpan="2" Panel.ZIndex="30"
                     Visibility="Collapsed" Background="#C20A0D0F"
-                    CornerRadius="{StaticResource RadiusWindow}">
+                    CornerRadius="0">
                 <Border Width="370" Padding="20" HorizontalAlignment="Center"
                         VerticalAlignment="Center" Style="{StaticResource SettingsGroup}">
                     <StackPanel>
@@ -655,7 +685,7 @@
                   TextOptions.TextFormattingMode="Display">
                 <Border x:Name="SavingBackdrop" Opacity="0"
                         Background="#DC0A0D0F"
-                        CornerRadius="{StaticResource RadiusWindow}"/>
+                        CornerRadius="0"/>
                 <StackPanel Width="260" HorizontalAlignment="Center"
                             VerticalAlignment="Center">
                     <Control Style="{StaticResource LoadingIndicator}"

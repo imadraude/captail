@@ -135,6 +135,16 @@ function Capture-Window {
 
     [NativeMethods]::ShowWindow($handle, 9) | Out-Null
     [NativeMethods]::SetForegroundWindow($handle) | Out-Null
+    [NativeMethods]::SetWindowPos(
+        $handle,
+        [NativeMethods]::HwndTopmost,
+        0,
+        0,
+        0,
+        0,
+        [NativeMethods]::SwpNoMove -bor
+            [NativeMethods]::SwpNoSize -bor
+            [NativeMethods]::SwpNoActivate) | Out-Null
     Start-Sleep -Milliseconds 250
 
     $rect = New-Object NativeMethods+RECT
@@ -156,13 +166,27 @@ function Capture-Window {
     try {
         $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
         try {
-            $graphics.CopyFromScreen(
-                $rect.Left,
-                $rect.Top,
-                0,
-                0,
-                (New-Object System.Drawing.Size($width, $height)),
-                [System.Drawing.CopyPixelOperation]::SourceCopy)
+            $destinationDc = $graphics.GetHdc()
+            $sourceDc = [NativeMethods]::GetDC([IntPtr]::Zero)
+            try {
+                $copied = [NativeMethods]::BitBlt(
+                    $destinationDc,
+                    0,
+                    0,
+                    $width,
+                    $height,
+                    $sourceDc,
+                    $rect.Left,
+                    $rect.Top,
+                    [NativeMethods]::Srccopy -bor [NativeMethods]::CaptureBlt)
+                if (-not $copied) {
+                    throw "BitBlt failed for Captail window."
+                }
+            }
+            finally {
+                [NativeMethods]::ReleaseDC([IntPtr]::Zero, $sourceDc) | Out-Null
+                $graphics.ReleaseHdc($destinationDc)
+            }
         }
         finally {
             $graphics.Dispose()
@@ -174,6 +198,16 @@ function Capture-Window {
     }
     finally {
         $bitmap.Dispose()
+        [NativeMethods]::SetWindowPos(
+            $handle,
+            [NativeMethods]::HwndNotTopmost,
+            0,
+            0,
+            0,
+            0,
+            [NativeMethods]::SwpNoMove -bor
+                [NativeMethods]::SwpNoSize -bor
+                [NativeMethods]::SwpNoActivate) | Out-Null
     }
 
     Write-Host "Captured $Path"
@@ -392,6 +426,14 @@ using System.Runtime.InteropServices;
 
 public static class NativeMethods
 {
+    public static readonly IntPtr HwndTopmost = new IntPtr(-1);
+    public static readonly IntPtr HwndNotTopmost = new IntPtr(-2);
+    public const uint SwpNoSize = 0x0001;
+    public const uint SwpNoMove = 0x0002;
+    public const uint SwpNoActivate = 0x0010;
+    public const uint Srccopy = 0x00CC0020;
+    public const uint CaptureBlt = 0x40000000;
+
     [StructLayout(LayoutKind.Sequential)]
     public struct RECT
     {
@@ -412,6 +454,36 @@ public static class NativeMethods
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool ShowWindow(IntPtr hWnd, int command);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool SetWindowPos(
+        IntPtr hWnd,
+        IntPtr hWndInsertAfter,
+        int x,
+        int y,
+        int width,
+        int height,
+        uint flags);
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetDC(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDc);
+
+    [DllImport("gdi32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool BitBlt(
+        IntPtr destinationDc,
+        int destinationX,
+        int destinationY,
+        int width,
+        int height,
+        IntPtr sourceDc,
+        int sourceX,
+        int sourceY,
+        uint rasterOperation);
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -462,7 +534,8 @@ try {
     $config.ReplayEnabled = $true
     $config.CaptureSystemAudio = $true
     $config.CaptureMicrophone = $true
-    $config.SeparateAudioTracks = $true
+    $config.SeparateAudioTracks = $false
+    $config.AudioRoutingMode = "advanced"
     if ($null -ne $resolvedReplay) {
         $config.OutputDirectory = Split-Path -Parent $resolvedReplay
     }
@@ -486,6 +559,18 @@ try {
 
         Set-SettingsScrollPercent -Root $root -Percent 66
         Capture-Window -Root $root -Path (Join-Path $OutputDirectory "captail-settings-audio.png")
+
+        $configureAudioButton = Find-AutomationElement -Root $root `
+            -AutomationId "ConfigureAudioRoutingButton"
+        Invoke-AutomationElement -Element $configureAudioButton
+        $routingRoot = Find-CaptailChildWindow -Process $automationProcess `
+            -AutomationId "ProcessAudioSearchBox" `
+            -FailureMessage "Application audio routing window did not open."
+        Start-Sleep -Seconds 2
+        Capture-Window -Root $routingRoot `
+            -Path (Join-Path $OutputDirectory "captail-audio-routing.png")
+        Close-AutomationWindow -Window $routingRoot
+        Start-Sleep -Milliseconds 500
     }
 
     if (-not $SkipEditor) {

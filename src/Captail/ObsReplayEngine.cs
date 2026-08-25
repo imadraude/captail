@@ -1273,7 +1273,9 @@ public sealed class ObsReplayEngine : IDisposable
             ReadProcessAudioStatus);
         return _processAudioReconciler.Reconcile(
             snapshot,
-            _config.ProcessAudioRoutes.Select(route =>
+            _config.ProcessAudioRoutes
+                .Where(route => route.Enabled)
+                .Select(route =>
                 new ProcessAudioTarget(route.Executable, route.Track)));
     }
 
@@ -1442,9 +1444,7 @@ public sealed class ObsReplayEngine : IDisposable
                     audioSettings,
                     "bitrate",
                     _config.AudioBitrateKbps);
-                string encoderName = IsAdvancedAudioRouting
-                    ? $"Captail Audio Track {index + 1}"
-                    : $"Captail Audio {index + 1}";
+                string encoderName = BuildAudioTrackName(_config, index + 1);
                 nint encoder = ObsNative.obs_audio_encoder_create(
                     audioEncoderId,
                     encoderName,
@@ -1882,6 +1882,51 @@ public sealed class ObsReplayEngine : IDisposable
         if (enabled == 0)
             return 1;
         return config.SeparateAudioTracks && enabled > 1 ? 2 : 1;
+    }
+
+    internal static string BuildAudioTrackName(Config config, int track)
+    {
+        ArgumentNullException.ThrowIfNull(config);
+        if (track is not (>= 1 and <= 6))
+            throw new ArgumentOutOfRangeException(nameof(track));
+
+        if (string.Equals(
+                config.AudioRoutingMode,
+                "advanced",
+                StringComparison.OrdinalIgnoreCase))
+        {
+            string[] applications = config.ProcessAudioRoutes
+                .Where(route => route.Enabled && route.Track == track)
+                .Select(route => Path.GetFileNameWithoutExtension(route.Executable))
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+            var sources = new List<string>(applications);
+            if (config.CaptureMicrophone &&
+                config.AdvancedMicrophoneTrack == track)
+            {
+                sources.Add("Microphone");
+            }
+
+            string suffix = sources.Count == 0
+                ? ""
+                : $" - {string.Join(" + ", sources)}";
+            string name = $"Track {track}{suffix}";
+            return name.Length <= 96 ? name : name[..96];
+        }
+
+        if (config.SeparateAudioTracks &&
+            config.CaptureSystemAudio &&
+            config.CaptureMicrophone)
+        {
+            return track == 1 ? "System / Game" : "Microphone";
+        }
+        if (config.CaptureSystemAudio && !config.CaptureMicrophone)
+            return "System / Game";
+        if (config.CaptureMicrophone && !config.CaptureSystemAudio)
+            return "Microphone";
+        return "Mixed audio";
     }
 
     internal static AdvancedProcessAudioAvailability DetectProcessAudioAvailability(

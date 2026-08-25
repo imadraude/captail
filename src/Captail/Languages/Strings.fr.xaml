@@ -143,6 +143,7 @@
   <sys:String x:Key="L.Audio.Codec">Codec audio</sys:String>
   <sys:String x:Key="L.Help.MicBoost">Augmente le gain du microphone avant l'encodage. Utilisez-le lorsque le volume à 100 % est encore silencieux. Une amplification trop importante augmente également le bruit et peut déformer les paroles fortes.</sys:String>
   <sys:String x:Key="L.Help.AudioTracks">Une piste mixée fonctionne partout et reste la plus simple à partager. Les pistes séparées gardent l'audio du jeu/système et le microphone indépendants pour le montage ; certains lecteurs ne lisent qu'une piste à la fois.</sys:String>
+  <sys:String x:Key="L.Help.ApplicationAudio">Choisissez les applications enregistrées par Captail et attribuez chacune à une piste. Les applications non cochées sont exclues. Le nombre de pistes dépend du codec audio sélectionné.</sys:String>
   <sys:String x:Key="L.Help.AudioCodec">AAC enregistre au format MP4 et fonctionne avec presque tous les lecteurs et éditeurs. Opus est efficace et sonne bien à des débits inférieurs, mais utilise MKV et peut nécessiter un éditeur moderne.</sys:String>
 
   <sys:String x:Key="L.Storage.ReplayFolder">Dossier des replays</sys:String>

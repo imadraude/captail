@@ -30,16 +30,16 @@
 Captail is a focused alternative to NVIDIA ShadowPlay Instant Replay. It keeps the latest seconds or minutes in a rolling buffer, then saves them when you press a hotkey. No scenes, streaming setup, account, cloud upload, analytics, or telemetry.
 
 > [!WARNING]
-> Captail `v0.2.1` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA RTX 40 and RTX 50 series are tested; other GPUs need broader public testing.
+> Captail `v0.2.2` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA RTX 40 and RTX 50 series are tested; other GPUs need broader public testing.
 
-## What's new in Captail 0.2.1?
+## What's new in Captail 0.2.2?
 
-- Open any recent replay in a fast built-in player, seek through it, change playback speed with the arrow keys, switch to fullscreen, or continue directly into Trim.
-- Let Game Capture sleep when no plausible game is running, reducing idle GPU and memory use while keeping a lightweight detector ready.
-- Receive an optional reminder when a game starts while Instant Replay is disabled.
-- Keep accidental settings changes under control with clear Cancel and Done actions. Closing settings with pending edits now shakes the window instead of silently losing them.
-- Access GitHub, bug reports, feature requests, and privacy information from one compact About menu.
-- Get a cleaner replay indicator and correctly sized Microsoft Store taskbar icons.
+- Route audio from individual applications to separate recording tracks. Selected apps stay first, active audio sessions follow, and every other running process remains searchable.
+- See real application icons and live level meters while assigning apps and microphone to tracks supported by the chosen audio format.
+- Toggle routed application and microphone sources directly from the main window without reopening Settings.
+- Preview every audio track found in a replay, keep or remove tracks independently, and use a taller editor layout when a file contains many tracks.
+- Recover application-audio capture without stopping the replay buffer when a routed process exits or restarts.
+- Keep the tray icon and replay-status indicator available after Windows startup, and avoid a shutdown crash caused by an already-disposed tray icon.
 
 ## Is Captail for me?
 
@@ -66,7 +66,11 @@ Captail is not a streaming application, scene compositor, DRM bypass, or cloud c
 
 <p align="center">
   <img src="docs/captail-settings-video.png" alt="Captail video settings with hardware AV1, 80 Mbps, 3840 by 2160 resolution, and 240 FPS selected" width="390">
-  <img src="docs/captail-settings-audio.png" alt="Captail audio settings with system audio, microphone, volume controls, microphone boost, and separate tracks" width="390">
+  <img src="docs/captail-settings-audio.png" alt="Captail audio settings with system audio, microphone, volume controls, microphone boost, and per-application routing" width="390">
+</p>
+
+<p align="center">
+  <img src="docs/captail-audio-routing.png" alt="Captail application audio routing with selected apps, live level meters, application icons, microphone, and track assignments" width="620">
 </p>
 
 <p align="center">
@@ -187,9 +191,12 @@ You can record system or detected-game audio, a microphone, or both.
 - Add up to `+20 dB` microphone boost when 100% is still too quiet.
 - Use **One mixed track** for maximum player compatibility.
 - Use **Separate tracks** to keep system/game audio and microphone independent for editing.
+- Use **Per-app routing** to select individual running applications and assign each one to an available recording track. Selected apps stay at the top, followed by apps currently playing audio and then other running processes.
 - Choose AAC in fragmented MP4 or Opus in MKV.
 
-Some media players play only one track from a multi-track file. Captail's clip editor previews the available tracks together and lets you keep or remove each track from the trimmed result.
+The selected audio codec and container determine how many tracks are available. Captail shows real application icons and live level meters in the routing window, and exposes routed sources as quick toggles on the main screen.
+
+Some media players play only one track from a multi-track file. Captail's clip editor previews every available track together and lets you keep or remove each track from the trimmed result.
 
 ## Can I manage and trim replays inside Captail?
 

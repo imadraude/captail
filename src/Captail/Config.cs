@@ -188,6 +188,7 @@ public sealed class Config
             {
                 Executable = route.Executable,
                 Track = route.Track,
+                Enabled = route.Enabled,
             })
             .ToList();
         AdvancedMicrophoneTrack = source.AdvancedMicrophoneTrack;
@@ -285,6 +286,7 @@ public sealed class Config
                 {
                     Executable = executable,
                     Track = route.Track,
+                    Enabled = route.Enabled,
                 });
         }
         return normalized.Values
@@ -331,6 +333,7 @@ public sealed class Config
         return leftRoutes.Length == rightRoutes.Length &&
                leftRoutes.Zip(rightRoutes).All(pair =>
                    pair.First.Track == pair.Second.Track &&
+                   pair.First.Enabled == pair.Second.Enabled &&
                    string.Equals(
                        pair.First.Executable,
                        pair.Second.Executable,
@@ -393,4 +396,5 @@ public sealed class ProcessAudioRoute
 {
     public string Executable { get; set; } = "";
     public int Track { get; set; } = 1;
+    public bool Enabled { get; set; } = true;
 }

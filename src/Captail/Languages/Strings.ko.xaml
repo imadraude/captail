@@ -143,6 +143,7 @@
   <sys:String x:Key="L.Audio.Codec">오디오 코덱</sys:String>
   <sys:String x:Key="L.Help.MicBoost">인코딩하기 전에 마이크 게인을 높입니다. 볼륨 100%가 여전히 조용할 때 사용하세요. 부스트를 너무 높이면 소음이 증가하고 큰 소리가 왜곡될 수도 있습니다.</sys:String>
   <sys:String x:Key="L.Help.AudioTracks">혼합 트랙은 어디에서나 재생되며 공유가 가장 쉽습니다. 별도의 트랙은 편집을 위해 게임/시스템 오디오 및 마이크를 독립적으로 유지합니다. 일부 플레이어는 한 번에 하나의 트랙만 재생합니다.</sys:String>
+  <sys:String x:Key="L.Help.ApplicationAudio">Captail이 녹음할 앱을 선택하고 각 앱에 트랙을 지정하세요. 선택하지 않은 앱은 녹음되지 않습니다. 사용 가능한 트랙 수는 선택한 오디오 코덱에 따라 달라집니다.</sys:String>
   <sys:String x:Key="L.Help.AudioCodec">AAC는 MP4로 저장되며 거의 모든 플레이어 및 편집자와 작동합니다. Opus는 효율적이고 낮은 비트 전송률에서도 좋은 소리를 내지만 MKV를 사용하므로 최신 편집기가 필요할 수 있습니다.</sys:String>
 
   <sys:String x:Key="L.Storage.ReplayFolder">리플레이 폴더</sys:String>
