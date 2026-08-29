@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Captail — Instant Replay that tries to stay on</title>
-  <meta name="description" content="Free, open-source Instant Replay for Windows with a rolling buffer, hardware encoding, and a recovery watchdog.">
+  <meta name="description" content="Free, open-source Instant Replay for Windows with recovery, per-application audio routing, hardware encoding, and local replay editing.">
   <meta name="theme-color" content="#0b0d0f">
   <meta name="color-scheme" content="dark">
   <link rel="canonical" href="https://faulmit.github.io/captail/">
@@ -15,7 +15,7 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Captail">
   <meta property="og:title" content="Captail — Instant Replay that tries to stay on">
-  <meta property="og:description" content="A focused, local Instant Replay utility for Windows with automatic capture recovery.">
+  <meta property="og:description" content="A focused, local Instant Replay utility for Windows with automatic recovery and per-application audio routing.">
   <meta property="og:url" content="https://faulmit.github.io/captail/">
   <meta property="og:image" content="https://faulmit.github.io/captail/assets/captail-social.png">
   <meta property="og:image:width" content="1200">
@@ -30,9 +30,9 @@
     "name": "Captail",
     "applicationCategory": "UtilitiesApplication",
     "operatingSystem": "Windows 10 version 2004 or newer, Windows 11",
-    "softwareVersion": "0.1.7",
-    "description": "Free, open-source Instant Replay utility for Windows with a rolling buffer and recovery watchdog.",
-    "downloadUrl": "https://github.com/FaulMit/captail/releases/download/v0.1.7/Captail-0.1.7-Setup-win-x64.exe",
+    "softwareVersion": "0.2.2",
+    "description": "Free, open-source Instant Replay utility for Windows with a rolling buffer, recovery watchdog, and per-application audio routing.",
+    "downloadUrl": "https://github.com/FaulMit/captail/releases/download/v0.2.2/Captail-0.2.2-Setup-win-x64.exe",
     "codeRepository": "https://github.com/FaulMit/captail",
     "license": "https://www.gnu.org/licenses/old-licenses/gpl-2.0.html",
     "offers": {
@@ -57,6 +57,7 @@
     </a>
     <nav class="site-nav" aria-label="Primary navigation">
       <a href="#recovery">How it works</a>
+      <a href="#audio">Application audio</a>
       <a href="#compatibility">Compatibility</a>
       <a href="#faq">FAQ</a>
     </nav>
@@ -71,7 +72,7 @@
       <div class="hero-ambient" aria-hidden="true"></div>
       <div class="hero-word" aria-hidden="true">CAPTAIL</div>
       <div class="hero-copy">
-        <p class="eyebrow"><span class="live-dot"></span> Windows replay utility · <span data-current-version>v0.1.7</span> preview</p>
+        <p class="eyebrow"><span class="live-dot"></span> Windows replay utility · <span data-current-version>v0.2.2</span> preview</p>
         <h1 id="hero-title">Instant Replay that <em>tries to stay on.</em></h1>
         <p class="hero-lede">Captail keeps recent gameplay ready, watches its capture pipeline, and attempts recovery when recording stops or stalls.</p>
         <div class="hero-actions">
@@ -83,16 +84,16 @@
             View source
           </a>
         </div>
-        <p class="hero-proof">Free · GPL open source · Local recordings · No account</p>
+        <p class="hero-proof">Free · GPL open source · 11 UI languages · Local recordings · No account</p>
       </div>
 
       <figure class="hero-product" data-hero-product>
         <div class="capture-state" aria-hidden="true">
           <span class="capture-state-dot"></span>
           <span>REAL APPLICATION UI</span>
-          <span class="capture-state-time" data-current-version>V0.1.7</span>
+          <span class="capture-state-time" data-current-version>V0.2.2</span>
         </div>
-        <img src="assets/captail-main.png" width="403" height="658" alt="Captail main window showing Instant Replay status, audio sources, format, disk space, and recent replays" fetchpriority="high" decoding="async">
+        <img src="assets/captail-main.png" width="404" height="650" alt="Captail 0.2.2 main window showing active Instant Replay, routed application audio sources, recording format, disk space, and recent replays" fetchpriority="high" decoding="async">
       </figure>
 
       <div class="hero-signal" aria-hidden="true">
@@ -140,7 +141,7 @@
         <li class="state-step state-active" data-reveal>
           <span class="state-index">04</span>
           <strong>Recording again</strong>
-          <p>The interface confirms when the replay buffer is healthy again.</p>
+          <p>The optional click-through indicator shows when replay is active, recovering, unavailable, or saved.</p>
         </li>
       </ol>
     </section>
@@ -154,20 +155,20 @@
             <span class="mode-number">A</span>
             <div>
               <h3>Desktop mode</h3>
-              <p>Records your selected monitor, then automatically switches to direct Game Capture when a fullscreen game appears.</p>
+              <p>Records your selected monitor, uses direct Game Capture when usable, and keeps desktop video active when a game cannot be hooked.</p>
             </div>
           </article>
           <article data-reveal>
             <span class="mode-number">B</span>
             <div>
               <h3>Game Capture mode</h3>
-              <p>Waits for a fullscreen game and never records the desktop. Better when privacy outside games matters more than continuous coverage.</p>
+              <p>Keeps a low-rate detector ready while the buffer sleeps, then wakes for a plausible game. The desktop is never recorded.</p>
             </div>
           </article>
         </div>
       </div>
       <div class="capture-media" data-reveal>
-        <img src="assets/captail-settings-video.jpg" width="404" height="720" alt="Captail video settings with Desktop source, AV1 codec, 1080p resolution, and 240 FPS selected" loading="lazy" decoding="async">
+        <img src="assets/captail-settings-video.png" width="404" height="720" alt="Captail 0.2.2 video settings with Desktop source, hardware AV1, 4K resolution, and 240 FPS selected" loading="lazy" decoding="async">
         <div class="media-annotation annotation-source" aria-hidden="true">SOURCE / DESKTOP</div>
         <div class="media-annotation annotation-rate" aria-hidden="true">240 FPS</div>
       </div>
@@ -205,33 +206,55 @@
         <h2 id="controls-title" data-reveal>Sound intact.<br>Timing under control.</h2>
         <ul class="feature-lines">
           <li data-reveal><strong>15 sec–15 min</strong><span>Configurable rolling duration, with an optional RAM limit.</span></li>
-          <li data-reveal><strong>Two audio paths</strong><span>System or detected-game audio plus microphone, mixed or separated.</span></li>
+          <li data-reveal><strong>Flexible audio</strong><span>Mixed, separate, or per-application tracks with independent microphone routing.</span></li>
           <li data-reveal><strong>Global hotkeys</strong><span>Save with Ctrl+Shift+F10. Toggle with Ctrl+Shift+F9. Both configurable.</span></li>
           <li data-reveal><strong>30–240 FPS</strong><span>Real requested capture rates; useful only when source and hardware sustain them.</span></li>
         </ul>
       </div>
       <figure class="controls-media" data-reveal>
-        <img src="assets/captail-settings-audio.jpg" width="404" height="720" alt="Captail audio, replay storage, and hotkey settings" loading="lazy" decoding="async">
+        <img src="assets/captail-settings-audio.png" width="404" height="720" alt="Captail 0.2.2 audio settings with system audio, microphone controls, and per-application routing" loading="lazy" decoding="async">
+      </figure>
+    </section>
+
+    <section class="routing" id="audio" aria-labelledby="routing-title">
+      <div class="routing-copy">
+        <div class="section-kicker" data-reveal>06 / APPLICATION AUDIO</div>
+        <h2 id="routing-title" data-reveal>Choose the apps.<br>Keep the tracks.</h2>
+        <p class="routing-lede" data-reveal>Route individual applications and your microphone to the tracks supported by the selected audio format.</p>
+        <ul class="routing-facts">
+          <li data-reveal><strong>Find the right process</strong><span>Selected apps stay first; active audio sessions follow, with every other running process searchable.</span></li>
+          <li data-reveal><strong>See what is live</strong><span>Real application icons and level meters make sources easier to identify.</span></li>
+          <li data-reveal><strong>Recover without disarming</strong><span>Routed sources recover after an application exits or restarts without stopping the replay buffer.</span></li>
+        </ul>
+      </div>
+      <figure class="routing-media" data-reveal>
+        <div class="media-annotation routing-annotation" aria-hidden="true">4 APPS / 5 TRACKS</div>
+        <img src="assets/captail-audio-routing.png" width="620" height="640" alt="Captail application audio routing with Chrome, Discord, a game, Spotify, microphone, track assignments, search, and live level meters" loading="lazy" decoding="async">
       </figure>
     </section>
 
     <section class="editor section" id="editor" aria-labelledby="editor-title">
       <div class="editor-heading">
         <div>
-          <div class="section-kicker" data-reveal>06 / AFTER THE SAVE</div>
-          <h2 id="editor-title" data-reveal>Review. Trim. Keep the tracks you need.</h2>
+          <div class="section-kicker" data-reveal>07 / REPLAY WORKBENCH</div>
+          <h2 id="editor-title" data-reveal>Play now.<br>Trim when it matters.</h2>
         </div>
-        <p data-reveal>Saved clips appear in Captail’s replay library. Open one to scrub, set a trim range, and keep or remove each audio track.</p>
+        <p data-reveal>Open a replay immediately, seek or change playback speed, then continue into the multi-track editor only when you need it.</p>
       </div>
-      <figure class="editor-media" data-reveal>
-        <img src="assets/captail-editor.png" width="898" height="789" alt="Captail clip editor showing game footage, trim handles, video thumbnails, and separate audio waveforms" loading="lazy" decoding="async">
+      <figure class="review-media player-media" data-reveal>
+        <figcaption>PLAYER / SEEK / 0.25×–2× / FULLSCREEN</figcaption>
+        <img src="assets/captail-player.png" width="900" height="736" alt="Captail replay player showing gameplay, seek controls, playback speed shortcuts, fullscreen, and a Trim action" loading="lazy" decoding="async">
+      </figure>
+      <figure class="review-media editor-media" data-reveal>
+        <figcaption>EDITOR / MULTI-TRACK / MERGE AUDIO</figcaption>
+        <img src="assets/captail-editor.png" width="900" height="838" alt="Captail 0.2.2 clip editor showing 4K 240 FPS gameplay, trim handles, separate audio waveforms, and the Merge audio tracks option" loading="lazy" decoding="async">
       </figure>
     </section>
 
     <section class="privacy section" id="privacy" aria-labelledby="privacy-title">
       <div class="privacy-word" aria-hidden="true">LOCAL</div>
       <div class="privacy-copy">
-        <div class="section-kicker section-kicker-dark" data-reveal>07 / PRIVACY</div>
+        <div class="section-kicker section-kicker-dark" data-reveal>08 / PRIVACY</div>
         <h2 id="privacy-title" data-reveal>Your replay stays yours.</h2>
         <p data-reveal>No Captail account. No ads. No analytics or telemetry. No automatic upload. Captures, settings, thumbnails, and logs stay on your PC.</p>
         <p class="privacy-exception" data-reveal><strong>Honest network note:</strong> GitHub builds may contact the GitHub Releases API to check for updates. An update package downloads only after you click the update control. Store builds use Microsoft Store updates.</p>
@@ -240,7 +263,7 @@
     </section>
 
     <section class="comparison section" id="comparison" aria-labelledby="comparison-title">
-      <div class="section-kicker" data-reveal>08 / CHOOSE FOR THE JOB</div>
+      <div class="section-kicker" data-reveal>09 / CHOOSE FOR THE JOB</div>
       <div class="section-heading comparison-heading">
         <h2 id="comparison-title" data-reveal>Focused replay, not a streaming suite.</h2>
         <p data-reveal>Scope comparison, not a performance benchmark.</p>
@@ -280,6 +303,12 @@
               <td>Use NVIDIA’s integrated capture tools</td>
               <td>Build scenes or combine replay with production tools</td>
             </tr>
+            <tr>
+              <th scope="row">After capture</th>
+              <td class="is-captail">Replay player and multi-track trim editor</td>
+              <td>Varies by NVIDIA software version</td>
+              <td>No focused clip library</td>
+            </tr>
           </tbody>
         </table>
       </section>
@@ -288,7 +317,7 @@
 
     <section class="compatibility section" id="compatibility" aria-labelledby="compatibility-title">
       <div class="compatibility-main">
-        <div class="section-kicker" data-reveal>09 / HARDWARE TRUTH</div>
+        <div class="section-kicker" data-reveal>10 / HARDWARE TRUTH</div>
         <h2 id="compatibility-title" data-reveal>Early preview.<br>Tested scope stated plainly.</h2>
         <dl class="hardware-list" data-reveal>
           <div><dt>Windows</dt><dd>10 version 2004+ or 11 · x64</dd></div>
@@ -311,16 +340,16 @@
     </section>
 
     <section class="quickstart section" id="quickstart" aria-labelledby="quickstart-title">
-      <div class="section-kicker" data-reveal>10 / QUICK START</div>
+      <div class="section-kicker" data-reveal>11 / QUICK START</div>
       <h2 id="quickstart-title" data-reveal>Three steps. Then leave it armed.</h2>
       <ol class="quickstart-list">
         <li data-reveal>
           <span>01</span>
-          <div><h3>Download</h3><p>Choose Setup for normal installation or Portable for a self-contained folder.</p></div>
+          <div><h3>Install</h3><p>Use Microsoft Store for managed updates, Setup for a normal installer, or Portable for a self-contained folder.</p></div>
         </li>
         <li data-reveal>
           <span>02</span>
-          <div><h3>Choose capture</h3><p>Select Desktop or Game Capture, then set duration, codec, FPS, and audio.</p></div>
+          <div><h3>Choose capture</h3><p>Select Desktop or Game Capture, then set duration, codec, FPS, and mixed, separate, or application audio.</p></div>
         </li>
         <li data-reveal>
           <span>03</span>
@@ -331,7 +360,7 @@
 
     <section class="faq section" id="faq" aria-labelledby="faq-title">
       <div class="faq-heading">
-        <div class="section-kicker" data-reveal>11 / FAQ</div>
+        <div class="section-kicker" data-reveal>12 / FAQ</div>
         <h2 id="faq-title" data-reveal>Before you press download.</h2>
       </div>
       <div class="faq-list">
@@ -341,7 +370,15 @@
         </details>
         <details data-reveal>
           <summary>Which download should I choose?</summary>
-          <p>Use the Setup EXE for a normal per-user Windows installation and uninstaller. Use Portable ZIP when you want a movable folder; extract the entire archive before launching Captail.exe.</p>
+          <p>Use Microsoft Store for Store-managed installation and updates. Use the Setup EXE for a normal per-user installer and uninstaller. Use Portable ZIP for a movable folder; extract the entire archive before launching Captail.exe.</p>
+        </details>
+        <details data-reveal>
+          <summary>Can Captail record only selected applications?</summary>
+          <p>Yes. Per-application audio routing can assign individual running apps and the microphone to available recording tracks. The selected audio codec and container determine how many tracks are available.</p>
+        </details>
+        <details data-reveal>
+          <summary>Which interface languages are available?</summary>
+          <p>English, Russian, Ukrainian, Simplified Chinese, Spanish, Brazilian Portuguese, German, French, Japanese, Korean, and Polish. First launch follows Windows when its language is supported.</p>
         </details>
         <details data-reveal>
           <summary>Does Captail upload clips or use telemetry?</summary>
@@ -371,7 +408,7 @@
       <div class="final-content">
         <p class="eyebrow"><span class="live-dot"></span> Free · Open source · Windows</p>
         <h2 id="final-title">Keep the last moment within reach.</h2>
-        <p>Download Captail’s latest early-preview release from GitHub.</p>
+        <p>Install from Microsoft Store or choose the latest Setup and Portable packages from GitHub.</p>
         <div class="hero-actions final-actions">
           <button class="button button-primary" type="button" data-download-trigger>Download latest release</button>
           <a class="button button-secondary" href="https://github.com/FaulMit/captail" target="_blank" rel="noreferrer">View source</a>
@@ -385,29 +422,40 @@
       <button class="download-close" type="button" data-download-close aria-label="Close download options">×</button>
       <p class="eyebrow"><span class="live-dot"></span> Windows x64 · Early preview</p>
       <h2 id="download-title">Choose your build.</h2>
-      <p class="download-status" data-download-status aria-live="polite">Latest GitHub preview · v0.1.7</p>
+      <p class="download-status" data-download-status aria-live="polite">Latest GitHub preview · v0.2.2</p>
 
       <div class="download-options">
-        <a class="download-option" data-download-setup href="https://github.com/FaulMit/captail/releases/download/v0.1.7/Captail-0.1.7-Setup-win-x64.exe">
+        <a class="download-option download-option-primary" data-download-setup href="https://github.com/FaulMit/captail/releases/download/v0.2.2/Captail-0.2.2-Setup-win-x64.exe">
           <span class="download-format">.EXE</span>
-          <span>
-            <strong>Setup</strong>
+          <span class="download-copy">
+            <span class="download-title-row">
+              <strong>Setup</strong>
+              <span class="download-recommendation">Recommended</span>
+            </span>
             <small>Normal per-user installation with updater and uninstaller.</small>
           </span>
-          <span class="download-recommendation">Recommended</span>
+          <span class="download-action">Download <span aria-hidden="true">↓</span></span>
         </a>
-        <a class="download-option" data-download-portable href="https://github.com/FaulMit/captail/releases/download/v0.1.7/Captail-0.1.7-Portable-win-x64.zip">
+        <a class="download-option" data-download-portable href="https://github.com/FaulMit/captail/releases/download/v0.2.2/Captail-0.2.2-Portable-win-x64.zip">
           <span class="download-format">.ZIP</span>
-          <span>
+          <span class="download-copy">
             <strong>Portable</strong>
             <small>Self-contained folder. Extract the entire archive before use.</small>
           </span>
-          <span class="download-arrow" aria-hidden="true">↓</span>
+          <span class="download-action download-action-secondary">Download ZIP <span aria-hidden="true">↓</span></span>
+        </a>
+        <a class="download-option download-option-store" href="https://apps.microsoft.com/detail/9PKVNVLKPTPS" target="_blank" rel="noreferrer">
+          <span class="download-format">STORE</span>
+          <span class="download-copy">
+            <strong>Microsoft Store</strong>
+            <small>Microsoft-managed installation and automatic updates.</small>
+          </span>
+          <span class="download-action download-action-store">Open Store <span aria-hidden="true">↗</span></span>
         </a>
       </div>
 
-      <p class="download-note">Unsigned preview. Windows may show “Unknown publisher.”</p>
-      <a class="download-release-link" data-download-release href="https://github.com/FaulMit/captail/releases/tag/v0.1.7" target="_blank" rel="noreferrer">Release notes, checksums, and provenance <span aria-hidden="true">↗</span></a>
+      <p class="download-note">GitHub packages are unsigned previews. Windows may show “Unknown publisher.”</p>
+      <a class="download-release-link" data-download-release href="https://github.com/FaulMit/captail/releases/tag/v0.2.2" target="_blank" rel="noreferrer">Release notes, checksums, and provenance <span aria-hidden="true">↗</span></a>
     </div>
   </dialog>
 
@@ -421,6 +469,7 @@
     </div>
     <nav aria-label="Project links">
       <a href="https://github.com/FaulMit/captail/releases">Releases</a>
+      <a href="https://apps.microsoft.com/detail/9PKVNVLKPTPS">Microsoft Store</a>
       <a href="https://github.com/FaulMit/captail/issues">Issues</a>
       <a href="https://github.com/FaulMit/captail/blob/main/CONTRIBUTING.md">Contribute</a>
       <a href="https://github.com/FaulMit/captail/blob/main/PRIVACY.md">Privacy</a>
