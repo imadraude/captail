@@ -1490,7 +1490,7 @@ public sealed class ObsReplayEngine : IDisposable
         switch (encoder.Family)
         {
             case "nvenc":
-                ConfigureNvenc(settings, loadProfile, encoder.Codec);
+                ConfigureNvenc(settings, loadProfile, encoder.Codec, _config);
                 break;
             case "amf":
                 ConfigureAmf(settings, loadProfile);
@@ -1511,34 +1511,57 @@ public sealed class ObsReplayEngine : IDisposable
     private static void ConfigureNvenc(
         nint settings,
         EncoderLoadProfile loadProfile,
-        string codec)
+        string codec,
+        Config config)
     {
-        ObsNative.obs_data_set_string(
+        NvencSettings recommendation = RecommendedNvencSettings(
+            codec,
+            config.NvencMode,
+            config.LowOverheadAdaptiveQuantization,
+            loadProfile);
+        ObsNative.obs_data_set_string(settings, "preset", recommendation.Preset);
+        ObsNative.obs_data_set_string(settings, "tune", recommendation.Tune);
+        ObsNative.obs_data_set_string(settings, "multipass", recommendation.Multipass);
+        ObsNative.obs_data_set_bool(settings, "lookahead", recommendation.Lookahead);
+        ObsNative.obs_data_set_bool(
             settings,
-            "preset",
-            loadProfile switch
+            "adaptive_quantization",
+            recommendation.AdaptiveQuantization);
+        ObsNative.obs_data_set_int(settings, "bf", recommendation.BFrames);
+    }
+
+    internal static NvencSettings RecommendedNvencSettings(
+        string codec,
+        string mode,
+        bool lowOverheadAdaptiveQuantization,
+        EncoderLoadProfile loadProfile)
+    {
+        bool lowOverhead = string.Equals(mode, "low-overhead", StringComparison.Ordinal);
+        return new NvencSettings(
+            lowOverhead ? "p2" : loadProfile switch
             {
                 EncoderLoadProfile.Standard => "p4",
                 EncoderLoadProfile.High => "p3",
                 _ => "p2",
-            });
-        ObsNative.obs_data_set_string(
-            settings,
-            "tune",
-            loadProfile == EncoderLoadProfile.Standard ? "hq" : "ll");
-        ObsNative.obs_data_set_string(settings, "multipass", "disabled");
-        ObsNative.obs_data_set_bool(settings, "lookahead", false);
-        ObsNative.obs_data_set_bool(
-            settings,
-            "adaptive_quantization",
-            loadProfile == EncoderLoadProfile.Standard);
-        ObsNative.obs_data_set_int(
-            settings,
-            "bf",
+            },
+            lowOverhead ? "ll" : loadProfile == EncoderLoadProfile.Standard ? "hq" : "ll",
+            "disabled",
+            false,
+            lowOverhead
+                ? lowOverheadAdaptiveQuantization
+                : loadProfile == EncoderLoadProfile.Standard,
             RecommendedNvencBFrames(
                 codec,
-                loadProfile == EncoderLoadProfile.Standard));
+                !lowOverhead && loadProfile == EncoderLoadProfile.Standard));
     }
+
+    internal sealed record NvencSettings(
+        string Preset,
+        string Tune,
+        string Multipass,
+        bool Lookahead,
+        bool AdaptiveQuantization,
+        int BFrames);
 
     internal static int RecommendedNvencBFrames(string codec, bool standardLoad) =>
         standardLoad &&
@@ -1616,7 +1639,7 @@ public sealed class ObsReplayEngine : IDisposable
             _ => 80,
         };
 
-    private enum EncoderLoadProfile
+    internal enum EncoderLoadProfile
     {
         Standard,
         High,

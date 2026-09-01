@@ -782,13 +782,43 @@
                                             </Button.ToolTip>
                                         </Button>
                                     </StackPanel>
-                                    <ComboBox x:Name="BitrateBox" Grid.Column="1" Style="{StaticResource DarkCombo}">
+                                    <ComboBox x:Name="BitrateBox" Grid.Column="1" Style="{StaticResource DarkCombo}"
+                                              IsEditable="True" IsTextSearchEnabled="False"
+                                              ToolTip="Auto or a custom value from 2 to 100 Mbps">
                                         <ComboBoxItem Tag="0" Content="{DynamicResource L.Video.AutoLoad}"/>
                                         <ComboBoxItem Tag="10" Content="{DynamicResource L.Video.Mbps10}"/>
                                         <ComboBoxItem Tag="20" Content="{DynamicResource L.Video.Mbps20}"/>
                                         <ComboBoxItem Tag="50" Content="{DynamicResource L.Video.Mbps50}"/>
                                         <ComboBoxItem Tag="80" Content="{DynamicResource L.Video.Mbps80}"/>
                                     </ComboBox>
+                                </Grid>
+                                <Border Style="{StaticResource RowDivider}"/>
+                                <Grid Margin="13,11">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="190"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="NVENC mode" Style="{StaticResource RowLabelText}"/>
+                                        <TextBlock Text="Low overhead uses P2, low-latency tuning, no multipass/lookahead or B-frames."
+                                                   Style="{StaticResource SecondaryText}" FontSize="10" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1">
+                                        <ComboBox x:Name="NvencModeBox" Style="{StaticResource DarkCombo}">
+                                            <ComboBoxItem Tag="balanced" Content="Balanced (default)"/>
+                                            <ComboBoxItem Tag="low-overhead" Content="Low overhead"/>
+                                        </ComboBox>
+                                        <CheckBox x:Name="LowOverheadAqBox" Content="Adaptive quantization"
+                                                  Margin="2,8,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                                <Border Style="{StaticResource RowDivider}"/>
+                                <Grid Margin="13,11">
+                                    <StackPanel>
+                                        <TextBlock Text="Estimated RAM buffer" Style="{StaticResource RowLabelText}"/>
+                                        <TextBlock x:Name="RamEstimateText" Style="{StaticResource SecondaryText}"
+                                                   FontSize="10" Margin="0,2,0,0"/>
+                                    </StackPanel>
                                 </Grid>
                                 <Border Style="{StaticResource RowDivider}"/>
                                 <Grid Margin="13,11">
