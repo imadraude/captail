@@ -1,6 +1,7 @@
 # Build output
 artifacts/
 runtime/
+node_modules/
 bin/
 obj/
 **/bin/
