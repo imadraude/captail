@@ -6,16 +6,16 @@ Every release must ship a fresh screenshot set captured from the exact release-c
 
 ## Required set for every release
 
-| README asset | Required state | What it must show |
-| --- | --- | --- |
-| `docs/captail-main.png` | Instant Replay active | Complete main window showing `AV1 · 4K · 240 FPS`, enabled system and microphone audio, current version, Save button, and several real recent-replay rows. |
-| `docs/captail-settings-video.png` | Video settings | Hardware AV1 selected at `3840 × 2160` and `240 FPS`, plus source, bitrate, quality profile, display, and resolution controls. |
-| `docs/captail-settings-audio.png` | Audio and replay settings | Enabled system audio and microphone, separate tracks, volume, microphone boost, buffer, storage, and hotkey controls where they fit naturally. Use a second real settings screenshot when one readable frame cannot contain them. |
-| `docs/captail-audio-routing.png` | Application audio routing open | Selected applications first, real application icons, live level meters, microphone assignment, track selectors, and additional running processes. |
-| `docs/captail-player.png` | Real replay loaded in Preview | Working AV1 4K 240 FPS playback, seek bar, keyboard help, Trim action, fullscreen control, and matching media details. |
-| `docs/captail-editor.png` | Real replay loaded | Working preview of a real AV1 4K 240 FPS replay, selected trim range, video timeline, available audio tracks, matching media details, and save actions. |
+| README asset                      | Required state                 | What it must show                                                                                                                                                                                                                 |
+| --------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `docs/captail-main.png`           | Instant Replay active          | Complete main window showing `AV1 · 4K · 240 FPS`, enabled system and microphone audio, current version, Save button, and several real recent-replay rows.                                                                        |
+| `docs/captail-settings-video.png` | Video settings                 | Hardware AV1 selected at `3840 × 2160` and `240 FPS`, plus source, bitrate, quality profile, display, and resolution controls.                                                                                                    |
+| `docs/captail-settings-audio.png` | Audio and replay settings      | Enabled system audio and microphone, separate tracks, volume, microphone boost, buffer, storage, and hotkey controls where they fit naturally. Use a second real settings screenshot when one readable frame cannot contain them. |
+| `docs/captail-audio-routing.png`  | Application audio routing open | Selected applications first, real application icons, live level meters, microphone assignment, track selectors, and additional running processes.                                                                                 |
+| `docs/captail-player.png`         | Real replay loaded in Preview  | Working AV1 4K 240 FPS playback, seek bar, keyboard help, Trim action, fullscreen control, and matching media details.                                                                                                            |
+| `docs/captail-editor.png`         | Real replay loaded             | Working preview of a real AV1 4K 240 FPS replay, selected trim range, video timeline, available audio tracks, matching media details, and save actions.                                                                           |
 
-The next refresh should migrate the two older settings JPEG files to the stable PNG names above. After that migration, overwrite the stable files on every release instead of adding versioned duplicates.
+The settings screenshots use the stable PNG names above. Overwrite the stable files on every release instead of adding versioned duplicates.
 
 ## README showcase profile
 
@@ -70,6 +70,7 @@ Small copy changes, internal performance work, dependency updates, and invisible
    ```
 
    This preserves every source frame and available audio track while spatially scaling video to 3840×2160 and encoding AV1. It is suitable for demonstrating editor UI and metadata, but it is not evidence of native 4K capture quality or performance.
+
 3. Run the capture tool from the repository root:
 
    ```powershell
@@ -80,6 +81,7 @@ Small copy changes, internal performance work, dependency updates, and invisible
    ```
 
    The tool backs up the user config, applies the English AV1/4K/240 showcase profile, opens each screen through Windows UI Automation, captures cursor-free PNG files, verifies editor media with bundled `ffprobe`, and restores the config even after a failure. Use `-SkipEditor` only while preparing the required showcase replay, or `-EditorOnly` to replace only `captail-editor.png`. `-AllowNonShowcaseReplay` exists for local harness testing and must not be used for release screenshots.
+
 4. Inspect all four PNG files at full size. Automation removes repetitive interaction; it does not replace visual review.
 5. Capture each significant new feature or redesigned workflow.
 6. Replace stable README assets and update image references or alt text when needed.
@@ -97,4 +99,4 @@ Recommended additional real screenshots:
 - display-identification action and its matching numbered monitor overlay;
 - sanitized Report bug form only if the in-app transition is visible and useful.
 
-Replay indicator screenshot is intentionally deferred. Current capture behavior cannot produce a truthful image of the indicator, and fixing that behavior is outside this documentation task. Do not use the existing concept graphic as a README product screenshot.
+Replay indicator screenshot is intentionally deferred. Current capture behavior cannot produce a truthful image of the indicator, and fixing that behavior is outside this documentation task.

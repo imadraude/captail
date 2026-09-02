@@ -29,6 +29,3 @@ TestResults/
 Thumbs.db
 Desktop.ini
 .DS_Store
-
-# Agent session logs
-codex-session-*.md
