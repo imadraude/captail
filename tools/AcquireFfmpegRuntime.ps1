@@ -8,22 +8,22 @@ param(
 
 $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"
-$assetVersion = "n8.1-latest"
+$releaseTag = "autobuild-2026-09-01-13-13"
 $version = "n8.1-2026-09-01"
 $isStatic = $Flavor -eq "Static"
 $archiveName = if ($isStatic) {
-    "ffmpeg-$assetVersion-win64-lgpl-8.1.zip"
+    "ffmpeg-n8.1.2-50-g1a748fe2cd-win64-lgpl-8.1.zip"
 }
 else {
-    "ffmpeg-$assetVersion-win64-lgpl-shared-8.1.zip"
+    "ffmpeg-n8.1.2-50-g1a748fe2cd-win64-lgpl-shared-8.1.zip"
 }
 $expectedArchiveSha256 = if ($isStatic) {
-    "332ec4a9b24064177e0c35fb15eef57afcc52cfd5ddf6cef5126e1e1d4dfa18c"
+    "14fea72ee692a5f832b8d7b0c7f1c050af124f72cf43d6a948faf98ff3c0072d"
 }
 else {
-    "7f5830a562038d561626e583192bf00d52f7ab2b2f7eaaddf3f81bb76791e167"
+    "7aeceacf1d52f19a9d3eb232a094d8cfe2883dfd0f566e5c00ea84151b146a55"
 }
-$url = "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/$archiveName"
+$url = "https://github.com/BtbN/FFmpeg-Builds/releases/download/$releaseTag/$archiveName"
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $allowedRuntimeRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot "runtime"))
 
