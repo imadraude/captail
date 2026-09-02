@@ -1475,7 +1475,9 @@ public sealed class ObsReplayEngine : IDisposable
     {
         int bitrateMbps = EffectiveBitrateMbps(
             _config.BitrateMbps,
-            loadProfile,
+            _outputWidth,
+            _outputHeight,
+            _config.FrameRate,
             _config.Codec,
             encoder.Family);
         ActiveBitrateMbps = bitrateMbps;
@@ -1633,33 +1635,52 @@ public sealed class ObsReplayEngine : IDisposable
 
     internal static int EffectiveBitrateMbps(
         int configuredBitrateMbps,
-        EncoderLoadProfile loadProfile,
+        uint outputWidth,
+        uint outputHeight,
+        int frameRate,
         string codec,
         string? encoderFamily)
     {
         int bitrateMbps = configuredBitrateMbps > 0
             ? configuredBitrateMbps
-            : AutomaticBitrateMbps(loadProfile, codec);
+            : AutomaticBitrateMbps(
+                outputWidth,
+                outputHeight,
+                frameRate,
+                codec);
         return string.Equals(encoderFamily, "qsv", StringComparison.OrdinalIgnoreCase)
             ? Math.Min(bitrateMbps, 65)
             : bitrateMbps;
     }
 
-    private static int AutomaticBitrateMbps(
-        EncoderLoadProfile loadProfile,
-        string codec) =>
-        (loadProfile, codec.ToLowerInvariant()) switch
+    internal static int AutomaticBitrateMbps(
+        uint outputWidth,
+        uint outputHeight,
+        int frameRate,
+        string codec)
+    {
+        const double referencePixels = 1920d * 1080d;
+        const double referenceFrameRate = 60d;
+        const double referenceBitrateMbps = 25d;
+
+        double pixels = Math.Max(1d, (double)outputWidth * outputHeight);
+        double safeFrameRate = Math.Max(1d, frameRate);
+        double codecFactor = codec.ToLowerInvariant() switch
         {
-            (EncoderLoadProfile.Standard, "av1") => 15,
-            (EncoderLoadProfile.Standard, "hevc") => 18,
-            (EncoderLoadProfile.Standard, _) => 25,
-            (EncoderLoadProfile.High, "av1") => 35,
-            (EncoderLoadProfile.High, "hevc") => 45,
-            (EncoderLoadProfile.High, _) => 55,
-            (EncoderLoadProfile.Extreme, "av1") => 50,
-            (EncoderLoadProfile.Extreme, "hevc") => 65,
-            _ => 80,
+            "av1" => 0.60d,
+            "hevc" => 0.75d,
+            _ => 1d,
         };
+
+        double calculated = referenceBitrateMbps *
+            Math.Pow(pixels / referencePixels, 0.75d) *
+            Math.Pow(safeFrameRate / referenceFrameRate, 0.60d) *
+            codecFactor;
+        int rounded = (int)Math.Round(
+            calculated,
+            MidpointRounding.AwayFromZero);
+        return Math.Clamp(rounded, 4, 100);
+    }
 
     internal enum EncoderLoadProfile
     {

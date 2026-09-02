@@ -109,7 +109,7 @@
   <sys:String x:Key="L.Video.Game">游戏</sys:String>
   <sys:String x:Key="L.Video.Codec">视频编码格式</sys:String>
   <sys:String x:Key="L.Video.Bitrate">码率</sys:String>
-  <sys:String x:Key="L.Video.AutoLoad">自动 · 自适应负载</sys:String>
+  <sys:String x:Key="L.Video.AutoLoad">自动 · 高画质</sys:String>
   <sys:String x:Key="L.Video.Mbps10">10 Mbps</sys:String>
   <sys:String x:Key="L.Video.Mbps20">20 Mbps</sys:String>
   <sys:String x:Key="L.Video.Mbps50">50 Mbps</sys:String>
@@ -129,7 +129,7 @@
   <sys:String x:Key="L.Help.VideoCodec.Av1">AV1 — 最新、最高效的编码格式。相同码率下画面更清晰，或相同画质下文件更小。GeForce RTX 40/50、Radeon RX 7000 和 Intel Arc 支持硬件编码。</sys:String>
   <sys:String x:Key="L.Help.VideoCodec.Hevc">HEVC — 压缩效率接近 AV1，并受到更多现代 GPU 的支持。</sys:String>
   <sys:String x:Key="L.Help.VideoCodec.H264">H.264 — 占用空间更大，但几乎处处可播放。</sys:String>
-  <sys:String x:Key="L.Help.Bitrate">每秒写入的视频数据量。数值越高，快速运动画面越清晰，但会占用更多内存和磁盘空间。50 Mbps 大约每分钟 375 MB。自动模式会根据编码格式、分辨率和帧率自适应。</sys:String>
+  <sys:String x:Key="L.Help.Bitrate">每秒写入的视频数据量。数值越高，快速运动画面越清晰，但会占用更多内存和磁盘空间。50 Mbps 大约每分钟 375 MB。自动模式会根据编码格式、分辨率和帧率计算稳定的高画质码率。</sys:String>
   <sys:String x:Key="L.Help.Resolution">“来源”保留原始分辨率。更低的分辨率会降低 GPU 负载、内存占用和文件体积，但也会丢失细节。它不会改变显示器分辨率。</sys:String>
   <sys:String x:Key="L.Help.FrameRate">60 FPS 足以满足正常播放。120–240 FPS 会录制真实的多余帧，实现流畅慢动作；Captail 不会凭空生成帧。游戏必须渲染得足够快，更高帧率也会增加 GPU 和内存占用。</sys:String>
 

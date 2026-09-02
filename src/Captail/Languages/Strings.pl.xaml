@@ -106,7 +106,7 @@
   <sys:String x:Key="L.Video.Game">Gra</sys:String>
   <sys:String x:Key="L.Video.Codec">Kodek</sys:String>
   <sys:String x:Key="L.Video.Bitrate">Szybkość transmisji</sys:String>
-  <sys:String x:Key="L.Video.AutoLoad">Auto · obciążenie adaptacyjne</sys:String>
+  <sys:String x:Key="L.Video.AutoLoad">Auto · wysoka jakość</sys:String>
   <sys:String x:Key="L.Video.Mbps10">10 Mb/s</sys:String>
   <sys:String x:Key="L.Video.Mbps20">20 Mb/s</sys:String>
   <sys:String x:Key="L.Video.Mbps50">50 Mb/s</sys:String>
@@ -126,7 +126,7 @@
   <sys:String x:Key="L.Help.VideoCodec.Av1">AV1 — najnowszy i najbardziej wydajny kodek. Czystszy obraz przy tej samej przepływności lub mniejsze pliki przy tej samej jakości. Obsługę sprzętową oferują GeForce RTX 40/50, Radeon RX 7000 i Intel Arc.</sys:String>
   <sys:String x:Key="L.Help.VideoCodec.Hevc">HEVC — prawie tak samo kompaktowy i obsługiwany przez nowsze procesory graficzne.</sys:String>
   <sys:String x:Key="L.Help.VideoCodec.H264">H.264 — zajmuje więcej miejsca, ale otwiera się prawie wszędzie.</sys:String>
-  <sys:String x:Key="L.Help.Bitrate">Ile danych wideo jest zapisywanych w każdej sekundzie. Wyższe wartości sprawiają, że szybki ruch jest czystszy, ale zużywają więcej pamięci RAM i miejsca na dysku. 50 Mb/s to około 375 MB na minutę. Automatycznie dostosowuje się do kodeka, rozdzielczości i liczby klatek na sekundę.</sys:String>
+  <sys:String x:Key="L.Help.Bitrate">Ile danych wideo jest zapisywanych w każdej sekundzie. Wyższe wartości sprawiają, że szybki ruch jest czystszy, ale zużywają więcej pamięci RAM i miejsca na dysku. 50 Mb/s to około 375 MB na minutę. Auto oblicza stabilną przepływność wysokiej jakości na podstawie kodeka, rozdzielczości i liczby klatek na sekundę.</sys:String>
   <sys:String x:Key="L.Help.Resolution">Źródło zachowuje oryginalne wymiary. Niższa rozdzielczość zmniejsza obciążenie procesora graficznego, wykorzystanie pamięci RAM i rozmiar pliku, ale także usuwa szczegóły. Nie zmienia rozdzielczości monitora.</sys:String>
   <sys:String x:Key="L.Help.FrameRate">Do normalnego odtwarzania wystarczy 60 FPS. 120–240 FPS zapisuje prawdziwe dodatkowe klatki dla płynnego zwolnionego tempa; Captail nie tworzy sztucznych klatek. Gra musi renderować wystarczająco szybko, a wyższy FPS zwiększa użycie GPU i pamięci.</sys:String>
 

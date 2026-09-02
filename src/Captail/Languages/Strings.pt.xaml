@@ -106,7 +106,7 @@
   <sys:String x:Key="L.Video.Game">Jogo</sys:String>
   <sys:String x:Key="L.Video.Codec">Codec</sys:String>
   <sys:String x:Key="L.Video.Bitrate">Taxa de bits</sys:String>
-  <sys:String x:Key="L.Video.AutoLoad">Carga automática · adaptativa</sys:String>
+  <sys:String x:Key="L.Video.AutoLoad">Auto · alta qualidade</sys:String>
   <sys:String x:Key="L.Video.Mbps10">10Mbps</sys:String>
   <sys:String x:Key="L.Video.Mbps20">20Mbps</sys:String>
   <sys:String x:Key="L.Video.Mbps50">50Mbps</sys:String>
@@ -126,7 +126,7 @@
   <sys:String x:Key="L.Help.VideoCodec.Av1">AV1 — o mais novo e eficiente. Produz imagem mais limpa com a mesma taxa de bits ou arquivos menores com a mesma qualidade. O suporte de hardware inclui GeForce RTX 40/50, Radeon RX 7000 e Intel Arc.</sys:String>
   <sys:String x:Key="L.Help.VideoCodec.Hevc">HEVC — quase tão compacto e compatível com GPUs mais modernas.</sys:String>
   <sys:String x:Key="L.Help.VideoCodec.H264">H.264 — ocupa mais espaço, mas abre em quase todos os lugares.</sys:String>
-  <sys:String x:Key="L.Help.Bitrate">Quantos dados de vídeo são gravados a cada segundo. Valores mais altos mantêm o movimento rápido mais limpo, mas usam mais RAM e espaço em disco. 50 Mbps equivalem a aproximadamente 375 MB por minuto. Adapta-se automaticamente ao codec, resolução e FPS.</sys:String>
+  <sys:String x:Key="L.Help.Bitrate">Quantos dados de vídeo são gravados a cada segundo. Valores mais altos mantêm o movimento rápido mais limpo, mas usam mais RAM e espaço em disco. 50 Mbps equivalem a aproximadamente 375 MB por minuto. Auto calcula uma taxa estável de alta qualidade com base no codec, na resolução e no FPS.</sys:String>
   <sys:String x:Key="L.Help.Resolution">A fonte mantém as dimensões originais. A resolução mais baixa reduz a carga da GPU, o uso de RAM e o tamanho do arquivo, mas também remove detalhes. Isso não altera a resolução do monitor.</sys:String>
   <sys:String x:Key="L.Help.FrameRate">60 FPS são suficientes para reprodução normal. 120–240 FPS grava quadros adicionais reais para câmera lenta suave; o Captail não gera quadros artificiais. O jogo precisa renderizar rápido o bastante, e FPS mais altos aumentam o uso da GPU e da memória.</sys:String>
 

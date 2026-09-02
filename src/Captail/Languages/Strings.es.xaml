@@ -106,7 +106,7 @@
   <sys:String x:Key="L.Video.Game">juego</sys:String>
   <sys:String x:Key="L.Video.Codec">Códec</sys:String>
   <sys:String x:Key="L.Video.Bitrate">tasa de bits</sys:String>
-  <sys:String x:Key="L.Video.AutoLoad">Auto · carga adaptativa</sys:String>
+  <sys:String x:Key="L.Video.AutoLoad">Auto · alta calidad</sys:String>
   <sys:String x:Key="L.Video.Mbps10">10Mbps</sys:String>
   <sys:String x:Key="L.Video.Mbps20">20Mbps</sys:String>
   <sys:String x:Key="L.Video.Mbps50">50Mbps</sys:String>
@@ -126,7 +126,7 @@
   <sys:String x:Key="L.Help.VideoCodec.Av1">AV1: el códec más nuevo y eficiente. Imagen más limpia con la misma tasa de bits o archivos más pequeños con la misma calidad. El soporte de hardware incluye GeForce RTX 40/50, Radeon RX 7000 e Intel Arc.</sys:String>
   <sys:String x:Key="L.Help.VideoCodec.Hevc">HEVC: casi tan compacto y compatible con GPU más modernas.</sys:String>
   <sys:String x:Key="L.Help.VideoCodec.H264">H.264: utiliza más espacio, pero se abre en casi todas partes.</sys:String>
-  <sys:String x:Key="L.Help.Bitrate">Cuántos datos de vídeo se escriben cada segundo. Los valores más altos mantienen los movimientos rápidos más limpios, pero utilizan más RAM y espacio en disco. 50 Mbps son aproximadamente 375 MB por minuto. Se adapta automáticamente al códec, resolución y FPS.</sys:String>
+  <sys:String x:Key="L.Help.Bitrate">Cuántos datos de vídeo se escriben cada segundo. Los valores más altos mantienen los movimientos rápidos más limpios, pero utilizan más RAM y espacio en disco. 50 Mbps son aproximadamente 375 MB por minuto. Auto calcula una tasa estable de alta calidad según el códec, la resolución y los FPS.</sys:String>
   <sys:String x:Key="L.Help.Resolution">La fuente mantiene las dimensiones originales. Una resolución más baja reduce la carga de la GPU, el uso de RAM y el tamaño del archivo, pero también elimina detalles. No cambia la resolución del monitor.</sys:String>
   <sys:String x:Key="L.Help.FrameRate">60 FPS son suficientes para una reproducción normal. 120–240 FPS graba fotogramas adicionales reales para una cámara lenta fluida; Captail no inventa fotogramas. El juego debe renderizarse lo bastante rápido y un FPS más alto aumenta el uso de GPU y memoria.</sys:String>
 

@@ -109,7 +109,7 @@
   <sys:String x:Key="L.Video.Game">Game</sys:String>
   <sys:String x:Key="L.Video.Codec">Codec</sys:String>
   <sys:String x:Key="L.Video.Bitrate">Bitrate</sys:String>
-  <sys:String x:Key="L.Video.AutoLoad">Auto · adaptive load</sys:String>
+  <sys:String x:Key="L.Video.AutoLoad">Auto · high quality</sys:String>
   <sys:String x:Key="L.Video.Mbps10">10 Mbps</sys:String>
   <sys:String x:Key="L.Video.Mbps20">20 Mbps</sys:String>
   <sys:String x:Key="L.Video.Mbps50">50 Mbps</sys:String>
@@ -129,7 +129,7 @@
   <sys:String x:Key="L.Help.VideoCodec.Av1">AV1 — newest and most efficient. Cleaner at the same bitrate, or smaller files at the same quality. Hardware support includes GeForce RTX 40/50, Radeon RX 7000 and Intel Arc.</sys:String>
   <sys:String x:Key="L.Help.VideoCodec.Hevc">HEVC — nearly as compact and supported by more modern GPUs.</sys:String>
   <sys:String x:Key="L.Help.VideoCodec.H264">H.264 — uses more space, but opens almost everywhere.</sys:String>
-  <sys:String x:Key="L.Help.Bitrate">How much video data is written each second. Higher values keep fast motion cleaner, but use more RAM and disk space. 50 Mbps is roughly 375 MB per minute. Auto adapts to codec, resolution and FPS.</sys:String>
+  <sys:String x:Key="L.Help.Bitrate">How much video data is written each second. Higher values keep fast motion cleaner, but use more RAM and disk space. 50 Mbps is roughly 375 MB per minute. Auto calculates a stable high-quality bitrate from the codec, resolution and FPS.</sys:String>
   <sys:String x:Key="L.Help.Resolution">Source keeps the original dimensions. Lower resolution reduces GPU load, RAM use and file size, but also removes detail. It does not change monitor resolution.</sys:String>
   <sys:String x:Key="L.Help.FrameRate">60 FPS is enough for normal playback. 120–240 FPS records real extra frames for smooth slow motion; Captail does not invent frames. The game must render fast enough, and higher FPS increases GPU and memory use.</sys:String>
 
