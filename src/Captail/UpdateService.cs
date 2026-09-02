@@ -41,13 +41,13 @@ internal sealed record PreparedUpdate(
 internal sealed class UpdateService
 {
     internal const string RepositoryUrl =
-        "https://github.com/FaulMit/captail";
+        "https://github.com/imadraude/captail";
 
     internal const string FeatureRequestUrl =
-        "https://github.com/FaulMit/captail/issues/new?template=feature_request.yml";
+        RepositoryUrl + "/issues/new?template=feature_request.yml";
 
     private const string ReleasesApiUrl =
-        "https://api.github.com/repos/FaulMit/captail/releases?per_page=10";
+        "https://api.github.com/repos/imadraude/captail/releases?per_page=10";
     private const long MaximumAssetBytes = 512L * 1024 * 1024;
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
     private static readonly Regex ReleaseTagPattern = new(
