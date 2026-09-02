@@ -4,6 +4,14 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-09-02
+
+### Fixed
+
+- Restored visible and editable bitrate values in compact dark-theme combo boxes.
+- Made NVENC adaptive-quantization checkbox text readable and moved the low-overhead explanation to a hover tooltip.
+- Fixed the About menu so GitHub, bug-report, and feature-request buttons open their links correctly.
+
 ## [0.3.0] - 2026-09-02
 
 ### Added
