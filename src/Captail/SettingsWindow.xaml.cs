@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.ComponentModel;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,6 +17,7 @@ namespace Captail;
 public partial class SettingsWindow : Window
 {
     private const double DashboardHeight = 650;
+    private const int ReplayPageSize = 64;
 
     private readonly Config _config;
     private readonly Action _saveReplay;
@@ -56,6 +58,8 @@ public partial class SettingsWindow : Window
     private bool _updateCheckInProgress;
     private bool _updateInstallInProgress;
     private int _libraryRefreshInProgress;
+    private readonly ObservableCollection<ReplayClipItem> _replayItems = [];
+    private bool _hasMoreReplays;
     private ReplayClip? _pendingDeleteClip;
     private IReadOnlyList<CaptureInterop.MonitorInfo> _monitors = [];
     private readonly List<DisplayIdentifierWindow> _displayIdentifierWindows = [];
@@ -111,6 +115,7 @@ public partial class SettingsWindow : Window
         _pendingAdvancedMicrophoneTrack = config.AdvancedMicrophoneTrack;
 
         InitializeComponent();
+        RecentReplaysList.ItemsSource = _replayItems;
         AttachSettingsChangeTracking();
         LanguageList.ItemsSource = Localization.SupportedLanguages;
         UpdateLanguageMenuSelection();
@@ -2405,14 +2410,18 @@ public partial class SettingsWindow : Window
         SetReplayLibraryState(loading: true);
         try
         {
-            IReadOnlyList<ReplayClip> clips = await _replayLibrary.GetRecentAsync(
+            IReadOnlyList<ReplayClip> clips = await _replayLibrary.GetPageAsync(
                 _outputDirectory,
-                int.MaxValue,
+                0,
+                ReplayPageSize,
                 _lifetimeCts.Token);
             if (_lifetimeCts.IsCancellationRequested)
                 return;
 
-            RecentReplaysList.ItemsSource = clips.Select(CreateReplayClipItem).ToArray();
+            _replayItems.Clear();
+            foreach (ReplayClip clip in clips)
+                _replayItems.Add(CreateReplayClipItem(clip));
+            _hasMoreReplays = clips.Count == ReplayPageSize;
             SetReplayLibraryState(empty: clips.Count == 0);
         }
         catch (OperationCanceledException) when (_lifetimeCts.IsCancellationRequested)
@@ -2422,7 +2431,7 @@ public partial class SettingsWindow : Window
         catch (Exception exception)
         {
             Log.Write($"Replay library refresh failed: {exception}");
-            RecentReplaysList.ItemsSource = null;
+            _replayItems.Clear();
             SetReplayLibraryState(error: true);
         }
         finally
@@ -2445,9 +2454,48 @@ public partial class SettingsWindow : Window
         ReplayLibraryErrorText.Visibility = error
             ? Visibility.Visible
             : Visibility.Collapsed;
-        RecentReplaysScrollViewer.Visibility = !loading && !empty && !error
+        RecentReplaysList.Visibility = !loading && !empty && !error
             ? Visibility.Visible
             : Visibility.Collapsed;
+    }
+
+    private async void RecentReplays_ScrollChanged(
+        object sender,
+        ScrollChangedEventArgs e)
+    {
+        if (!_hasMoreReplays || e.ExtentHeight - e.ViewportHeight - e.VerticalOffset > 2)
+            return;
+        await LoadMoreReplaysAsync();
+    }
+
+    private async Task LoadMoreReplaysAsync()
+    {
+        if (Interlocked.Exchange(ref _libraryRefreshInProgress, 1) != 0)
+            return;
+        try
+        {
+            IReadOnlyList<ReplayClip> clips = await _replayLibrary.GetPageAsync(
+                _outputDirectory,
+                _replayItems.Count,
+                ReplayPageSize,
+                _lifetimeCts.Token);
+            foreach (ReplayClip clip in clips)
+                _replayItems.Add(CreateReplayClipItem(clip));
+            _hasMoreReplays = clips.Count == ReplayPageSize;
+        }
+        catch (OperationCanceledException) when (_lifetimeCts.IsCancellationRequested)
+        {
+            // Window is closing.
+        }
+        catch (Exception exception)
+        {
+            Log.Write($"Replay library page failed: {exception.Message}");
+            _hasMoreReplays = false;
+        }
+        finally
+        {
+            Interlocked.Exchange(ref _libraryRefreshInProgress, 0);
+        }
     }
 
     private ReplayClipItem CreateReplayClipItem(ReplayClip clip)
@@ -2460,6 +2508,7 @@ public partial class SettingsWindow : Window
                 thumbnail = new BitmapImage();
                 thumbnail.BeginInit();
                 thumbnail.CacheOption = BitmapCacheOption.OnLoad;
+                thumbnail.DecodePixelWidth = 224;
                 thumbnail.UriSource = new Uri(clip.ThumbnailPath);
                 thumbnail.EndInit();
                 thumbnail.Freeze();

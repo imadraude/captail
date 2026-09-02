@@ -21,6 +21,9 @@ public sealed record ReplayClip(
 
 public sealed class ReplayLibrary
 {
+    private const long MaximumCacheBytes = 512L * 1024 * 1024;
+    private static readonly TimeSpan MaximumCacheAge = TimeSpan.FromDays(30);
+    private static int _cacheMaintenanceStarted;
     private static readonly HashSet<string> VideoExtensions = new(
         [".mp4", ".mkv", ".mov", ".webm"],
         StringComparer.OrdinalIgnoreCase);
@@ -31,13 +34,24 @@ public sealed class ReplayLibrary
     {
         _ffmpeg = ffmpeg;
         _thumbnailDirectory = AppDataPaths.ThumbnailDirectory;
+        if (Interlocked.Exchange(ref _cacheMaintenanceStarted, 1) == 0)
+            _ = Task.Run(MaintainCache);
     }
 
     public async Task<IReadOnlyList<ReplayClip>> GetRecentAsync(
         string rootDirectory,
         int limit,
         CancellationToken cancellationToken = default)
+        => await GetPageAsync(rootDirectory, 0, limit, cancellationToken);
+
+    public async Task<IReadOnlyList<ReplayClip>> GetPageAsync(
+        string rootDirectory,
+        int skip,
+        int limit,
+        CancellationToken cancellationToken = default)
     {
+        if (skip < 0)
+            throw new ArgumentOutOfRangeException(nameof(skip));
         if (limit <= 0 || !Directory.Exists(rootDirectory))
             return [];
 
@@ -51,15 +65,14 @@ public sealed class ReplayLibrary
                 IgnoreInaccessible = true,
                 AttributesToSkip = FileAttributes.ReparsePoint,
             };
-            files = Directory.EnumerateFiles(root, "*", options)
+            // Keep only the requested prefix. A full OrderBy materializes every
+            // FileInfo and scales poorly for long-running replay libraries.
+            IEnumerable<FileInfo> candidates = Directory.EnumerateFiles(root, "*", options)
                 .Where(path =>
                     VideoExtensions.Contains(Path.GetExtension(path)) &&
                     !IsInternalWorkingFile(path))
-                .Select(path => new FileInfo(path))
-                .Where(file => file.Exists && file.Length > 0)
-                .OrderByDescending(file => file.LastWriteTimeUtc)
-                .Take(limit)
-                .ToList();
+                .Select(path => new FileInfo(path));
+            files = SelectPage(candidates, skip, limit, cancellationToken);
         }
         catch (Exception exception) when (
             exception is IOException or UnauthorizedAccessException)
@@ -81,6 +94,37 @@ public sealed class ReplayLibrary
                 clips[index] = await LoadClipAsync(root, files[index], token);
             });
         return clips;
+    }
+
+    internal static List<FileInfo> SelectPage(
+        IEnumerable<FileInfo> candidates,
+        int skip,
+        int limit,
+        CancellationToken cancellationToken = default)
+    {
+        if (skip < 0)
+            throw new ArgumentOutOfRangeException(nameof(skip));
+        if (limit <= 0)
+            return [];
+
+        int retainedCount = checked(skip + limit);
+        var newest = new PriorityQueue<FileInfo, (long Ticks, string Path)>();
+        foreach (FileInfo file in candidates)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (!file.Exists || file.Length <= 0)
+                continue;
+            newest.Enqueue(file, (file.LastWriteTimeUtc.Ticks, file.FullName));
+            if (newest.Count > retainedCount)
+                newest.Dequeue();
+        }
+        return newest.UnorderedItems
+            .Select(item => item.Element)
+            .OrderByDescending(file => file.LastWriteTimeUtc)
+            .ThenByDescending(file => file.FullName, StringComparer.OrdinalIgnoreCase)
+            .Skip(skip)
+            .Take(limit)
+            .ToList();
     }
 
     public void Reveal(string rootDirectory, ReplayClip clip)
@@ -261,7 +305,7 @@ public sealed class ReplayLibrary
         if (!_ffmpeg.IsAvailable || clip.Duration <= TimeSpan.Zero)
             return clip.ThumbnailPath;
 
-        long bucket = Math.Max(0, (long)(position.TotalMilliseconds / 100) * 100);
+        long bucket = Math.Max(0, (long)(position.TotalMilliseconds / 250) * 250);
         string identity = $"{source}|{clip.SizeBytes}|{clip.SavedAt.ToUniversalTime().Ticks}|{bucket}";
         string hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(identity)));
         string path = Path.Combine(_thumbnailDirectory, $"{hash}_preview.jpg");
@@ -366,6 +410,50 @@ public sealed class ReplayLibrary
         catch (IOException)
         {
             // Cache cleanup is best effort.
+        }
+    }
+
+    private void MaintainCache()
+    {
+        try
+        {
+            if (!Directory.Exists(_thumbnailDirectory))
+                return;
+
+            DateTime cutoff = DateTime.UtcNow - MaximumCacheAge;
+            FileInfo[] files = Directory.EnumerateFiles(_thumbnailDirectory)
+                .Select(path => new FileInfo(path))
+                .Where(file => file.Exists)
+                .OrderByDescending(file => file.LastWriteTimeUtc)
+                .ToArray();
+            long retainedBytes = 0;
+            foreach (FileInfo file in files)
+            {
+                bool expired = file.LastWriteTimeUtc < cutoff;
+                bool overBudget = retainedBytes + file.Length > MaximumCacheBytes;
+                if (expired || overBudget)
+                {
+                    try
+                    {
+                        file.Delete();
+                    }
+                    catch (IOException)
+                    {
+                        // Cache cleanup is best effort.
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                        // Cache cleanup is best effort.
+                    }
+                    continue;
+                }
+                retainedBytes += file.Length;
+            }
+        }
+        catch (Exception exception) when (
+            exception is IOException or UnauthorizedAccessException)
+        {
+            Log.Write($"Thumbnail cache cleanup failed: {exception.Message}");
         }
     }
 }

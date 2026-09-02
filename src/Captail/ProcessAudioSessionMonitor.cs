@@ -313,7 +313,7 @@ internal static class ProcessAudioSessionDiscovery
 
 internal sealed class ProcessAudioSessionMonitor : IAsyncDisposable
 {
-    private static readonly TimeSpan PollInterval = TimeSpan.FromMilliseconds(160);
+    private static readonly TimeSpan PollInterval = TimeSpan.FromMilliseconds(250);
     private static readonly TimeSpan ProcessRefreshInterval = TimeSpan.FromSeconds(2);
     private readonly Action<ProcessAudioSessionUpdate> _updated;
     private readonly CancellationTokenSource _cancellation = new();
