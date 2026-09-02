@@ -329,6 +329,17 @@
   <sys:String x:Key="L.Engine.BufferUnexpectedStop">O buffer de replay parou inesperadamente.</sys:String>
   <sys:String x:Key="L.Engine.BufferError">Buffer de replay: {0}</sys:String>
 
+  <sys:String x:Key="L.Video.BitrateCustomHint">Automático ou valor personalizado de 2 a 100 Mbps</sys:String>
+  <sys:String x:Key="L.Video.NvencMode">Modo NVENC</sys:String>
+  <sys:String x:Key="L.Help.NvencLowOverhead">A carga baixa usa P2 e baixa latência sem multipass, lookahead ou quadros B.</sys:String>
+  <sys:String x:Key="L.Video.NvencBalanced">Equilibrado (padrão)</sys:String>
+  <sys:String x:Key="L.Video.NvencLowOverhead">Carga baixa</sys:String>
+  <sys:String x:Key="L.Video.AdaptiveQuantization">Quantização adaptativa</sys:String>
+  <sys:String x:Key="L.Video.EstimatedRamBuffer">Buffer de RAM estimado</sys:String>
+  <sys:String x:Key="L.Video.NvencUnavailable">As configurações NVENC não estão disponíveis para o codificador selecionado.</sys:String>
+  <sys:String x:Key="L.Video.RamEstimate">≈ {0:0} MB por {1:0.#} min · {2} faixa(s) de áudio · vídeo a {4} Mbps</sys:String>
+  <sys:String x:Key="L.Video.RamEstimateCapped">≈ {0:0} MB por {1:0.#} min · {2} faixa(s) de áudio · limite {3} MB · vídeo a {4} Mbps</sys:String>
+
   <sys:String x:Key="L.Unit.Seconds">{0} segundos</sys:String>
   <sys:String x:Key="L.Unit.Minutes">{0} min</sys:String>
   <sys:String x:Key="L.Unit.GB">{0} GB</sys:String>

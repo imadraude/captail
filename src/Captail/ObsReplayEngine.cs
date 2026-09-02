@@ -995,7 +995,7 @@ public sealed class ObsReplayEngine : IDisposable
 
     private static string ToObsPath(string path) => path.Replace('\\', '/');
 
-    private static (uint Width, uint Height) ResolveOutputSize(
+    internal static (uint Width, uint Height) ResolveOutputSize(
         uint sourceWidth,
         uint sourceHeight,
         string setting) =>
@@ -1473,11 +1473,11 @@ public sealed class ObsReplayEngine : IDisposable
         CodecCapability encoder,
         EncoderLoadProfile loadProfile)
     {
-        int bitrateMbps = _config.BitrateMbps > 0
-            ? _config.BitrateMbps
-            : AutomaticBitrateMbps(loadProfile, _config.Codec);
-        if (encoder.Family == "qsv")
-            bitrateMbps = Math.Min(bitrateMbps, 65);
+        int bitrateMbps = EffectiveBitrateMbps(
+            _config.BitrateMbps,
+            loadProfile,
+            _config.Codec,
+            encoder.Family);
         ActiveBitrateMbps = bitrateMbps;
 
         ObsNative.obs_data_set_int(settings, "bitrate", bitrateMbps * 1000L);
@@ -1490,7 +1490,7 @@ public sealed class ObsReplayEngine : IDisposable
         switch (encoder.Family)
         {
             case "nvenc":
-                ConfigureNvenc(settings, loadProfile, encoder.Codec);
+                ConfigureNvenc(settings, loadProfile, encoder.Codec, _config);
                 break;
             case "amf":
                 ConfigureAmf(settings, loadProfile);
@@ -1511,34 +1511,60 @@ public sealed class ObsReplayEngine : IDisposable
     private static void ConfigureNvenc(
         nint settings,
         EncoderLoadProfile loadProfile,
-        string codec)
+        string codec,
+        Config config)
     {
-        ObsNative.obs_data_set_string(
+        NvencSettings recommendation = RecommendedNvencSettings(
+            codec,
+            config.NvencMode,
+            config.LowOverheadAdaptiveQuantization,
+            loadProfile);
+        ObsNative.obs_data_set_string(settings, "preset", recommendation.Preset);
+        ObsNative.obs_data_set_string(settings, "tune", recommendation.Tune);
+        ObsNative.obs_data_set_string(settings, "multipass", recommendation.Multipass);
+        ObsNative.obs_data_set_bool(settings, "lookahead", recommendation.Lookahead);
+        ObsNative.obs_data_set_bool(
             settings,
-            "preset",
-            loadProfile switch
+            "adaptive_quantization",
+            recommendation.AdaptiveQuantization);
+        ObsNative.obs_data_set_int(settings, "bf", recommendation.BFrames);
+    }
+
+    internal static NvencSettings RecommendedNvencSettings(
+        string codec,
+        string mode,
+        bool lowOverheadAdaptiveQuantization,
+        EncoderLoadProfile loadProfile)
+    {
+        bool lowOverhead = string.Equals(
+            mode,
+            NvencModes.LowOverhead,
+            StringComparison.Ordinal);
+        return new NvencSettings(
+            lowOverhead ? "p2" : loadProfile switch
             {
                 EncoderLoadProfile.Standard => "p4",
                 EncoderLoadProfile.High => "p3",
                 _ => "p2",
-            });
-        ObsNative.obs_data_set_string(
-            settings,
-            "tune",
-            loadProfile == EncoderLoadProfile.Standard ? "hq" : "ll");
-        ObsNative.obs_data_set_string(settings, "multipass", "disabled");
-        ObsNative.obs_data_set_bool(settings, "lookahead", false);
-        ObsNative.obs_data_set_bool(
-            settings,
-            "adaptive_quantization",
-            loadProfile == EncoderLoadProfile.Standard);
-        ObsNative.obs_data_set_int(
-            settings,
-            "bf",
+            },
+            lowOverhead ? "ll" : loadProfile == EncoderLoadProfile.Standard ? "hq" : "ll",
+            "disabled",
+            false,
+            lowOverhead
+                ? lowOverheadAdaptiveQuantization
+                : loadProfile == EncoderLoadProfile.Standard,
             RecommendedNvencBFrames(
                 codec,
-                loadProfile == EncoderLoadProfile.Standard));
+                !lowOverhead && loadProfile == EncoderLoadProfile.Standard));
     }
+
+    internal sealed record NvencSettings(
+        string Preset,
+        string Tune,
+        string Multipass,
+        bool Lookahead,
+        bool AdaptiveQuantization,
+        int BFrames);
 
     internal static int RecommendedNvencBFrames(string codec, bool standardLoad) =>
         standardLoad &&
@@ -1589,15 +1615,34 @@ public sealed class ObsReplayEngine : IDisposable
             loadProfile == EncoderLoadProfile.Standard ? 2 : 0);
     }
 
-    private EncoderLoadProfile SelectLoadProfile()
+    private EncoderLoadProfile SelectLoadProfile() =>
+        SelectLoadProfile(_outputWidth, _outputHeight, _config.FrameRate);
+
+    internal static EncoderLoadProfile SelectLoadProfile(
+        uint outputWidth,
+        uint outputHeight,
+        int frameRate)
     {
-        ulong pixelsPerSecond =
-            (ulong)_outputWidth * _outputHeight * (uint)_config.FrameRate;
-        if (_config.FrameRate >= 240 || pixelsPerSecond > 600_000_000)
+        ulong pixelsPerSecond = (ulong)outputWidth * outputHeight * (uint)frameRate;
+        if (frameRate >= 240 || pixelsPerSecond > 600_000_000)
             return EncoderLoadProfile.Extreme;
-        if (_config.FrameRate >= 120 || pixelsPerSecond > 220_000_000)
+        if (frameRate >= 120 || pixelsPerSecond > 220_000_000)
             return EncoderLoadProfile.High;
         return EncoderLoadProfile.Standard;
+    }
+
+    internal static int EffectiveBitrateMbps(
+        int configuredBitrateMbps,
+        EncoderLoadProfile loadProfile,
+        string codec,
+        string? encoderFamily)
+    {
+        int bitrateMbps = configuredBitrateMbps > 0
+            ? configuredBitrateMbps
+            : AutomaticBitrateMbps(loadProfile, codec);
+        return string.Equals(encoderFamily, "qsv", StringComparison.OrdinalIgnoreCase)
+            ? Math.Min(bitrateMbps, 65)
+            : bitrateMbps;
     }
 
     private static int AutomaticBitrateMbps(
@@ -1616,7 +1661,7 @@ public sealed class ObsReplayEngine : IDisposable
             _ => 80,
         };
 
-    private enum EncoderLoadProfile
+    internal enum EncoderLoadProfile
     {
         Standard,
         High,

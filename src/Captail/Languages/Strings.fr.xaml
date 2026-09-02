@@ -329,6 +329,17 @@
   <sys:String x:Key="L.Engine.BufferUnexpectedStop">Le tampon du replay s'est arrêté de manière inattendue.</sys:String>
   <sys:String x:Key="L.Engine.BufferError">Tampon du replay : {0}</sys:String>
 
+  <sys:String x:Key="L.Video.BitrateCustomHint">Auto ou valeur personnalisée de 2 à 100 Mbit/s</sys:String>
+  <sys:String x:Key="L.Video.NvencMode">Mode NVENC</sys:String>
+  <sys:String x:Key="L.Help.NvencLowOverhead">La faible charge utilise P2 et une faible latence, sans multipasse, anticipation ni images B.</sys:String>
+  <sys:String x:Key="L.Video.NvencBalanced">Équilibré (par défaut)</sys:String>
+  <sys:String x:Key="L.Video.NvencLowOverhead">Faible charge</sys:String>
+  <sys:String x:Key="L.Video.AdaptiveQuantization">Quantification adaptative</sys:String>
+  <sys:String x:Key="L.Video.EstimatedRamBuffer">Tampon RAM estimé</sys:String>
+  <sys:String x:Key="L.Video.NvencUnavailable">Les réglages NVENC ne sont pas disponibles pour l’encodeur sélectionné.</sys:String>
+  <sys:String x:Key="L.Video.RamEstimate">≈ {0:0} Mo pour {1:0.#} min · {2} piste(s) audio · vidéo {4} Mbit/s</sys:String>
+  <sys:String x:Key="L.Video.RamEstimateCapped">≈ {0:0} Mo pour {1:0.#} min · {2} piste(s) audio · limite {3} Mo · vidéo {4} Mbit/s</sys:String>
+
   <sys:String x:Key="L.Unit.Seconds">{0} secondes</sys:String>
   <sys:String x:Key="L.Unit.Minutes">{0} minutes</sys:String>
   <sys:String x:Key="L.Unit.GB">{0} Go</sys:String>

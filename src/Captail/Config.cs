@@ -18,6 +18,10 @@ public sealed class Config
     public int FrameRate { get; set; } = 60;
     /// <summary>0 = adaptive bitrate based on codec and load.</summary>
     public int BitrateMbps { get; set; }
+    /// <summary>See <see cref="NvencModes"/>.</summary>
+    public string NvencMode { get; set; } = NvencModes.Balanced;
+    /// <summary>Only used by the low-overhead NVENC mode.</summary>
+    public bool LowOverheadAdaptiveQuantization { get; set; }
     public string Hotkey { get; set; } = "Ctrl+Shift+F10";
     public string ToggleReplayHotkey { get; set; } = "Ctrl+Shift+F9";
     public bool ReplayEnabled { get; set; } = true;
@@ -161,6 +165,8 @@ public sealed class Config
         MaxReplaySizeMb = source.MaxReplaySizeMb;
         FrameRate = source.FrameRate;
         BitrateMbps = source.BitrateMbps;
+        NvencMode = source.NvencMode;
+        LowOverheadAdaptiveQuantization = source.LowOverheadAdaptiveQuantization;
         Hotkey = source.Hotkey;
         ToggleReplayHotkey = source.ToggleReplayHotkey;
         ReplayEnabled = source.ReplayEnabled;
@@ -202,6 +208,8 @@ public sealed class Config
         MaxReplaySizeMb == other.MaxReplaySizeMb &&
         FrameRate == other.FrameRate &&
         BitrateMbps == other.BitrateMbps &&
+        string.Equals(NvencMode, other.NvencMode, StringComparison.Ordinal) &&
+        LowOverheadAdaptiveQuantization == other.LowOverheadAdaptiveQuantization &&
         string.Equals(Codec, other.Codec, StringComparison.Ordinal) &&
         MonitorIndex == other.MonitorIndex &&
         string.Equals(RecordingResolution, other.RecordingResolution, StringComparison.Ordinal) &&
@@ -228,7 +236,11 @@ public sealed class Config
         BufferSeconds = AllowedValue(BufferSeconds, [15, 30, 60, 120, 300, 600, 900], 300);
         MaxReplaySizeMb = AllowedValue(MaxReplaySizeMb, [0, 250, 500, 1000, 2000, 5000, 10000], 0);
         FrameRate = AllowedValue(FrameRate, [30, 60, 120, 144, 240], 60);
-        BitrateMbps = AllowedValue(BitrateMbps, [0, 10, 20, 50, 80], 0);
+        BitrateMbps = BitrateMbps == 0 ? 0 : Math.Clamp(BitrateMbps, 2, 100);
+        NvencMode = AllowedText(
+            NvencMode,
+            [NvencModes.Balanced, NvencModes.LowOverhead],
+            NvencModes.Balanced);
         Hotkey = NormalizeHotkey(Hotkey, "Ctrl+Shift+F10");
         ToggleReplayHotkey = NormalizeHotkey(ToggleReplayHotkey, "Ctrl+Shift+F9");
         if (!HotkeyManager.IsValid(Hotkey))
@@ -343,6 +355,20 @@ public sealed class Config
     private static int AllowedValue(int value, int[] allowed, int fallback) =>
         allowed.Contains(value) ? value : fallback;
 
+    internal static long EstimateReplayBytes(
+        int videoBitrateMbps,
+        int durationSeconds,
+        int audioBitrateKbps,
+        int audioTrackCount)
+    {
+        int video = Math.Clamp(videoBitrateMbps, 2, 100);
+        int duration = Math.Max(0, durationSeconds);
+        int audio = Math.Clamp(audioBitrateKbps, 0, 512);
+        int tracks = Math.Clamp(audioTrackCount, 0, 6);
+        long totalBitsPerSecond = video * 1_000_000L + audio * 1_000L * tracks;
+        return (totalBitsPerSecond * duration + 7) / 8;
+    }
+
     private static string AllowedText(
         string? value,
         string[] allowed,
@@ -390,6 +416,12 @@ public sealed class Config
 
     private static string NormalizeLanguage(string? language) =>
         Localization.NormalizeLanguage(language);
+}
+
+internal static class NvencModes
+{
+    internal const string Balanced = "balanced";
+    internal const string LowOverhead = "low-overhead";
 }
 
 public sealed class ProcessAudioRoute
