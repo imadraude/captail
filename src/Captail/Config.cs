@@ -18,8 +18,8 @@ public sealed class Config
     public int FrameRate { get; set; } = 60;
     /// <summary>0 = adaptive bitrate based on codec and load.</summary>
     public int BitrateMbps { get; set; }
-    /// <summary>"balanced" preserves Captail defaults; "low-overhead" minimizes NVENC GPU work.</summary>
-    public string NvencMode { get; set; } = "balanced";
+    /// <summary>See <see cref="NvencModes"/>.</summary>
+    public string NvencMode { get; set; } = NvencModes.Balanced;
     /// <summary>Only used by the low-overhead NVENC mode.</summary>
     public bool LowOverheadAdaptiveQuantization { get; set; }
     public string Hotkey { get; set; } = "Ctrl+Shift+F10";
@@ -237,7 +237,10 @@ public sealed class Config
         MaxReplaySizeMb = AllowedValue(MaxReplaySizeMb, [0, 250, 500, 1000, 2000, 5000, 10000], 0);
         FrameRate = AllowedValue(FrameRate, [30, 60, 120, 144, 240], 60);
         BitrateMbps = BitrateMbps == 0 ? 0 : Math.Clamp(BitrateMbps, 2, 100);
-        NvencMode = AllowedText(NvencMode, ["balanced", "low-overhead"], "balanced");
+        NvencMode = AllowedText(
+            NvencMode,
+            [NvencModes.Balanced, NvencModes.LowOverhead],
+            NvencModes.Balanced);
         Hotkey = NormalizeHotkey(Hotkey, "Ctrl+Shift+F10");
         ToggleReplayHotkey = NormalizeHotkey(ToggleReplayHotkey, "Ctrl+Shift+F9");
         if (!HotkeyManager.IsValid(Hotkey))
@@ -413,6 +416,12 @@ public sealed class Config
 
     private static string NormalizeLanguage(string? language) =>
         Localization.NormalizeLanguage(language);
+}
+
+internal static class NvencModes
+{
+    internal const string Balanced = "balanced";
+    internal const string LowOverhead = "low-overhead";
 }
 
 public sealed class ProcessAudioRoute

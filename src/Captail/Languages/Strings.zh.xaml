@@ -331,6 +331,17 @@
   <sys:String x:Key="L.Engine.BufferUnexpectedStop">回放缓冲区意外停止。</sys:String>
   <sys:String x:Key="L.Engine.BufferError">回放缓冲区：{0}</sys:String>
 
+  <sys:String x:Key="L.Video.BitrateCustomHint">自动或 2 到 100 Mbps 的自定义值</sys:String>
+  <sys:String x:Key="L.Video.NvencMode">NVENC 模式</sys:String>
+  <sys:String x:Key="L.Help.NvencLowOverhead">低开销模式使用 P2 和低延迟调优，不使用多通道、前瞻或 B 帧。</sys:String>
+  <sys:String x:Key="L.Video.NvencBalanced">均衡（默认）</sys:String>
+  <sys:String x:Key="L.Video.NvencLowOverhead">低开销</sys:String>
+  <sys:String x:Key="L.Video.AdaptiveQuantization">自适应量化</sys:String>
+  <sys:String x:Key="L.Video.EstimatedRamBuffer">预计 RAM 缓冲区</sys:String>
+  <sys:String x:Key="L.Video.NvencUnavailable">所选编码器不支持 NVENC 设置。</sys:String>
+  <sys:String x:Key="L.Video.RamEstimate">≈ {0:0} MB / {1:0.#} 分钟 · {2} 条音轨 · 视频 {4} Mbps</sys:String>
+  <sys:String x:Key="L.Video.RamEstimateCapped">≈ {0:0} MB / {1:0.#} 分钟 · {2} 条音轨 · 上限 {3} MB · 视频 {4} Mbps</sys:String>
+
   <sys:String x:Key="L.Unit.Seconds">{0} 秒</sys:String>
   <sys:String x:Key="L.Unit.Minutes">{0} 分钟</sys:String>
   <sys:String x:Key="L.Unit.GB">{0} GB</sys:String>

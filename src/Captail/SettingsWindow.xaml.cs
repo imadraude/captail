@@ -156,6 +156,7 @@ public partial class SettingsWindow : Window
             _config.Codec = fallback;
         }
         UpdateHardwareEncoderText();
+        UpdatePerformanceSettingsState();
     }
 
     public void UpdateCapabilities(EncoderCapabilities capabilities)
@@ -969,7 +970,19 @@ public partial class SettingsWindow : Window
     {
         if (!IsInitialized)
             return;
-        LowOverheadAqBox.IsEnabled = GetSelectedTag(NvencModeBox, "balanced") == "low-overhead";
+        string codec = GetSelectedTag(CodecBox, _config.Codec);
+        bool nvencAvailable = string.Equals(
+            _capabilities.Preferred(codec)?.Family,
+            "nvenc",
+            StringComparison.OrdinalIgnoreCase);
+        NvencSettingsRow.IsEnabled = nvencAvailable;
+        NvencSettingsRow.ToolTip = nvencAvailable
+            ? null
+            : Localization.Text("L.Video.NvencUnavailable");
+        LowOverheadAqBox.IsEnabled =
+            nvencAvailable &&
+            GetSelectedTag(NvencModeBox, NvencModes.Balanced) ==
+                NvencModes.LowOverhead;
         UpdateRamEstimate();
     }
 
@@ -977,24 +990,54 @@ public partial class SettingsWindow : Window
     {
         if (!IsInitialized)
             return;
-        int bitrate = GetBitrateMbps(BitrateBox, _config.BitrateMbps);
-        if (bitrate == 0)
-        {
-            RamEstimateText.Text = "Auto bitrate · estimate updates when a fixed bitrate is selected";
-            return;
-        }
         int duration = GetSelectedRadioInt(BufferOptions, _config.BufferSeconds);
         Config pending = _config.Clone();
+        ApplyPerformanceSettings(pending);
+        pending.Codec = GetSelectedTag(CodecBox, _config.Codec);
+        pending.FrameRate = GetSelectedRadioInt(FpsOptions, _config.FrameRate);
+        pending.MonitorIndex = GetSelectedInt(MonitorBox, _config.MonitorIndex);
+        pending.RecordingResolution = GetSelectedTag(
+            ResolutionBox,
+            _config.RecordingResolution);
         pending.CaptureSystemAudio = SystemAudioBox.IsChecked == true;
         pending.CaptureMicrophone = MicBox.IsChecked == true;
         pending.SeparateAudioTracks = GetSelectedTag(AudioTrackModeBox, "mixed") == "separate";
+
+        CaptureInterop.MonitorInfo? monitor = _monitors.FirstOrDefault(item =>
+            item.Index == pending.MonitorIndex);
+        uint sourceWidth = (uint)Math.Max(1, monitor?.Width ?? 1920);
+        uint sourceHeight = (uint)Math.Max(1, monitor?.Height ?? 1080);
+        (uint outputWidth, uint outputHeight) = ObsReplayEngine.ResolveOutputSize(
+            sourceWidth,
+            sourceHeight,
+            pending.RecordingResolution);
+        ObsReplayEngine.EncoderLoadProfile loadProfile =
+            ObsReplayEngine.SelectLoadProfile(
+                outputWidth,
+                outputHeight,
+                pending.FrameRate);
+        string? encoderFamily = _capabilities.Preferred(pending.Codec)?.Family;
+        int bitrate = ObsReplayEngine.EffectiveBitrateMbps(
+            pending.BitrateMbps,
+            loadProfile,
+            pending.Codec,
+            encoderFamily);
         int tracks = ObsReplayEngine.AudioTrackCount(pending);
         long bytes = Config.EstimateReplayBytes(bitrate, duration, pending.AudioBitrateKbps, tracks);
         int limitMb = GetSelectedInt(ReplaySizeLimitBox, 0);
-        string cap = limitMb > 0 && bytes > limitMb * 1024L * 1024L
-            ? $" · capped at {limitMb} MB"
-            : "";
-        RamEstimateText.Text = $"≈ {bytes / 1024d / 1024d:0} MB for {duration / 60d:0.#} min · includes {tracks} audio track(s){cap}";
+        bool capped = limitMb > 0 && bytes > limitMb * 1024L * 1024L;
+        if (capped)
+            bytes = limitMb * 1024L * 1024L;
+        string estimateKey = capped
+            ? "L.Video.RamEstimateCapped"
+            : "L.Video.RamEstimate";
+        RamEstimateText.Text = Localization.Format(
+            estimateKey,
+            bytes / 1024d / 1024d,
+            duration / 60d,
+            tracks,
+            limitMb,
+            bitrate);
     }
 
     private void SettingsValue_Changed(
@@ -1045,9 +1088,7 @@ public partial class SettingsWindow : Window
         candidate.MaxReplaySizeMb = GetSelectedInt(ReplaySizeLimitBox, 0);
         candidate.CaptureSource = GetSelectedTag(CaptureSourceBox, "desktop");
         candidate.Codec = GetSelectedTag(CodecBox, _config.Codec);
-        candidate.BitrateMbps = GetBitrateMbps(BitrateBox, _config.BitrateMbps);
-        candidate.NvencMode = GetSelectedTag(NvencModeBox, _config.NvencMode);
-        candidate.LowOverheadAdaptiveQuantization = LowOverheadAqBox.IsChecked == true;
+        ApplyPerformanceSettings(candidate);
         candidate.FrameRate = GetSelectedRadioInt(FpsOptions, _config.FrameRate);
         candidate.MonitorIndex = GetSelectedInt(MonitorBox, _config.MonitorIndex);
         candidate.RecordingResolution = GetSelectedTag(ResolutionBox, "source");
@@ -2235,9 +2276,7 @@ public partial class SettingsWindow : Window
         try
         {
             candidate.Codec = selectedCodec;
-            candidate.BitrateMbps = GetBitrateMbps(BitrateBox, _config.BitrateMbps);
-            candidate.NvencMode = GetSelectedTag(NvencModeBox, _config.NvencMode);
-            candidate.LowOverheadAdaptiveQuantization = LowOverheadAqBox.IsChecked == true;
+            ApplyPerformanceSettings(candidate);
             candidate.FrameRate = GetSelectedRadioInt(FpsOptions, _config.FrameRate);
             candidate.MonitorIndex = GetSelectedInt(MonitorBox, _config.MonitorIndex);
             candidate.RecordingResolution = GetSelectedTag(ResolutionBox, "source");
@@ -2266,6 +2305,15 @@ public partial class SettingsWindow : Window
                     AutostartBox.IsChecked == true))
                 // Keep pending choices visible so the failing setting can be corrected.
                 return;
+
+            int displayedBitrate = GetBitrateMbps(
+                BitrateBox,
+                _config.BitrateMbps);
+            if (candidate.BitrateMbps != displayedBitrate)
+            {
+                BitrateBox.SelectedItem = null;
+                BitrateBox.Text = candidate.BitrateMbps.ToString();
+            }
 
             Applied = true;
             _savedAutostartEnabled = AutostartBox.IsChecked == true;
@@ -2860,6 +2908,21 @@ public partial class SettingsWindow : Window
 
     private static int GetSelectedInt(ComboBox box, int fallback) =>
         int.TryParse(GetSelectedTag(box, ""), out int value) ? value : fallback;
+
+    private void ApplyPerformanceSettings(Config candidate)
+    {
+        int configuredBitrate = GetBitrateMbps(BitrateBox, _config.BitrateMbps);
+        string codec = GetSelectedTag(CodecBox, _config.Codec);
+        string? encoderFamily = _capabilities.Preferred(codec)?.Family;
+        candidate.BitrateMbps = string.Equals(
+            encoderFamily,
+            "qsv",
+            StringComparison.OrdinalIgnoreCase)
+                ? Math.Min(configuredBitrate, 65)
+                : configuredBitrate;
+        candidate.NvencMode = GetSelectedTag(NvencModeBox, _config.NvencMode);
+        candidate.LowOverheadAdaptiveQuantization = LowOverheadAqBox.IsChecked == true;
+    }
 
     private static int GetBitrateMbps(ComboBox box, int fallback)
     {

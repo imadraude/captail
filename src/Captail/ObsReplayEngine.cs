@@ -995,7 +995,7 @@ public sealed class ObsReplayEngine : IDisposable
 
     private static string ToObsPath(string path) => path.Replace('\\', '/');
 
-    private static (uint Width, uint Height) ResolveOutputSize(
+    internal static (uint Width, uint Height) ResolveOutputSize(
         uint sourceWidth,
         uint sourceHeight,
         string setting) =>
@@ -1473,11 +1473,11 @@ public sealed class ObsReplayEngine : IDisposable
         CodecCapability encoder,
         EncoderLoadProfile loadProfile)
     {
-        int bitrateMbps = _config.BitrateMbps > 0
-            ? _config.BitrateMbps
-            : AutomaticBitrateMbps(loadProfile, _config.Codec);
-        if (encoder.Family == "qsv")
-            bitrateMbps = Math.Min(bitrateMbps, 65);
+        int bitrateMbps = EffectiveBitrateMbps(
+            _config.BitrateMbps,
+            loadProfile,
+            _config.Codec,
+            encoder.Family);
         ActiveBitrateMbps = bitrateMbps;
 
         ObsNative.obs_data_set_int(settings, "bitrate", bitrateMbps * 1000L);
@@ -1536,7 +1536,10 @@ public sealed class ObsReplayEngine : IDisposable
         bool lowOverheadAdaptiveQuantization,
         EncoderLoadProfile loadProfile)
     {
-        bool lowOverhead = string.Equals(mode, "low-overhead", StringComparison.Ordinal);
+        bool lowOverhead = string.Equals(
+            mode,
+            NvencModes.LowOverhead,
+            StringComparison.Ordinal);
         return new NvencSettings(
             lowOverhead ? "p2" : loadProfile switch
             {
@@ -1612,15 +1615,34 @@ public sealed class ObsReplayEngine : IDisposable
             loadProfile == EncoderLoadProfile.Standard ? 2 : 0);
     }
 
-    private EncoderLoadProfile SelectLoadProfile()
+    private EncoderLoadProfile SelectLoadProfile() =>
+        SelectLoadProfile(_outputWidth, _outputHeight, _config.FrameRate);
+
+    internal static EncoderLoadProfile SelectLoadProfile(
+        uint outputWidth,
+        uint outputHeight,
+        int frameRate)
     {
-        ulong pixelsPerSecond =
-            (ulong)_outputWidth * _outputHeight * (uint)_config.FrameRate;
-        if (_config.FrameRate >= 240 || pixelsPerSecond > 600_000_000)
+        ulong pixelsPerSecond = (ulong)outputWidth * outputHeight * (uint)frameRate;
+        if (frameRate >= 240 || pixelsPerSecond > 600_000_000)
             return EncoderLoadProfile.Extreme;
-        if (_config.FrameRate >= 120 || pixelsPerSecond > 220_000_000)
+        if (frameRate >= 120 || pixelsPerSecond > 220_000_000)
             return EncoderLoadProfile.High;
         return EncoderLoadProfile.Standard;
+    }
+
+    internal static int EffectiveBitrateMbps(
+        int configuredBitrateMbps,
+        EncoderLoadProfile loadProfile,
+        string codec,
+        string? encoderFamily)
+    {
+        int bitrateMbps = configuredBitrateMbps > 0
+            ? configuredBitrateMbps
+            : AutomaticBitrateMbps(loadProfile, codec);
+        return string.Equals(encoderFamily, "qsv", StringComparison.OrdinalIgnoreCase)
+            ? Math.Min(bitrateMbps, 65)
+            : bitrateMbps;
     }
 
     private static int AutomaticBitrateMbps(

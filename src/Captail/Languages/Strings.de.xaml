@@ -329,6 +329,17 @@
   <sys:String x:Key="L.Engine.BufferUnexpectedStop">Der Replay-Puffer wurde unerwartet gestoppt.</sys:String>
   <sys:String x:Key="L.Engine.BufferError">Replay-Puffer: {0}</sys:String>
 
+  <sys:String x:Key="L.Video.BitrateCustomHint">Automatisch oder eigener Wert von 2 bis 100 Mbit/s</sys:String>
+  <sys:String x:Key="L.Video.NvencMode">NVENC-Modus</sys:String>
+  <sys:String x:Key="L.Help.NvencLowOverhead">Geringe Last verwendet P2 und niedrige Latenz ohne Multipass, Lookahead oder B-Frames.</sys:String>
+  <sys:String x:Key="L.Video.NvencBalanced">Ausgewogen (Standard)</sys:String>
+  <sys:String x:Key="L.Video.NvencLowOverhead">Geringe Last</sys:String>
+  <sys:String x:Key="L.Video.AdaptiveQuantization">Adaptive Quantisierung</sys:String>
+  <sys:String x:Key="L.Video.EstimatedRamBuffer">Geschätzter RAM-Puffer</sys:String>
+  <sys:String x:Key="L.Video.NvencUnavailable">NVENC-Einstellungen sind für den gewählten Encoder nicht verfügbar.</sys:String>
+  <sys:String x:Key="L.Video.RamEstimate">≈ {0:0} MB für {1:0.#} Min. · {2} Audiospur(en) · Video {4} Mbit/s</sys:String>
+  <sys:String x:Key="L.Video.RamEstimateCapped">≈ {0:0} MB für {1:0.#} Min. · {2} Audiospur(en) · Limit {3} MB · Video {4} Mbit/s</sys:String>
+
   <sys:String x:Key="L.Unit.Seconds">{0} Sek</sys:String>
   <sys:String x:Key="L.Unit.Minutes">{0} Min</sys:String>
   <sys:String x:Key="L.Unit.GB">{0} GB</sys:String>

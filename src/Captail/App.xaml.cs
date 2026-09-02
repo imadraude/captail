@@ -891,7 +891,11 @@ public partial class App : Application
                 Hotkey = "Ctrl+A+B",
             };
             invalidConfig.Normalize();
-            var customBitrate = new Config { BitrateMbps = 7, NvencMode = "low-overhead" };
+            var customBitrate = new Config
+            {
+                BitrateMbps = 7,
+                NvencMode = NvencModes.LowOverhead,
+            };
             customBitrate.Normalize();
             Config persistedBitrate = customBitrate.Clone();
             long ramEstimate = Config.EstimateReplayBytes(8, 300, 192, 1);
@@ -935,6 +939,16 @@ public partial class App : Application
                 !lowOverhead.Lookahead &&
                 !lowOverhead.AdaptiveQuantization &&
                 lowOverhead.BFrames == 0 &&
+                ObsReplayEngine.EffectiveBitrateMbps(
+                    100,
+                    ObsReplayEngine.EncoderLoadProfile.Standard,
+                    "h264",
+                    "qsv") == 65 &&
+                ObsReplayEngine.EffectiveBitrateMbps(
+                    0,
+                    ObsReplayEngine.EncoderLoadProfile.Standard,
+                    "h264",
+                    "nvenc") == 25 &&
                 ObsReplayEngine.RecommendedNvencBFrames("hevc", true) == 0 &&
                 ObsReplayEngine.RecommendedNvencBFrames("h264", true) == 2 &&
                 ObsReplayEngine.RecommendedNvencBFrames("h264", false) == 0 &&
