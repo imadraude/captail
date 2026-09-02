@@ -2273,7 +2273,7 @@ public partial class App : Application
         {
             var asset = new UpdateAsset(
                 "qa",
-                new Uri("https://github.com/FaulMit/captail"),
+                new Uri(UpdateService.RepositoryUrl),
                 1,
                 $"sha256:{new string('0', 64)}");
             return Task.FromResult<UpdateRelease?>(
@@ -2281,7 +2281,7 @@ public partial class App : Application
                     new Version(0, 2, 2),
                     "v0.2.2",
                     new Uri(
-                        "https://github.com/FaulMit/captail/releases/tag/v0.2.2"),
+                        UpdateService.RepositoryUrl + "/releases/tag/v0.2.2"),
                     true,
                     asset,
                     asset,
