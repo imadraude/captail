@@ -7,6 +7,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Languages/Strings.en.xaml"/>
                 <ResourceDictionary Source="Themes/Theme.xaml"/>
+                <ResourceDictionary Source="Themes/SettingsFixes.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
