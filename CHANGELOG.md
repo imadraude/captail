@@ -4,6 +4,13 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-09-02
+
+### Fixed
+
+- Kept the editable bitrate selector the same height as the other video controls.
+- Added the missing NVENC help affordance and made tooltip spacing and hover behavior consistent across the settings window.
+
 ## [0.3.1] - 2026-09-02
 
 ### Fixed

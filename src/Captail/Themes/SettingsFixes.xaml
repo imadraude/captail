@@ -9,6 +9,7 @@
     <Setter Property="FontFamily" Value="{StaticResource FontUi}"/>
     <Setter Property="FontSize" Value="12"/>
     <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="MinHeight" Value="34"/>
     <Setter Property="Cursor" Value="Hand"/>
     <Setter Property="ItemContainerStyle" Value="{StaticResource DarkComboItem}"/>
     <Setter Property="Template">
@@ -58,7 +59,7 @@
             <TextBox x:Name="PART_EditableTextBox"
                      Visibility="Collapsed"
                      Margin="11,0,28,0"
-                     Padding="0"
+                     Padding="0,7"
                      BorderThickness="0"
                      Background="Transparent"
                      Foreground="{TemplateBinding Foreground}"

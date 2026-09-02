@@ -228,6 +228,10 @@
     </Setter>
   </Style>
 
+  <!-- String-valued tooltips are materialized by WPF as ToolTip controls.
+       Base them on the same surface and spacing as the richer help cards. -->
+  <Style TargetType="ToolTip" BasedOn="{StaticResource HelpToolTip}"/>
+
   <Style x:Key="HelpIconButton" TargetType="Button">
     <Setter Property="Width" Value="16"/>
     <Setter Property="Height" Value="16"/>
@@ -1028,6 +1032,53 @@
   </Style>
 
   <!-- ============ COMBOBOX ============ -->
+  <Style x:Key="CompactCheckBox" TargetType="CheckBox">
+    <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+    <Setter Property="FontFamily" Value="{StaticResource FontUi}"/>
+    <Setter Property="FontSize" Value="10.5"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="CheckBox">
+          <Grid Background="Transparent">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Border x:Name="Box" Width="15" Height="15"
+                    Background="{StaticResource BgControlBrush}"
+                    BorderBrush="{StaticResource DividerBrush}"
+                    BorderThickness="1" CornerRadius="4"
+                    VerticalAlignment="Center">
+              <Path x:Name="Check" Data="M 3,7 L 6,10 L 12,4"
+                    Stroke="{StaticResource AccentBrush}" StrokeThickness="2"
+                    StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                    StrokeLineJoin="Round" Visibility="Collapsed"/>
+            </Border>
+            <ContentPresenter Grid.Column="1" Margin="7,0,0,0"
+                              VerticalAlignment="Center"
+                              RecognizesAccessKey="True"/>
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+              <Setter TargetName="Box" Property="Background" Value="{StaticResource AccentSubtleBrush}"/>
+              <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+              <Setter TargetName="Check" Property="Visibility" Value="Visible"/>
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter Property="Opacity" Value="0.4"/>
+              <Setter Property="Cursor" Value="Arrow"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
   <Style x:Key="DarkComboItem" TargetType="ComboBoxItem">
     <Setter Property="Foreground" Value="{StaticResource TextValueBrush}"/>
     <Setter Property="FontFamily" Value="{StaticResource FontUi}"/>
@@ -1063,6 +1114,7 @@
     <Setter Property="FontFamily" Value="{StaticResource FontUi}"/>
     <Setter Property="FontSize" Value="12"/>
     <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="MinHeight" Value="34"/>
     <Setter Property="Cursor" Value="Hand"/>
     <Setter Property="ItemContainerStyle" Value="{StaticResource DarkComboItem}"/>
     <Setter Property="Template">
@@ -1091,7 +1143,18 @@
             </ToggleButton>
             <ContentPresenter Content="{TemplateBinding SelectionBoxItem}"
                               ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                              x:Name="SelectionPresenter"
                               Margin="11,7,28,7" VerticalAlignment="Center" IsHitTestVisible="False"/>
+            <TextBox x:Name="PART_EditableTextBox"
+                     Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Foreground="{TemplateBinding Foreground}"
+                     FontFamily="{TemplateBinding FontFamily}"
+                     FontSize="{TemplateBinding FontSize}"
+                     FontWeight="{TemplateBinding FontWeight}"
+                     Background="Transparent" BorderThickness="0"
+                     Padding="0,7" Margin="11,0,28,0"
+                     VerticalContentAlignment="Center"
+                     Visibility="Collapsed"/>
             <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom"
                    AllowsTransparency="True" StaysOpen="False" VerticalOffset="4">
               <Border Background="#FF15191C" BorderBrush="{StaticResource WindowBorderBrush}" BorderThickness="1"
@@ -1103,6 +1166,15 @@
               </Border>
             </Popup>
           </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsEditable" Value="True">
+              <Setter TargetName="SelectionPresenter" Property="Visibility" Value="Collapsed"/>
+              <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter Property="Opacity" Value="0.45"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
         </ControlTemplate>
       </Setter.Value>
     </Setter>

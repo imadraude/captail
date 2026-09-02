@@ -765,6 +765,10 @@
                                 </Grid>
                                 <Border Style="{StaticResource RowDivider}"/>
                                 <Grid Margin="13,11">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="190"/>
@@ -782,7 +786,8 @@
                                             </Button.ToolTip>
                                         </Button>
                                     </StackPanel>
-                                    <ComboBox x:Name="BitrateBox" Grid.Column="1" Style="{StaticResource DarkCombo}"
+                                    <ComboBox x:Name="BitrateBox" Grid.Row="1" Grid.ColumnSpan="2"
+                                              Style="{StaticResource DarkCombo}" Margin="0,8,0,0"
                                               IsEditable="True" IsTextSearchEnabled="False"
                                               ToolTip="{DynamicResource L.Video.BitrateCustomHint}">
                                         <ComboBoxItem Tag="0" Content="{DynamicResource L.Video.AutoLoad}"/>
@@ -794,23 +799,39 @@
                                 </Grid>
                                 <Border Style="{StaticResource RowDivider}"/>
                                 <Grid x:Name="NvencSettingsRow" Margin="13,11">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="190"/>
                                     </Grid.ColumnDefinitions>
-                                    <StackPanel>
-                                        <TextBlock Text="{DynamicResource L.Video.NvencMode}" Style="{StaticResource RowLabelText}"/>
-                                        <TextBlock Text="{DynamicResource L.Help.NvencLowOverhead}"
-                                                   Style="{StaticResource SecondaryText}" FontSize="10" TextWrapping="Wrap"/>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="{DynamicResource L.Video.NvencMode}"
+                                                   Style="{StaticResource RowLabelText}"/>
+                                        <Button Style="{StaticResource HelpIconButton}">
+                                            <Button.ToolTip>
+                                                <ToolTip Style="{StaticResource HelpToolTip}">
+                                                    <StackPanel>
+                                                        <TextBlock Text="{DynamicResource L.Video.NvencMode}"
+                                                                   Style="{StaticResource HelpTipTitle}"/>
+                                                        <TextBlock Text="{DynamicResource L.Help.NvencLowOverhead}"
+                                                                   Style="{StaticResource HelpTipBody}"/>
+                                                    </StackPanel>
+                                                </ToolTip>
+                                            </Button.ToolTip>
+                                        </Button>
                                     </StackPanel>
-                                    <StackPanel Grid.Column="1">
-                                        <ComboBox x:Name="NvencModeBox" Style="{StaticResource DarkCombo}">
-                                            <ComboBoxItem Tag="balanced" Content="{DynamicResource L.Video.NvencBalanced}"/>
-                                            <ComboBoxItem Tag="low-overhead" Content="{DynamicResource L.Video.NvencLowOverhead}"/>
-                                        </ComboBox>
-                                        <CheckBox x:Name="LowOverheadAqBox" Content="{DynamicResource L.Video.AdaptiveQuantization}"
-                                                  Margin="2,8,0,0"/>
-                                    </StackPanel>
+                                    <ComboBox x:Name="NvencModeBox" Grid.Column="1"
+                                              Style="{StaticResource DarkCombo}">
+                                        <ComboBoxItem Tag="balanced" Content="{DynamicResource L.Video.NvencBalanced}"/>
+                                        <ComboBoxItem Tag="low-overhead" Content="{DynamicResource L.Video.NvencLowOverhead}"/>
+                                    </ComboBox>
+                                    <CheckBox x:Name="LowOverheadAqBox" Grid.Row="1" Grid.ColumnSpan="2"
+                                              Content="{DynamicResource L.Video.AdaptiveQuantization}"
+                                              Style="{StaticResource CompactCheckBox}"
+                                              Margin="0,8,0,0"/>
                                 </Grid>
                                 <Border Style="{StaticResource RowDivider}"/>
                                 <Grid Margin="13,11">
