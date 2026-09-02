@@ -1,6 +1,9 @@
 name: Build release
 
 on:
+  push:
+    tags:
+      - "v*"
   workflow_dispatch:
     inputs:
       version:
@@ -28,16 +31,22 @@ jobs:
     runs-on: windows-2022
     timeout-minutes: 45
     env:
-      VERSION: ${{ inputs.version }}
-      RELEASE_DIR: artifacts/release/${{ inputs.version }}
+      VERSION: ${{ github.event_name == 'push' && github.ref_name || inputs.version }}
 
     steps:
       - name: Validate version
+        id: version
         shell: pwsh
         run: |
+          if ($env:GITHUB_EVENT_NAME -eq "push") {
+            $env:VERSION = $env:VERSION -replace '^v', ''
+          }
           if ($env:VERSION -notmatch '^\d+\.\d+\.\d+$') {
             throw "Invalid semantic version: $env:VERSION"
           }
+          "VERSION=$env:VERSION" >> $env:GITHUB_ENV
+          "RELEASE_DIR=artifacts/release/$env:VERSION" >> $env:GITHUB_ENV
+          "value=$env:VERSION" >> $env:GITHUB_OUTPUT
           $releases = gh release list --repo "$env:GITHUB_REPOSITORY" --limit 100 --json tagName |
             ConvertFrom-Json
           if ($releases.tagName -contains "v$env:VERSION") {
@@ -227,10 +236,10 @@ jobs:
       - name: Upload workflow artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: Captail-${{ inputs.version }}-win-x64
+          name: Captail-${{ steps.version.outputs.value }}-win-x64
           path: |
-            ${{ env.RELEASE_DIR }}/Captail-${{ inputs.version }}-Portable-win-x64.zip
-            ${{ env.RELEASE_DIR }}/Captail-${{ inputs.version }}-Setup-win-x64.exe
+            ${{ env.RELEASE_DIR }}/Captail-${{ steps.version.outputs.value }}-Portable-win-x64.zip
+            ${{ env.RELEASE_DIR }}/Captail-${{ steps.version.outputs.value }}-Setup-win-x64.exe
             ${{ env.RELEASE_DIR }}/SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 30
@@ -239,8 +248,8 @@ jobs:
         uses: actions/attest@508db95dd578ae2727ebd6217d5ba78e4fbda05d # v4
         with:
           subject-path: |
-            ${{ env.RELEASE_DIR }}/Captail-${{ inputs.version }}-Portable-win-x64.zip
-            ${{ env.RELEASE_DIR }}/Captail-${{ inputs.version }}-Setup-win-x64.exe
+            ${{ env.RELEASE_DIR }}/Captail-${{ steps.version.outputs.value }}-Portable-win-x64.zip
+            ${{ env.RELEASE_DIR }}/Captail-${{ steps.version.outputs.value }}-Setup-win-x64.exe
             ${{ env.RELEASE_DIR }}/SHA256SUMS.txt
 
       - name: Publish GitHub Release
