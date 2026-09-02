@@ -16,6 +16,7 @@ public sealed class HotkeyManager : IDisposable
     private const int WM_HOTKEY = 0x0312;
     private const int SaveHotkeyId = 1;
     private const int ToggleHotkeyId = 2;
+    private const int RecordHotkeyId = 3;
     private const uint MOD_ALT = 0x0001;
     private const uint MOD_CONTROL = 0x0002;
     private const uint MOD_SHIFT = 0x0004;
@@ -23,11 +24,13 @@ public sealed class HotkeyManager : IDisposable
     private readonly HwndSource _source;
     private (uint Modifiers, uint Vk)? _saveBinding;
     private (uint Modifiers, uint Vk)? _toggleBinding;
+    private (uint Modifiers, uint Vk)? _recordBinding;
 
     public event Action? SaveRequested;
     public event Action? ToggleRequested;
+    public event Action? RecordRequested;
 
-    public HotkeyManager(string saveHotkey, string toggleHotkey)
+    public HotkeyManager(string saveHotkey, string toggleHotkey, string recordHotkey = "Ctrl+Shift+F11")
     {
         _source = new HwndSource(new HwndSourceParameters("CaptailHotkeys")
         {
@@ -36,25 +39,31 @@ public sealed class HotkeyManager : IDisposable
             WindowStyle = 0,
             HwndSourceHook = WndProc,
         });
-        Rebind(saveHotkey, toggleHotkey);
+        Rebind(saveHotkey, toggleHotkey, recordHotkey);
     }
 
-    public void Rebind(string saveHotkey, string toggleHotkey)
+    public void Rebind(string saveHotkey, string toggleHotkey) =>
+        Rebind(saveHotkey, toggleHotkey, "Ctrl+Shift+F11");
+
+    public void Rebind(string saveHotkey, string toggleHotkey, string recordHotkey)
     {
         var newSave = Parse(saveHotkey);
         var newToggle = Parse(toggleHotkey);
-        if (newSave == newToggle)
+        var newRecord = Parse(recordHotkey);
+        if (newSave == newToggle || newSave == newRecord || newToggle == newRecord)
             throw new InvalidOperationException(
                 Localization.Text("L.Hotkey.MustDiffer"));
 
-        if (_saveBinding == newSave && _toggleBinding == newToggle)
+        if (_saveBinding == newSave && _toggleBinding == newToggle && _recordBinding == newRecord)
             return;
 
         var oldSave = _saveBinding;
         var oldToggle = _toggleBinding;
+        var oldRecord = _recordBinding;
         UnregisterCurrent();
 
         bool saveRegistered = false;
+        bool toggleRegistered = false;
         try
         {
             if (!RegisterHotKey(_source.Handle, SaveHotkeyId, newSave.Modifiers, newSave.Vk))
@@ -65,18 +74,27 @@ public sealed class HotkeyManager : IDisposable
             if (!RegisterHotKey(_source.Handle, ToggleHotkeyId, newToggle.Modifiers, newToggle.Vk))
                 throw new InvalidOperationException(
                     Localization.Format("L.Hotkey.Occupied", toggleHotkey));
+            toggleRegistered = true;
+
+            if (!RegisterHotKey(_source.Handle, RecordHotkeyId, newRecord.Modifiers, newRecord.Vk))
+                throw new InvalidOperationException(
+                    Localization.Format("L.Hotkey.Occupied", recordHotkey));
 
             _saveBinding = newSave;
             _toggleBinding = newToggle;
+            _recordBinding = newRecord;
         }
         catch
         {
             if (saveRegistered)
                 UnregisterHotKey(_source.Handle, SaveHotkeyId);
-            UnregisterHotKey(_source.Handle, ToggleHotkeyId);
+            if (toggleRegistered)
+                UnregisterHotKey(_source.Handle, ToggleHotkeyId);
+            UnregisterHotKey(_source.Handle, RecordHotkeyId);
             _saveBinding = null;
             _toggleBinding = null;
-            Restore(oldSave, oldToggle);
+            _recordBinding = null;
+            Restore(oldSave, oldToggle, oldRecord);
             throw;
         }
     }
@@ -106,7 +124,25 @@ public sealed class HotkeyManager : IDisposable
         }
     }
 
-    private void Restore((uint Modifiers, uint Vk)? save, (uint Modifiers, uint Vk)? toggle)
+    public static bool AreDistinct(string first, string second, string third)
+    {
+        try
+        {
+            var p1 = Parse(first);
+            var p2 = Parse(second);
+            var p3 = Parse(third);
+            return p1 != p2 && p1 != p3 && p2 != p3;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private void Restore(
+        (uint Modifiers, uint Vk)? save,
+        (uint Modifiers, uint Vk)? toggle,
+        (uint Modifiers, uint Vk)? record)
     {
         if (save is { } saveBinding &&
             RegisterHotKey(_source.Handle, SaveHotkeyId, saveBinding.Modifiers, saveBinding.Vk))
@@ -119,6 +155,12 @@ public sealed class HotkeyManager : IDisposable
         {
             _toggleBinding = toggleBinding;
         }
+
+        if (record is { } recordBinding &&
+            RegisterHotKey(_source.Handle, RecordHotkeyId, recordBinding.Modifiers, recordBinding.Vk))
+        {
+            _recordBinding = recordBinding;
+        }
     }
 
     private void UnregisterCurrent()
@@ -127,8 +169,11 @@ public sealed class HotkeyManager : IDisposable
             UnregisterHotKey(_source.Handle, SaveHotkeyId);
         if (_toggleBinding is not null)
             UnregisterHotKey(_source.Handle, ToggleHotkeyId);
+        if (_recordBinding is not null)
+            UnregisterHotKey(_source.Handle, RecordHotkeyId);
         _saveBinding = null;
         _toggleBinding = null;
+        _recordBinding = null;
     }
 
     private static (uint Modifiers, uint Vk) Parse(string hotkey)
@@ -173,6 +218,8 @@ public sealed class HotkeyManager : IDisposable
             SaveRequested?.Invoke();
         else if (wParam == ToggleHotkeyId)
             ToggleRequested?.Invoke();
+        else if (wParam == RecordHotkeyId)
+            RecordRequested?.Invoke();
         else
             return 0;
 

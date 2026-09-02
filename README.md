@@ -30,16 +30,16 @@
 Captail is a focused alternative to NVIDIA ShadowPlay Instant Replay. It keeps the latest seconds or minutes in a rolling buffer, then saves them when you press a hotkey. No scenes, streaming setup, account, cloud upload, analytics, or telemetry.
 
 > [!WARNING]
-> Captail `v0.4.0` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA RTX 40 and RTX 50 series are tested; other GPUs need broader public testing.
+> Captail `v0.5.0` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA RTX 40 and RTX 50 series are tested; other GPUs need broader public testing.
 
-## What's new in Captail 0.4.0?
+## What's new in Captail 0.5.0?
 
+- **Standard / Manual Recording:** Start and stop standard recording at any time (`Ctrl+Shift+F11`) alongside Instant Replay without dual-encoder overhead.
+- **Dual-Action Dashboard:** Side-by-side Save Replay and Record buttons with a live duration stopwatch (`00:01:23`).
+- **HUD Indicator & Badges:** Red pulsating status overlay and distinct `REC` / `REPLAY` badges in recent replays.
+- **Customizable 3-Way Hotkeys:** Dedicated hotkey configuration for save, toggle, and manual recording with collision resolution.
 - Resilient Replay Runtime architecture with serialized commands and transactional settings rollback.
 - Full automated test suite verifying state machine, configuration transactions, and encoding policies.
-- Immutable runtime dependencies with SHA-256 integrity verification.
-- Streamlined settings draft management with centralized configuration equality checks.
-- Smooth automatic bitrate scaling with hardware NVENC/QSV safety rules and instant memory estimates.
-- Fork ownership and update channels directed to `imadraude/captail`.
 
 ## Is Captail for me?
 
@@ -58,7 +58,6 @@ It is a good fit if you want:
 Captail is not a streaming application, scene compositor, DRM bypass, or cloud clip service.
 
 ## What does it look like?
-
 
 <p align="center">
   <img src="docs/captail-main.png" alt="Captail main window showing replay status, audio sources, recording format, disk space, and recent replays" width="420">
@@ -85,12 +84,12 @@ Captail is not a streaming application, scene compositor, DRM bypass, or cloud c
 
 Install Captail from [Microsoft Store](https://apps.microsoft.com/detail/9PKVNVLKPTPS), or open [GitHub Releases](https://github.com/imadraude/captail/releases) and choose a package:
 
-| Package | Choose it when | Installation |
-| --- | --- | --- |
-| **Microsoft Store** | You want Microsoft-managed installation and automatic updates | Open the [Store listing](https://apps.microsoft.com/detail/9PKVNVLKPTPS) and select **Install**. |
-| `Captail-x.y.z-Setup-win-x64.exe` | You want the normal Windows experience | Run Setup. It installs Captail for your Windows account and adds an uninstaller to Windows Settings. |
-| `Captail-x.y.z-Portable-win-x64.zip` | You want a movable, self-contained folder | Extract the entire ZIP, then run `Captail.exe` inside it. Do not run it from the archive. |
-| `SHA256SUMS.txt` | You want to verify the download | Compare the package SHA-256 with the published value before running it. |
+| Package                              | Choose it when                                                | Installation                                                                                         |
+| ------------------------------------ | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| **Microsoft Store**                  | You want Microsoft-managed installation and automatic updates | Open the [Store listing](https://apps.microsoft.com/detail/9PKVNVLKPTPS) and select **Install**.     |
+| `Captail-x.y.z-Setup-win-x64.exe`    | You want the normal Windows experience                        | Run Setup. It installs Captail for your Windows account and adds an uninstaller to Windows Settings. |
+| `Captail-x.y.z-Portable-win-x64.zip` | You want a movable, self-contained folder                     | Extract the entire ZIP, then run `Captail.exe` inside it. Do not run it from the archive.            |
+| `SHA256SUMS.txt`                     | You want to verify the download                               | Compare the package SHA-256 with the published value before running it.                              |
 
 Every Captail package includes .NET, libobs, FFmpeg, and the embedded preview player. You do not need to install OBS Studio or extra runtimes.
 
@@ -111,10 +110,10 @@ Every Captail package includes .NET, libobs, FFmpeg, and the embedded preview pl
 
 Default hotkeys:
 
-| Action | Default |
-| --- | --- |
-| Save recent footage | `Ctrl+Shift+F10` |
-| Enable or disable Instant Replay | `Ctrl+Shift+F9` |
+| Action                           | Default          |
+| -------------------------------- | ---------------- |
+| Save recent footage              | `Ctrl+Shift+F10` |
+| Enable or disable Instant Replay | `Ctrl+Shift+F9`  |
 
 Both hotkeys are configurable. Double-click the tray icon to reopen Captail.
 
@@ -128,10 +127,10 @@ If similarly sized monitors are hard to distinguish, open Video settings and sel
 
 ## What does each capture mode record?
 
-| Mode | When no game is detected | When a fullscreen game appears | Audio source |
-| --- | --- | --- | --- |
-| **Desktop** | Records the selected monitor | Uses direct Game Capture when usable; otherwise keeps desktop video active while recognizing supported fullscreen games | Selected Windows output device |
-| **Game Capture** | Keeps a lightweight game detector ready while the replay buffer sleeps | Wakes the replay buffer and captures the detected game directly | Detected game audio |
+| Mode             | When no game is detected                                               | When a fullscreen game appears                                                                                          | Audio source                   |
+| ---------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| **Desktop**      | Records the selected monitor                                           | Uses direct Game Capture when usable; otherwise keeps desktop video active while recognizing supported fullscreen games | Selected Windows output device |
+| **Game Capture** | Keeps a lightweight game detector ready while the replay buffer sleeps | Wakes the replay buffer and captures the detected game directly                                                         | Detected game audio            |
 
 Use **Desktop** when you want continuous coverage; use **Game Capture** when privacy and low idle resource use outside games matter more. In Game Capture mode, Captail wakes the replay buffer only after a plausible game appears. When a fullscreen game cannot be hooked, Desktop mode favors uninterrupted video over pretending direct Game Capture is working.
 
@@ -139,14 +138,14 @@ Use **Desktop** when you want continuous coverage; use **Game Capture** when pri
 
 Captail supervises the recording pipeline instead of assuming that a successful start means it will remain healthy forever.
 
-| Situation | Expected behavior |
-| --- | --- |
-| Game closes or crashes | Desktop mode returns to desktop capture. Game Capture mode waits for another game. |
-| You switch between game and desktop | Desktop mode follows the active capture source without stopping the buffer. |
-| A capture source temporarily disappears | Captail keeps the pipeline supervised and retries recovery. |
-| Graphics driver restarts | Video may pause or go black temporarily; the watchdog attempts a controlled restart with retry delay. |
-| Recovery cannot complete | Captail reports the failure and retries instead of silently claiming that replay is active. |
-| DRM-protected video appears | Protected regions may be black. Captail does not bypass DRM and is designed to keep the buffer running. |
+| Situation                               | Expected behavior                                                                                       |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Game closes or crashes                  | Desktop mode returns to desktop capture. Game Capture mode waits for another game.                      |
+| You switch between game and desktop     | Desktop mode follows the active capture source without stopping the buffer.                             |
+| A capture source temporarily disappears | Captail keeps the pipeline supervised and retries recovery.                                             |
+| Graphics driver restarts                | Video may pause or go black temporarily; the watchdog attempts a controlled restart with retry delay.   |
+| Recovery cannot complete                | Captail reports the failure and retries instead of silently claiming that replay is active.             |
+| DRM-protected video appears             | Protected regions may be black. Captail does not bypass DRM and is designed to keep the buffer running. |
 
 Recovery reduces lost footage; it cannot guarantee frames that Windows, a game, an anti-cheat system, or a failed driver never delivered.
 
@@ -165,11 +164,11 @@ After a successful save, Captail starts a new replay segment. Saving again five 
 
 Captail detects the current GPU and driver, then hides unavailable hardware codecs.
 
-| Codec | Best for | Trade-off |
-| --- | --- | --- |
-| **AV1** | Best compression on supported modern GPUs | Newest format; some older players and editors may not support it. Hardware support commonly includes GeForce RTX 40/50, Radeon RX 7000, and Intel Arc. |
-| **HEVC / H.265** | Good compression with broader modern-GPU support | Compatibility is better than AV1 but still weaker than H.264 in older software. |
-| **H.264 / AVC** | Easiest playback, editing, and sharing | Larger files or lower quality at the same bitrate. |
+| Codec            | Best for                                         | Trade-off                                                                                                                                              |
+| ---------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **AV1**          | Best compression on supported modern GPUs        | Newest format; some older players and editors may not support it. Hardware support commonly includes GeForce RTX 40/50, Radeon RX 7000, and Intel Arc. |
+| **HEVC / H.265** | Good compression with broader modern-GPU support | Compatibility is better than AV1 but still weaker than H.264 in older software.                                                                        |
+| **H.264 / AVC**  | Easiest playback, editing, and sharing           | Larger files or lower quality at the same bitrate.                                                                                                     |
 
 Unsure? Start with **H.264** for compatibility. Use **AV1** when your GPU and editor support it and file efficiency matters.
 
@@ -226,15 +225,15 @@ GitHub builds contact the GitHub Releases API to check whether a newer version e
 
 ## How is Captail different from ShadowPlay and OBS Replay Buffer?
 
-| | Captail | ShadowPlay | OBS Replay Buffer |
-| --- | --- | --- | --- |
-| Primary job | Instant replay | NVIDIA capture suite | Recording/streaming production |
-| GPU support goal | NVIDIA, AMD, Intel hardware encoders | NVIDIA | Broad through OBS |
-| Setup | Choose settings and leave it in tray | GeForce/NVIDIA App | Configure scenes, sources, and output |
-| Automatic desktop/game switching | Yes, in Desktop mode | Platform-managed | Requires scene/source setup |
-| Capture watchdog and recovery | Built around automatic supervision | Internal behavior | Not Captail's focused workflow |
-| Built-in replay library and trim editor | Yes | Varies by NVIDIA software version | No focused clip library |
-| Open source | Yes | No | Yes |
+|                                         | Captail                              | ShadowPlay                        | OBS Replay Buffer                     |
+| --------------------------------------- | ------------------------------------ | --------------------------------- | ------------------------------------- |
+| Primary job                             | Instant replay                       | NVIDIA capture suite              | Recording/streaming production        |
+| GPU support goal                        | NVIDIA, AMD, Intel hardware encoders | NVIDIA                            | Broad through OBS                     |
+| Setup                                   | Choose settings and leave it in tray | GeForce/NVIDIA App                | Configure scenes, sources, and output |
+| Automatic desktop/game switching        | Yes, in Desktop mode                 | Platform-managed                  | Requires scene/source setup           |
+| Capture watchdog and recovery           | Built around automatic supervision   | Internal behavior                 | Not Captail's focused workflow        |
+| Built-in replay library and trim editor | Yes                                  | Varies by NVIDIA software version | No focused clip library               |
+| Open source                             | Yes                                  | No                                | Yes                                   |
 
 Captail uses libobs for capture and encoding, but it is not an OBS Studio frontend. It exposes no streaming, scenes, transitions, or plugin management because those features would work against its small, single-purpose UI.
 
@@ -248,13 +247,13 @@ Requirements:
 
 Current hardware status:
 
-| Hardware | Status |
-| --- | --- |
-| NVIDIA GeForce RTX 50 series | Tested |
-| NVIDIA GeForce RTX 40 series | Tested |
-| Older NVIDIA GPUs | Not yet verified; expected to work when supported by libobs/NVENC |
-| AMD GPUs | Capability detection implemented; public hardware testing needed |
-| Intel GPUs | Capability detection implemented; public hardware testing needed |
+| Hardware                     | Status                                                            |
+| ---------------------------- | ----------------------------------------------------------------- |
+| NVIDIA GeForce RTX 50 series | Tested                                                            |
+| NVIDIA GeForce RTX 40 series | Tested                                                            |
+| Older NVIDIA GPUs            | Not yet verified; expected to work when supported by libobs/NVENC |
+| AMD GPUs                     | Capability detection implemented; public hardware testing needed  |
+| Intel GPUs                   | Capability detection implemented; public hardware testing needed  |
 
 Codec options are based on detected encoder support. Captail falls back to another available codec if a previously selected encoder disappears.
 

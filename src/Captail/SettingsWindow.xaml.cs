@@ -37,11 +37,16 @@ public partial class SettingsWindow : Window
     private string _outputDirectory;
     private string _pendingSaveHotkey;
     private string _pendingToggleHotkey;
+    private string _pendingRecordHotkey;
     private Button? _capturingHotkeyButton;
     private bool _updatingUi;
     private bool _runtimeActive;
     private int _availableReplaySeconds;
     private bool? _animatedRecordingState;
+    private bool _isRecording;
+    private bool _isRecordingPaused;
+    private TimeSpan _recordingDuration;
+    private DispatcherTimer? _recordingTimer;
     private int _deviceRefreshVersion;
     private int _diskRefreshInProgress;
     private int _actionInProgress;
@@ -100,6 +105,7 @@ public partial class SettingsWindow : Window
         _outputDirectory = config.OutputDirectory;
         _pendingSaveHotkey = config.Hotkey;
         _pendingToggleHotkey = config.ToggleReplayHotkey;
+        _pendingRecordHotkey = config.RecordHotkey;
         _runtimeActive = runtimeActive;
         _pendingProcessAudioRoutes = CloneProcessAudioRoutes(config.ProcessAudioRoutes);
         _pendingAdvancedMicrophoneTrack = config.AdvancedMicrophoneTrack;
@@ -426,8 +432,10 @@ public partial class SettingsWindow : Window
 
             _pendingSaveHotkey = _config.Hotkey;
             _pendingToggleHotkey = _config.ToggleReplayHotkey;
+            _pendingRecordHotkey = _config.RecordHotkey;
             SaveHotkeyButton.Content = _pendingSaveHotkey;
             ToggleHotkeyButton.Content = _pendingToggleHotkey;
+            RecordHotkeyButton.Content = _pendingRecordHotkey;
 
             _outputDirectory = _config.OutputDirectory;
             OutputDirText.Text = _outputDirectory;
@@ -525,7 +533,49 @@ public partial class SettingsWindow : Window
                     ? Math.Max(1, _availableReplaySeconds)
                     : _config.BufferSeconds));
         HotkeySummaryText.Text = _config.Hotkey;
+        RecordHotkeySummaryText.Text = _config.RecordHotkey;
         OutputFolderSummaryText.Text = _config.OutputDirectory;
+    }
+
+    internal void UpdateRecordingState(bool isRecording, bool isPaused, TimeSpan duration)
+    {
+        _isRecording = isRecording;
+        _isRecordingPaused = isPaused;
+        _recordingDuration = duration;
+
+        if (isRecording)
+        {
+            RecordButtonText.Text = duration.ToString(@"hh\:mm\:ss");
+            RecordButton.ToolTip = Localization.Text("L.Record.Stop");
+            if (_recordingTimer is null)
+            {
+                _recordingTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+                _recordingTimer.Tick += (_, _) =>
+                {
+                    if (_isRecording)
+                    {
+                        _recordingDuration = _recordingDuration.Add(TimeSpan.FromSeconds(1));
+                        RecordButtonText.Text = _recordingDuration.ToString(@"hh\:mm\:ss");
+                    }
+                };
+                _recordingTimer.Start();
+            }
+        }
+        else
+        {
+            _recordingTimer?.Stop();
+            _recordingTimer = null;
+            RecordButtonText.Text = Localization.Text("L.Record.Start");
+            RecordButton.ToolTip = Localization.Text("L.Record.Start");
+        }
+    }
+
+    private async void RecordButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (Application.Current is App app)
+        {
+            await app.ToggleRecordingAsync();
+        }
     }
 
     private void UpdateDashboardAudioSources(bool advancedAudio)
@@ -1100,6 +1150,7 @@ public partial class SettingsWindow : Window
         candidate.OrganizeReplaysByGame = OrganizeByGameBox.IsChecked == true;
         candidate.Hotkey = _pendingSaveHotkey;
         candidate.ToggleReplayHotkey = _pendingToggleHotkey;
+        candidate.RecordHotkey = _pendingRecordHotkey;
         return candidate;
     }
 
@@ -2081,8 +2132,10 @@ public partial class SettingsWindow : Window
 
         string hotkey = FormatHotkey(modifiers, key);
         bool captureSave = Equals(_capturingHotkeyButton.Tag, "save");
-        string other = captureSave ? _pendingToggleHotkey : _pendingSaveHotkey;
-        if (!HotkeyManager.AreDistinct(hotkey, other))
+        bool captureRecord = Equals(_capturingHotkeyButton.Tag, "record");
+        string other1 = captureSave ? _pendingToggleHotkey : (captureRecord ? _pendingSaveHotkey : _pendingSaveHotkey);
+        string other2 = captureSave ? _pendingRecordHotkey : (captureRecord ? _pendingToggleHotkey : _pendingRecordHotkey);
+        if (!HotkeyManager.AreDistinct(hotkey, other1, other2))
         {
             _capturingHotkeyButton.Content =
                 Localization.Text("L.Hotkey.InUse");
@@ -2091,6 +2144,8 @@ public partial class SettingsWindow : Window
 
         if (captureSave)
             _pendingSaveHotkey = hotkey;
+        else if (captureRecord)
+            _pendingRecordHotkey = hotkey;
         else
             _pendingToggleHotkey = hotkey;
         _capturingHotkeyButton.Content = hotkey;
@@ -2103,8 +2158,12 @@ public partial class SettingsWindow : Window
         if (_capturingHotkeyButton is null)
             return;
 
-        bool captureSave = Equals(_capturingHotkeyButton.Tag, "save");
-        _capturingHotkeyButton.Content = captureSave ? _pendingSaveHotkey : _pendingToggleHotkey;
+        if (Equals(_capturingHotkeyButton.Tag, "save"))
+            _capturingHotkeyButton.Content = _pendingSaveHotkey;
+        else if (Equals(_capturingHotkeyButton.Tag, "record"))
+            _capturingHotkeyButton.Content = _pendingRecordHotkey;
+        else
+            _capturingHotkeyButton.Content = _pendingToggleHotkey;
         _capturingHotkeyButton = null;
     }
 
@@ -2113,7 +2172,8 @@ public partial class SettingsWindow : Window
         CancelHotkeyCapture();
         if (!HotkeyManager.IsValid(_pendingSaveHotkey) ||
             !HotkeyManager.IsValid(_pendingToggleHotkey) ||
-            !HotkeyManager.AreDistinct(_pendingSaveHotkey, _pendingToggleHotkey))
+            !HotkeyManager.IsValid(_pendingRecordHotkey) ||
+            !HotkeyManager.AreDistinct(_pendingSaveHotkey, _pendingToggleHotkey, _pendingRecordHotkey))
         {
             ShowError(
                 Localization.Text("L.Error.HotkeysTitle"),
@@ -2849,7 +2909,14 @@ public partial class SettingsWindow : Window
         string Details,
         string Duration,
         BitmapImage? Thumbnail,
-        bool CanTrim);
+        bool CanTrim)
+    {
+        public bool IsRecording => Clip.IsRecording;
+        public string KindBadge => Clip.KindBadge;
+        public Brush BadgeBackground => IsRecording
+            ? new SolidColorBrush(Color.FromRgb(220, 53, 69))
+            : new SolidColorBrush(Color.FromArgb(187, 11, 15, 17));
+    }
 
     private sealed record DashboardAudioSource(string Key, bool Microphone);
 

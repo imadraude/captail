@@ -211,6 +211,14 @@
   <sys:String x:Key="L.Library.OverwriteMessage">Der ausgewählte Bereich und die aktivierten Audiospuren ersetzen die Originaldatei. Dies kann nicht rückgängig gemacht werden.</sys:String>
   <sys:String x:Key="L.Library.OverwriteMergeMessage">Der ausgewählte Bereich ersetzt die Originaldatei und alle aktivierten Audiospuren werden zu einer gemischt. Dies kann nicht rückgängig gemacht werden.</sys:String>
 
+  <sys:String x:Key="L.Record.Start">Aufnahme</sys:String>
+  <sys:String x:Key="L.Record.Stop">Aufnahme beenden</sys:String>
+  <sys:String x:Key="L.Record.Recording">Aufnahme</sys:String>
+  <sys:String x:Key="L.Hotkey.Record">Aufnahme starten / beenden</sys:String>
+  <sys:String x:Key="L.Hotkey.RecordHint">Schaltet manuelle Aufnahme um</sys:String>
+  <sys:String x:Key="L.Notify.RecordingStarted">Aufnahme gestartet</sys:String>
+  <sys:String x:Key="L.Notify.RecordingSaved">Aufnahme gespeichert</sys:String>
+  <sys:String x:Key="L.Tray.Record">Aufnahme</sys:String>
   <sys:String x:Key="L.Hotkey.SaveReplay">Wiederholung speichern</sys:String>
   <sys:String x:Key="L.Hotkey.SaveHint">Speichert den aktuellen Puffer</sys:String>
   <sys:String x:Key="L.Hotkey.Toggle">Aktivieren/deaktivieren</sys:String>

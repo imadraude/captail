@@ -214,6 +214,14 @@
   <sys:String x:Key="L.Library.OverwriteMessage">Selected range and enabled audio tracks will replace original file. This cannot be undone.</sys:String>
   <sys:String x:Key="L.Library.OverwriteMergeMessage">Selected range will replace original file, and all enabled audio tracks will be mixed into one. This cannot be undone.</sys:String>
 
+  <sys:String x:Key="L.Record.Start">Record</sys:String>
+  <sys:String x:Key="L.Record.Stop">Stop recording</sys:String>
+  <sys:String x:Key="L.Record.Recording">Recording</sys:String>
+  <sys:String x:Key="L.Hotkey.Record">Start / Stop recording</sys:String>
+  <sys:String x:Key="L.Hotkey.RecordHint">Toggles manual recording</sys:String>
+  <sys:String x:Key="L.Notify.RecordingStarted">Recording started</sys:String>
+  <sys:String x:Key="L.Notify.RecordingSaved">Recording saved</sys:String>
+  <sys:String x:Key="L.Tray.Record">Recording</sys:String>
   <sys:String x:Key="L.Hotkey.SaveReplay">Save replay</sys:String>
   <sys:String x:Key="L.Hotkey.SaveHint">Saves current buffer</sys:String>
   <sys:String x:Key="L.Hotkey.Toggle">Enable / disable</sys:String>

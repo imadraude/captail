@@ -211,6 +211,14 @@
   <sys:String x:Key="L.Library.OverwriteMessage">Вибраний діапазон і ввімкнені звукові доріжки замінять оригінальний файл. Це неможливо скасувати.</sys:String>
   <sys:String x:Key="L.Library.OverwriteMergeMessage">Вибраний діапазон замінить вихідний файл, а всі включені аудіодоріжки буде змішано в один. Це неможливо скасувати.</sys:String>
 
+  <sys:String x:Key="L.Record.Start">Запис</sys:String>
+  <sys:String x:Key="L.Record.Stop">Зупинити запис</sys:String>
+  <sys:String x:Key="L.Record.Recording">Запис</sys:String>
+  <sys:String x:Key="L.Hotkey.Record">Почати / Зупинити запис</sys:String>
+  <sys:String x:Key="L.Hotkey.RecordHint">Вмикає або вимикає ручний запис</sys:String>
+  <sys:String x:Key="L.Notify.RecordingStarted">Запис розпочато</sys:String>
+  <sys:String x:Key="L.Notify.RecordingSaved">Запис збережено</sys:String>
+  <sys:String x:Key="L.Tray.Record">Запис</sys:String>
   <sys:String x:Key="L.Hotkey.SaveReplay">Зберегти повтор</sys:String>
   <sys:String x:Key="L.Hotkey.SaveHint">Зберігає поточний буфер</sys:String>
   <sys:String x:Key="L.Hotkey.Toggle">Увімкнути/вимкнути</sys:String>

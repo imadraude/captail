@@ -211,6 +211,14 @@
   <sys:String x:Key="L.Library.OverwriteMessage">Wybrany zakres i włączone ścieżki audio zastąpią oryginalny plik. Tego nie można cofnąć.</sys:String>
   <sys:String x:Key="L.Library.OverwriteMergeMessage">Wybrany zakres zastąpi oryginalny plik, a wszystkie włączone ścieżki audio zostaną zmiksowane w jedną. Tego nie można cofnąć.</sys:String>
 
+  <sys:String x:Key="L.Record.Start">Nagrywanie</sys:String>
+  <sys:String x:Key="L.Record.Stop">Zatrzymaj nagrywanie</sys:String>
+  <sys:String x:Key="L.Record.Recording">Nagrywanie</sys:String>
+  <sys:String x:Key="L.Hotkey.Record">Rozpocznij / Zatrzymaj nagrywanie</sys:String>
+  <sys:String x:Key="L.Hotkey.RecordHint">Przełącza nagrywanie ręczne</sys:String>
+  <sys:String x:Key="L.Notify.RecordingStarted">Rozpoczęto nagrywanie</sys:String>
+  <sys:String x:Key="L.Notify.RecordingSaved">Nagranie zapisane</sys:String>
+  <sys:String x:Key="L.Tray.Record">Nagrywanie</sys:String>
   <sys:String x:Key="L.Hotkey.SaveReplay">Zapisz powtórkę</sys:String>
   <sys:String x:Key="L.Hotkey.SaveHint">Zapisuje bieżący bufor</sys:String>
   <sys:String x:Key="L.Hotkey.Toggle">Włącz / wyłącz</sys:String>

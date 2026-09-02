@@ -81,13 +81,22 @@ public sealed class ObsReplayEngine : IDisposable
 
     private readonly Config _config;
     private readonly object _saveGate = new();
+    private readonly object _recordingGate = new();
     private readonly ObsNative.SignalCallback _savedCallback;
     private readonly ObsNative.SignalCallback _stoppedCallback;
+    private readonly ObsNative.SignalCallback _recordingStoppedCallback;
     private readonly List<nint> _audioSources = [];
     private readonly List<nint> _audioEncoders = [];
     private readonly Dictionary<nint, nint> _processAudioSceneItems = [];
     private ProcessAudioReconciler? _processAudioReconciler;
     private int _processAudioSourceNumber;
+    private nint _recordingOutput;
+    private nint _recordingOutputSignals;
+    private TaskCompletionSource<string>? _pendingRecordingStop;
+    private DateTime _recordingStartedUtc;
+    private string _activeRecordingPath = "";
+    private volatile bool _isRecording;
+    private volatile bool _isRecordingPaused;
 
     private nint _videoSource;
     private nint _desktopVideoSource;
@@ -146,6 +155,18 @@ public sealed class ObsReplayEngine : IDisposable
         ObsNative.obs_output_active(_output) &&
         _videoEncoder != 0 &&
         ObsNative.obs_encoder_active(_videoEncoder);
+
+    public bool IsRecording =>
+        _isRecording &&
+        _recordingOutput != 0 &&
+        ObsNative.obs_output_active(_recordingOutput);
+
+    public bool IsRecordingPaused => _isRecordingPaused;
+
+    public TimeSpan RecordingDuration =>
+        _isRecording ? DateTime.UtcNow - _recordingStartedUtc : TimeSpan.Zero;
+
+    public string ActiveRecordingPath => _activeRecordingPath;
 
     public string Description
     {
@@ -567,6 +588,7 @@ public sealed class ObsReplayEngine : IDisposable
         IsAutomaticCapture = !IsGameCapture;
         _savedCallback = OnReplaySaved;
         _stoppedCallback = OnOutputStopped;
+        _recordingStoppedCallback = OnRecordingOutputStopped;
     }
 
     public void Start()
@@ -722,6 +744,175 @@ public sealed class ObsReplayEngine : IDisposable
     public Task<string> SaveReplayAsync(
         CancellationToken cancellationToken = default) =>
         BeginSaveReplay(cancellationToken).Completion;
+
+    public Task<string> StartRecordingAsync(string? targetPath = null)
+    {
+        lock (_recordingGate)
+        {
+            if (!_started || _videoEncoder == 0)
+                throw new InvalidOperationException(Localization.Text("L.Engine.BufferStopped"));
+            if (_isRecording || _recordingOutput != 0)
+                throw new InvalidOperationException("Recording is already in progress.");
+
+            string captureDirectory = _config.OutputDirectory;
+            Directory.CreateDirectory(captureDirectory);
+            bool opus = string.Equals(
+                _config.AudioCodec,
+                "opus",
+                StringComparison.OrdinalIgnoreCase);
+
+            string extension = opus ? "mkv" : "mp4";
+            string filename = string.IsNullOrWhiteSpace(targetPath)
+                ? $"Recording_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.{extension}"
+                : Path.GetFileName(targetPath);
+            string fullPath = Path.Combine(captureDirectory, filename);
+            _activeRecordingPath = fullPath;
+
+            nint settings = ObsNative.obs_data_create();
+            try
+            {
+                ObsNative.obs_data_set_string(settings, "path", fullPath);
+                ObsNative.obs_data_set_string(settings, "directory", captureDirectory);
+                ObsNative.obs_data_set_string(settings, "extension", extension);
+                ObsNative.obs_data_set_bool(settings, "allow_spaces", false);
+                if (!opus)
+                {
+                    ObsNative.obs_data_set_string(
+                        settings,
+                        "muxer_settings",
+                        "movflags=frag_keyframe+empty_moov+delay_moov");
+                }
+
+                _recordingOutput = ObsNative.obs_output_create(
+                    "ffmpeg_muxer",
+                    "Captail Manual Recording",
+                    settings,
+                    0);
+            }
+            finally
+            {
+                ObsNative.obs_data_release(settings);
+            }
+
+            if (_recordingOutput == 0)
+                throw new InvalidOperationException("Failed to create recording output.");
+
+            ObsNative.obs_output_set_video_encoder(_recordingOutput, _videoEncoder);
+            for (int index = 0; index < _audioEncoders.Count; index++)
+            {
+                ObsNative.obs_output_set_audio_encoder(
+                    _recordingOutput,
+                    _audioEncoders[index],
+                    (nuint)index);
+            }
+
+            _recordingOutputSignals = ObsNative.obs_output_get_signal_handler(_recordingOutput);
+            ObsNative.signal_handler_connect(
+                _recordingOutputSignals,
+                "stop",
+                _recordingStoppedCallback,
+                0);
+
+            if (!ObsNative.obs_output_start(_recordingOutput))
+            {
+                string error = PtrToString(ObsNative.obs_output_get_last_error(_recordingOutput));
+                CleanupRecordingOutput();
+                throw new InvalidOperationException(
+                    string.IsNullOrWhiteSpace(error)
+                        ? "Failed to start recording."
+                        : error);
+            }
+
+            _isRecording = true;
+            _isRecordingPaused = false;
+            _recordingStartedUtc = DateTime.UtcNow;
+            Log.Write($"Manual recording started: {fullPath}");
+            return Task.FromResult(fullPath);
+        }
+    }
+
+    public async Task<string> StopRecordingAsync(CancellationToken cancellationToken = default)
+    {
+        Task<string> completionTask;
+        lock (_recordingGate)
+        {
+            if (!_isRecording || _recordingOutput == 0)
+                throw new InvalidOperationException("Recording is not running.");
+
+            if (_pendingRecordingStop is not null)
+            {
+                completionTask = _pendingRecordingStop.Task;
+            }
+            else
+            {
+                _pendingRecordingStop = new TaskCompletionSource<string>(
+                    TaskCreationOptions.RunContinuationsAsynchronously);
+                completionTask = _pendingRecordingStop.Task;
+                ObsNative.obs_output_stop(_recordingOutput);
+            }
+        }
+
+        string rawPath;
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeout.CancelAfter(TimeSpan.FromSeconds(30));
+        try
+        {
+            rawPath = await completionTask.WaitAsync(timeout.Token);
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            lock (_recordingGate)
+            {
+                if (_recordingOutput != 0 && ObsNative.obs_output_active(_recordingOutput))
+                    ObsNative.obs_output_force_stop(_recordingOutput);
+                _pendingRecordingStop = null;
+            }
+            throw new TimeoutException("Recording stop timed out.");
+        }
+        finally
+        {
+            lock (_recordingGate)
+            {
+                CleanupRecordingOutput();
+            }
+        }
+
+        bool isGameHooked = IsGameHooked;
+        string hookedExecutable = isGameHooked
+            ? ReadStringProcedure(
+                ObsNative.obs_source_get_proc_handler(_gameVideoSource),
+                "get_hooked",
+                "executable")
+            : "";
+        string? replayGameExecutable = ResolveReplayGameExecutable(
+            IsAutomaticCapture,
+            _automaticGameActive || _automaticDesktopFallbackActive,
+            _activeGameExecutable,
+            isGameHooked,
+            hookedExecutable);
+
+        string finalPath = ReplayPaths.RouteSavedReplay(_config, rawPath, replayGameExecutable);
+        Log.Write($"Manual recording saved: {finalPath}");
+        return finalPath;
+    }
+
+    public bool PauseRecording(bool pause)
+    {
+        lock (_recordingGate)
+        {
+            if (!_isRecording || _recordingOutput == 0)
+                return false;
+
+            if (ObsNative.obs_output_can_pause(_recordingOutput))
+            {
+                bool success = ObsNative.obs_output_pause(_recordingOutput, pause);
+                if (success)
+                    _isRecordingPaused = pause;
+                return success;
+            }
+            return false;
+        }
+    }
 
     public bool HasSaveSnapshotStarted(ReplaySaveOperation operation) =>
         BufferedBytes != operation.InitialMuxBytes;
@@ -1691,6 +1882,9 @@ public sealed class ObsReplayEngine : IDisposable
 
     private void ResumeOrStartGameReplayBuffer()
     {
+        if (!_config.ReplayEnabled)
+            return;
+
         if (_output == 0)
             throw new InvalidOperationException(
                 Localization.Text("L.Engine.BufferUnavailable"));
@@ -1906,6 +2100,13 @@ public sealed class ObsReplayEngine : IDisposable
             return;
         }
 
+        if (!_config.ReplayEnabled)
+        {
+            _replayWindowStartedUtc = default;
+            Log.Write("Replay Buffer sleeping; Instant Replay is disabled.");
+            return;
+        }
+
         if (!ObsNative.obs_output_start(_output))
         {
             string error = PtrToString(ObsNative.obs_output_get_last_error(_output));
@@ -2069,6 +2270,42 @@ public sealed class ObsReplayEngine : IDisposable
                 : Localization.Format("L.Engine.BufferError", error));
     }
 
+    private void OnRecordingOutputStopped(nint _, nint __)
+    {
+        lock (_recordingGate)
+        {
+            _isRecording = false;
+            _isRecordingPaused = false;
+            string savedPath = _activeRecordingPath;
+            TaskCompletionSource<string>? completion = _pendingRecordingStop;
+            _pendingRecordingStop = null;
+            completion?.TrySetResult(savedPath);
+        }
+    }
+
+    private void CleanupRecordingOutput()
+    {
+        if (_recordingOutputSignals != 0)
+        {
+            ObsNative.signal_handler_disconnect(
+                _recordingOutputSignals,
+                "stop",
+                _recordingStoppedCallback,
+                0);
+            _recordingOutputSignals = 0;
+        }
+
+        if (_recordingOutput != 0)
+        {
+            if (ObsNative.obs_output_active(_recordingOutput))
+                ObsNative.obs_output_force_stop(_recordingOutput);
+            ObsNative.obs_output_release(_recordingOutput);
+            _recordingOutput = 0;
+        }
+        _isRecording = false;
+        _isRecordingPaused = false;
+    }
+
     private static bool ReadBoolProcedure(nint handler, string procedure, string name)
     {
         if (handler == 0)
@@ -2151,6 +2388,13 @@ public sealed class ObsReplayEngine : IDisposable
         {
             _pendingSave?.TrySetCanceled();
             _pendingSave = null;
+        }
+
+        lock (_recordingGate)
+        {
+            _pendingRecordingStop?.TrySetCanceled();
+            _pendingRecordingStop = null;
+            CleanupRecordingOutput();
         }
 
         if (!_obsStarted)

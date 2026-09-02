@@ -269,30 +269,63 @@
                                  Height="3" Minimum="0" Maximum="100"/>
                 </StackPanel>
 
-                <Button x:Name="SaveReplayButton" Style="{StaticResource AccentButton}"
-                        HorizontalContentAlignment="Stretch"
-                        Margin="0,14,0,0" Click="SaveReplay_Click">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="1" Orientation="Horizontal">
-                            <Path Data="{StaticResource IconDownload}"
-                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                  StrokeThickness="2"
-                                  Width="16" Height="16" Stretch="Uniform" Margin="0,0,9,0"/>
-                            <TextBlock x:Name="SaveButtonText" Text="Save 5 min"
-                                       FontSize="13.5" FontWeight="ExtraBold"/>
-                        </StackPanel>
-                        <Border Grid.Column="2" Background="#29000000" CornerRadius="6"
-                                Padding="7,3" HorizontalAlignment="Right" Margin="10,0,0,0">
-                            <TextBlock x:Name="HotkeySummaryText" Text="Ctrl+Shift+F10"
-                                       FontFamily="{StaticResource FontMono}" FontSize="10"/>
-                        </Border>
-                    </Grid>
-                </Button>
+                <Grid Margin="0,14,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button x:Name="SaveReplayButton" Grid.Column="0"
+                            Style="{StaticResource AccentButton}"
+                            HorizontalContentAlignment="Stretch"
+                            Click="SaveReplay_Click">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Path Data="{StaticResource IconDownload}"
+                                      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                      StrokeThickness="2"
+                                      Width="15" Height="15" Stretch="Uniform" Margin="0,0,7,0"/>
+                                <TextBlock x:Name="SaveButtonText" Text="Save 5 min"
+                                           FontSize="13" FontWeight="ExtraBold"/>
+                            </StackPanel>
+                            <Border Grid.Column="2" Background="#29000000" CornerRadius="6"
+                                    Padding="5,2" HorizontalAlignment="Right" Margin="6,0,0,0">
+                                <TextBlock x:Name="HotkeySummaryText" Text="Ctrl+Shift+F10"
+                                           FontFamily="{StaticResource FontMono}" FontSize="9.5"/>
+                            </Border>
+                        </Grid>
+                    </Button>
+
+                    <Button x:Name="RecordButton" Grid.Column="2"
+                            Style="{StaticResource SubtleButton}"
+                            HorizontalContentAlignment="Stretch"
+                            Click="RecordButton_Click">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Ellipse x:Name="RecordDot" Width="9" Height="9"
+                                         Fill="#FF5F63" Margin="0,0,7,0"/>
+                                <TextBlock x:Name="RecordButtonText" Text="{DynamicResource L.Record.Start}"
+                                           FontSize="13" FontWeight="ExtraBold"/>
+                            </StackPanel>
+                            <Border Grid.Column="2" Background="#29000000" CornerRadius="6"
+                                    Padding="5,2" HorizontalAlignment="Right" Margin="6,0,0,0">
+                                <TextBlock x:Name="RecordHotkeySummaryText" Text="Ctrl+Shift+F11"
+                                           FontFamily="{StaticResource FontMono}" FontSize="9.5"/>
+                            </Border>
+                        </Grid>
+                    </Button>
+                </Grid>
 
                 <Grid Margin="2,10,2,0">
                     <Path Data="{StaticResource IconFolder}" Stroke="{StaticResource TextMutedBrush}"
@@ -376,6 +409,12 @@
                                                     <ImageBrush ImageSource="{Binding Thumbnail}"
                                                                 Stretch="UniformToFill"/>
                                                 </Border.Background>
+                                            </Border>
+                                            <Border HorizontalAlignment="Left" VerticalAlignment="Top"
+                                                    Margin="5" Padding="4,1.5" CornerRadius="3"
+                                                    Background="{Binding BadgeBackground}">
+                                                <TextBlock Text="{Binding KindBadge}" FontFamily="{StaticResource FontMono}"
+                                                           FontSize="9" FontWeight="Bold" Foreground="White"/>
                                             </Border>
                                             <Border HorizontalAlignment="Right" VerticalAlignment="Bottom"
                                                     Margin="5" Padding="5,2" CornerRadius="4"
@@ -1179,6 +1218,20 @@
                                     <Button x:Name="ToggleHotkeyButton" Grid.Column="1"
                                             Style="{StaticResource SubtleButton}" MinWidth="128"
                                             Tag="toggle" Click="HotkeyCapture_Click"/>
+                                </Grid>
+                                <Border Style="{StaticResource RowDivider}"/>
+                                <Grid Margin="13,11">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="{DynamicResource L.Hotkey.Record}" Style="{StaticResource RowLabelText}"/>
+                                        <TextBlock Text="{DynamicResource L.Hotkey.RecordHint}" Style="{StaticResource SecondaryText}"/>
+                                    </StackPanel>
+                                    <Button x:Name="RecordHotkeyButton" Grid.Column="1"
+                                            Style="{StaticResource SubtleButton}" MinWidth="128"
+                                            Tag="record" Click="HotkeyCapture_Click"/>
                                 </Grid>
                             </StackPanel>
                         </Border>

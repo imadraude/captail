@@ -440,4 +440,124 @@ public sealed class ReplayRuntimeTests
         public Task<string> SaveAsync(CancellationToken cancellationToken) =>
             Task.FromResult("replay.mp4");
     }
+
+    [Fact]
+    public async Task StartAndStopRecordingWhileReplayEnabledPreservesRunningBuffer()
+    {
+        var events = new List<string>();
+        var pipeline = new ManualRecordingPipeline(events);
+        var config = new Config { ReplayEnabled = true };
+        await using var runtime = new ReplayRuntime(
+            config,
+            new RecordingPipelineFactory(pipeline, events),
+            new RecordingConfigStore(events));
+
+        await runtime.SetEnabledAsync(true);
+        events.Clear();
+
+        string startPath = await runtime.StartRecordingAsync();
+        Assert.Equal("recording.mp4", startPath);
+        Assert.True(runtime.Snapshot.IsRecording);
+        Assert.False(runtime.Snapshot.IsRecordingPaused);
+        Assert.NotNull(runtime.Snapshot.RecordingStartedUtc);
+        Assert.Equal(ReplayRuntimeState.Running, runtime.Snapshot.State);
+
+        string stopPath = await runtime.StopRecordingAsync();
+        Assert.Equal("recording.mp4", stopPath);
+        Assert.False(runtime.Snapshot.IsRecording);
+        Assert.Null(runtime.Snapshot.RecordingStartedUtc);
+        Assert.Equal(ReplayRuntimeState.Running, runtime.Snapshot.State);
+        Assert.Equal(["start-recording", "stop-recording"], events);
+    }
+
+    [Fact]
+    public async Task StartAndStopRecordingWhileReplayDisabledStartsAndStopsPipeline()
+    {
+        var events = new List<string>();
+        var pipeline = new ManualRecordingPipeline(events);
+        var config = new Config { ReplayEnabled = false };
+        await using var runtime = new ReplayRuntime(
+            config,
+            new RecordingPipelineFactory(pipeline, events),
+            new RecordingConfigStore(events));
+
+        Assert.Equal(ReplayRuntimeState.Disabled, runtime.Snapshot.State);
+
+        string startPath = await runtime.StartRecordingAsync();
+        Assert.Equal("recording.mp4", startPath);
+        Assert.True(runtime.Snapshot.IsRecording);
+        Assert.Equal(ReplayRuntimeState.Running, runtime.Snapshot.State);
+
+        string stopPath = await runtime.StopRecordingAsync();
+        Assert.Equal("recording.mp4", stopPath);
+        Assert.False(runtime.Snapshot.IsRecording);
+        Assert.Equal(ReplayRuntimeState.Disabled, runtime.Snapshot.State);
+        Assert.Equal(["create", "start", "start-recording", "stop-recording", "dispose"], events);
+    }
+
+    [Fact]
+    public async Task DisablingReplayDuringRecordingPreservesPipelineUntilRecordingStops()
+    {
+        var events = new List<string>();
+        var pipeline = new ManualRecordingPipeline(events);
+        var config = new Config { ReplayEnabled = true };
+        await using var runtime = new ReplayRuntime(
+            config,
+            new RecordingPipelineFactory(pipeline, events),
+            new RecordingConfigStore(events));
+
+        await runtime.SetEnabledAsync(true);
+        await runtime.StartRecordingAsync();
+        events.Clear();
+
+        ReplayCommandResult disableResult = await runtime.SetEnabledAsync(false);
+        Assert.True(disableResult.Succeeded);
+        Assert.False(runtime.Snapshot.ReplayEnabled);
+        Assert.True(runtime.Snapshot.IsRecording);
+        Assert.Equal(ReplayRuntimeState.Running, runtime.Snapshot.State);
+        Assert.DoesNotContain("dispose", events);
+
+        await runtime.StopRecordingAsync();
+        Assert.Equal(ReplayRuntimeState.Disabled, runtime.Snapshot.State);
+        Assert.Contains("dispose", events);
+    }
+
+    private sealed class ManualRecordingPipeline(List<string> events) : IReplayPipeline
+    {
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            events.Add("start");
+            return Task.CompletedTask;
+        }
+
+        public Task<string> SaveAsync(CancellationToken cancellationToken)
+        {
+            events.Add("save");
+            return Task.FromResult("replay.mp4");
+        }
+
+        public Task<string> StartRecordingAsync(CancellationToken cancellationToken)
+        {
+            events.Add("start-recording");
+            return Task.FromResult("recording.mp4");
+        }
+
+        public Task<string> StopRecordingAsync(CancellationToken cancellationToken)
+        {
+            events.Add("stop-recording");
+            return Task.FromResult("recording.mp4");
+        }
+
+        public Task<bool> PauseRecordingAsync(bool pause, CancellationToken cancellationToken)
+        {
+            events.Add($"pause-recording:{pause}");
+            return Task.FromResult(true);
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            events.Add("dispose");
+            return ValueTask.CompletedTask;
+        }
+    }
 }

@@ -14,6 +14,7 @@ internal enum ReplayIndicatorState
     Recovering,
     Error,
     Saved,
+    Recording,
 }
 
 internal enum ReplayIndicatorPlacement
@@ -190,6 +191,7 @@ public partial class ReplayStatusIndicatorWindow : Window
 
         Color accent = state switch
         {
+            ReplayIndicatorState.Recording => Color.FromRgb(255, 95, 99),
             ReplayIndicatorState.Recovering => Color.FromRgb(242, 194, 66),
             ReplayIndicatorState.Error => Color.FromRgb(255, 95, 99),
             _ => Color.FromRgb(99, 224, 189),
@@ -200,6 +202,17 @@ public partial class ReplayStatusIndicatorWindow : Window
 
         switch (state)
         {
+            case ReplayIndicatorState.Recording:
+                StateRing.StrokeDashArray = new DoubleCollection([6, 3]);
+                StartRotation(1800);
+                CenterDot.BeginAnimation(
+                    OpacityProperty,
+                    new DoubleAnimation(0.3, 1, TimeSpan.FromMilliseconds(500))
+                    {
+                        AutoReverse = true,
+                        RepeatBehavior = RepeatBehavior.Forever,
+                    });
+                break;
             case ReplayIndicatorState.Active:
                 StateRing.StrokeDashArray = new DoubleCollection([7, 3]);
                 StartRotation(2200);

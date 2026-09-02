@@ -211,6 +211,14 @@
   <sys:String x:Key="L.Library.OverwriteMessage">El rango seleccionado y las pistas de audio habilitadas reemplazarán el archivo original. Esto no se puede deshacer.</sys:String>
   <sys:String x:Key="L.Library.OverwriteMergeMessage">El rango seleccionado reemplazará el archivo original y todas las pistas de audio habilitadas se mezclarán en una. Esto no se puede deshacer.</sys:String>
 
+  <sys:String x:Key="L.Record.Start">Grabar</sys:String>
+  <sys:String x:Key="L.Record.Stop">Detener grabación</sys:String>
+  <sys:String x:Key="L.Record.Recording">Grabación</sys:String>
+  <sys:String x:Key="L.Hotkey.Record">Iniciar / Detener grabación</sys:String>
+  <sys:String x:Key="L.Hotkey.RecordHint">Alterna la grabación manual</sys:String>
+  <sys:String x:Key="L.Notify.RecordingStarted">Grabación iniciada</sys:String>
+  <sys:String x:Key="L.Notify.RecordingSaved">Grabación guardada</sys:String>
+  <sys:String x:Key="L.Tray.Record">Grabación</sys:String>
   <sys:String x:Key="L.Hotkey.SaveReplay">Guardar repetición</sys:String>
   <sys:String x:Key="L.Hotkey.SaveHint">Guarda el buffer actual</sys:String>
   <sys:String x:Key="L.Hotkey.Toggle">Activar/desactivar</sys:String>

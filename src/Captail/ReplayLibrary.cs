@@ -13,7 +13,11 @@ public sealed record ReplayClip(
     DateTime SavedAt,
     long SizeBytes,
     TimeSpan Duration,
-    string? ThumbnailPath);
+    string? ThumbnailPath)
+{
+    public bool IsRecording => Name.StartsWith("Recording", StringComparison.OrdinalIgnoreCase);
+    public string KindBadge => IsRecording ? "REC" : "REPLAY";
+}
 
 public sealed class ReplayLibrary
 {

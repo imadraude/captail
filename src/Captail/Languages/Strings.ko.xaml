@@ -211,6 +211,14 @@
   <sys:String x:Key="L.Library.OverwriteMessage">선택한 범위와 활성화된 오디오 트랙이 원본 파일을 대체합니다. 이 작업은 취소할 수 없습니다.</sys:String>
   <sys:String x:Key="L.Library.OverwriteMergeMessage">선택한 범위가 원본 파일을 대체하고 활성화된 모든 오디오 트랙이 하나로 혼합됩니다. 이 작업은 취소할 수 없습니다.</sys:String>
 
+  <sys:String x:Key="L.Record.Start">녹화</sys:String>
+  <sys:String x:Key="L.Record.Stop">녹화 중지</sys:String>
+  <sys:String x:Key="L.Record.Recording">녹화 중</sys:String>
+  <sys:String x:Key="L.Hotkey.Record">녹화 시작 / 중지</sys:String>
+  <sys:String x:Key="L.Hotkey.RecordHint">수동 녹화를 전환합니다</sys:String>
+  <sys:String x:Key="L.Notify.RecordingStarted">녹화 시작됨</sys:String>
+  <sys:String x:Key="L.Notify.RecordingSaved">녹화 저장됨</sys:String>
+  <sys:String x:Key="L.Tray.Record">녹화</sys:String>
   <sys:String x:Key="L.Hotkey.SaveReplay">리플레이 저장</sys:String>
   <sys:String x:Key="L.Hotkey.SaveHint">현재 버퍼를 저장합니다.</sys:String>
   <sys:String x:Key="L.Hotkey.Toggle">활성화 / 비활성화</sys:String>

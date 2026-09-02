@@ -24,6 +24,7 @@ public sealed class Config
     public bool LowOverheadAdaptiveQuantization { get; set; }
     public string Hotkey { get; set; } = "Ctrl+Shift+F10";
     public string ToggleReplayHotkey { get; set; } = "Ctrl+Shift+F9";
+    public string RecordHotkey { get; set; } = "Ctrl+Shift+F11";
     public bool ReplayEnabled { get; set; } = true;
     public bool WarnWhenGameStartsWithReplayOff { get; set; } = true;
     public bool ShowRecordingIndicator { get; set; } = true;
@@ -169,6 +170,7 @@ public sealed class Config
         LowOverheadAdaptiveQuantization = source.LowOverheadAdaptiveQuantization;
         Hotkey = source.Hotkey;
         ToggleReplayHotkey = source.ToggleReplayHotkey;
+        RecordHotkey = source.RecordHotkey;
         ReplayEnabled = source.ReplayEnabled;
         WarnWhenGameStartsWithReplayOff = source.WarnWhenGameStartsWithReplayOff;
         ShowRecordingIndicator = source.ShowRecordingIndicator;
@@ -245,6 +247,10 @@ public sealed class Config
                    ToggleReplayHotkey,
                    other.ToggleReplayHotkey,
                    StringComparison.Ordinal) &&
+               string.Equals(
+                   RecordHotkey,
+                   other.RecordHotkey,
+                   StringComparison.Ordinal) &&
                PipelineEquals(other);
     }
 
@@ -261,12 +267,20 @@ public sealed class Config
             NvencModes.Balanced);
         Hotkey = NormalizeHotkey(Hotkey, "Ctrl+Shift+F10");
         ToggleReplayHotkey = NormalizeHotkey(ToggleReplayHotkey, "Ctrl+Shift+F9");
+        RecordHotkey = NormalizeHotkey(RecordHotkey, "Ctrl+Shift+F11");
         if (!HotkeyManager.IsValid(Hotkey))
             Hotkey = "Ctrl+Shift+F10";
         if (!HotkeyManager.IsValid(ToggleReplayHotkey) ||
             !HotkeyManager.AreDistinct(Hotkey, ToggleReplayHotkey))
         {
             ToggleReplayHotkey = "Ctrl+Shift+F9";
+        }
+        if (!HotkeyManager.IsValid(RecordHotkey) ||
+            !HotkeyManager.AreDistinct(Hotkey, ToggleReplayHotkey, RecordHotkey))
+        {
+            RecordHotkey = "Ctrl+Shift+F11";
+            if (!HotkeyManager.AreDistinct(Hotkey, ToggleReplayHotkey, RecordHotkey))
+                RecordHotkey = "Ctrl+Shift+F8";
         }
         Codec = AllowedText(Codec, ["h264", "hevc", "av1"], "h264");
         MonitorIndex = Math.Clamp(MonitorIndex, 0, 63);

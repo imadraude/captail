@@ -211,6 +211,14 @@
   <sys:String x:Key="L.Library.OverwriteMessage">O intervalo selecionado e as faixas de áudio ativadas substituirão o arquivo original. Isto não pode ser desfeito.</sys:String>
   <sys:String x:Key="L.Library.OverwriteMergeMessage">O intervalo selecionado substituirá o arquivo original e todas as faixas de áudio habilitadas serão mixadas em uma. Isto não pode ser desfeito.</sys:String>
 
+  <sys:String x:Key="L.Record.Start">Gravar</sys:String>
+  <sys:String x:Key="L.Record.Stop">Parar gravação</sys:String>
+  <sys:String x:Key="L.Record.Recording">Gravação</sys:String>
+  <sys:String x:Key="L.Hotkey.Record">Iniciar / Parar gravação</sys:String>
+  <sys:String x:Key="L.Hotkey.RecordHint">Alterna a gravação manual</sys:String>
+  <sys:String x:Key="L.Notify.RecordingStarted">Gravação iniciada</sys:String>
+  <sys:String x:Key="L.Notify.RecordingSaved">Gravação salva</sys:String>
+  <sys:String x:Key="L.Tray.Record">Gravação</sys:String>
   <sys:String x:Key="L.Hotkey.SaveReplay">Salvar replay</sys:String>
   <sys:String x:Key="L.Hotkey.SaveHint">Salva buffer atual</sys:String>
   <sys:String x:Key="L.Hotkey.Toggle">Ativar/desativar</sys:String>

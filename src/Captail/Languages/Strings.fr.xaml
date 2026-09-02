@@ -211,6 +211,14 @@
   <sys:String x:Key="L.Library.OverwriteMessage">La plage sélectionnée et les pistes audio activées remplaceront le fichier d'origine. Cela ne peut pas être annulé.</sys:String>
   <sys:String x:Key="L.Library.OverwriteMergeMessage">La plage sélectionnée remplacera le fichier d'origine et toutes les pistes audio activées seront mixées en une seule. Cela ne peut pas être annulé.</sys:String>
 
+  <sys:String x:Key="L.Record.Start">Enregistrer</sys:String>
+  <sys:String x:Key="L.Record.Stop">Arrêter l'enregistrement</sys:String>
+  <sys:String x:Key="L.Record.Recording">Enregistrement</sys:String>
+  <sys:String x:Key="L.Hotkey.Record">Démarrer / Arrêter l'enregistrement</sys:String>
+  <sys:String x:Key="L.Hotkey.RecordHint">Bascule l'enregistrement manuel</sys:String>
+  <sys:String x:Key="L.Notify.RecordingStarted">Enregistrement démarré</sys:String>
+  <sys:String x:Key="L.Notify.RecordingSaved">Enregistrement enregistré</sys:String>
+  <sys:String x:Key="L.Tray.Record">Enregistrement</sys:String>
   <sys:String x:Key="L.Hotkey.SaveReplay">Enregistrer la rediffusion</sys:String>
   <sys:String x:Key="L.Hotkey.SaveHint">Enregistre le tampon actuel</sys:String>
   <sys:String x:Key="L.Hotkey.Toggle">Activer / désactiver</sys:String>

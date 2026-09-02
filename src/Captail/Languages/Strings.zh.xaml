@@ -214,6 +214,14 @@
   <sys:String x:Key="L.Library.OverwriteMessage">所选范围和启用的音轨将替换原文件。此操作无法撤销。</sys:String>
   <sys:String x:Key="L.Library.OverwriteMergeMessage">所选范围将替换原文件，所有启用的音轨将混合为一条。此操作无法撤销。</sys:String>
 
+  <sys:String x:Key="L.Record.Start">录制</sys:String>
+  <sys:String x:Key="L.Record.Stop">停止录制</sys:String>
+  <sys:String x:Key="L.Record.Recording">录制中</sys:String>
+  <sys:String x:Key="L.Hotkey.Record">开始 / 停止录制</sys:String>
+  <sys:String x:Key="L.Hotkey.RecordHint">切换手动录制</sys:String>
+  <sys:String x:Key="L.Notify.RecordingStarted">录制已开始</sys:String>
+  <sys:String x:Key="L.Notify.RecordingSaved">录制已保存</sys:String>
+  <sys:String x:Key="L.Tray.Record">录制</sys:String>
   <sys:String x:Key="L.Hotkey.SaveReplay">保存回放</sys:String>
   <sys:String x:Key="L.Hotkey.SaveHint">保存当前缓冲区</sys:String>
   <sys:String x:Key="L.Hotkey.Toggle">启用 / 禁用</sys:String>

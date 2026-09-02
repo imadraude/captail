@@ -214,6 +214,14 @@
   <sys:String x:Key="L.Library.OverwriteMessage">Выбранный участок и включённые аудиодорожки заменят исходный файл. Отменить это действие нельзя.</sys:String>
   <sys:String x:Key="L.Library.OverwriteMergeMessage">Выбранный участок заменит исходный файл, а все включённые аудиодорожки будут смешаны в одну. Отменить это действие нельзя.</sys:String>
 
+  <sys:String x:Key="L.Record.Start">Запись</sys:String>
+  <sys:String x:Key="L.Record.Stop">Остановить запись</sys:String>
+  <sys:String x:Key="L.Record.Recording">Запись</sys:String>
+  <sys:String x:Key="L.Hotkey.Record">Начать / Остановить запись</sys:String>
+  <sys:String x:Key="L.Hotkey.RecordHint">Включает или выключает ручную запись</sys:String>
+  <sys:String x:Key="L.Notify.RecordingStarted">Запись начата</sys:String>
+  <sys:String x:Key="L.Notify.RecordingSaved">Запись сохранена</sys:String>
+  <sys:String x:Key="L.Tray.Record">Запись</sys:String>
   <sys:String x:Key="L.Hotkey.SaveReplay">Сохранить повтор</sys:String>
   <sys:String x:Key="L.Hotkey.SaveHint">Сохраняет текущий буфер</sys:String>
   <sys:String x:Key="L.Hotkey.Toggle">Включить / выключить</sys:String>

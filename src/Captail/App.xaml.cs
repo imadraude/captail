@@ -21,9 +21,11 @@ public partial class App : Application
     private HotkeyManager? _hotkeys;
     private string _boundHotkey = "";
     private string _boundToggleHotkey = "";
+    private string _boundRecordHotkey = "";
     private TaskbarIcon? _tray;
     private bool? _trayActiveState;
     private MenuItem? _saveMenuItem;
+    private MenuItem? _recordMenuItem;
     private MenuItem? _toggleMenuItem;
     private MenuItem? _openFolderMenuItem;
     private MenuItem? _settingsMenuItem;
@@ -1529,11 +1531,13 @@ public partial class App : Application
     {
         _boundHotkey = _config!.Hotkey;
         _boundToggleHotkey = _config.ToggleReplayHotkey;
+        _boundRecordHotkey = _config.RecordHotkey;
         try
         {
             _hotkeys = new HotkeyManager(
                 _config.Hotkey,
-                _config.ToggleReplayHotkey);
+                _config.ToggleReplayHotkey,
+                _config.RecordHotkey);
             SubscribeHotkeys();
         }
         catch (Exception exception)
@@ -1552,9 +1556,86 @@ public partial class App : Application
     {
         _hotkeys!.SaveRequested += SaveReplay;
         _hotkeys.ToggleRequested += ToggleReplayFromHotkey;
+        _hotkeys.RecordRequested += ToggleRecordFromHotkey;
     }
 
     private void ToggleReplayFromHotkey() => _ = ToggleReplayAsync();
+
+    private void ToggleRecordFromHotkey() => _ = ToggleRecordingAsync();
+
+    internal async Task<string?> ToggleRecordingAsync()
+    {
+        if (_replayRuntime?.Snapshot.IsRecording == true)
+            return await StopRecordingAsync();
+        else
+            return await StartRecordingAsync();
+    }
+
+    private async Task<string?> StartRecordingAsync()
+    {
+        if (Volatile.Read(ref _exiting) != 0)
+            return null;
+
+        try
+        {
+            if (_replayRuntime is null)
+                throw new InvalidOperationException("Replay runtime is not initialized.");
+
+            string path = await _replayRuntime.StartRecordingAsync();
+            ShowOverlayNotification(
+                "●",
+                Localization.Text("L.Notify.RecordingStarted"),
+                Path.GetFileName(path),
+                OverlayTone.Neutral);
+            UpdateUiState();
+            return path;
+        }
+        catch (Exception exception)
+        {
+            Log.Write($"Start recording failed: {exception}");
+            ShowOverlayNotification(
+                "!",
+                Localization.Text("L.Notify.SaveError"),
+                exception.Message,
+                OverlayTone.Error);
+            UpdateUiState();
+            return null;
+        }
+    }
+
+    private async Task<string?> StopRecordingAsync()
+    {
+        if (Volatile.Read(ref _exiting) != 0)
+            return null;
+
+        try
+        {
+            if (_replayRuntime is null)
+                throw new InvalidOperationException("Replay runtime is not initialized.");
+
+            string path = await _replayRuntime.StopRecordingAsync();
+            _settingsWindow?.NotifyReplaySaved(path);
+            ShowReplaySavedIndicator();
+            ShowOverlayNotification(
+                "✓",
+                Localization.Text("L.Notify.RecordingSaved"),
+                Path.GetFileName(path),
+                OverlayTone.Success);
+            UpdateUiState();
+            return path;
+        }
+        catch (Exception exception)
+        {
+            Log.Write($"Stop recording failed: {exception}");
+            ShowOverlayNotification(
+                "!",
+                Localization.Text("L.Notify.SaveError"),
+                exception.Message,
+                OverlayTone.Error);
+            UpdateUiState();
+            return null;
+        }
+    }
 
     private async Task ToggleReplayAsync()
     {
@@ -2193,6 +2274,12 @@ public partial class App : Application
         _saveMenuItem.Click += (_, _) => SaveReplay();
         menu.Items.Add(_saveMenuItem);
 
+        _recordMenuItem = CreateMenuItem(
+            Localization.Text("L.Record.Start"),
+            _config.RecordHotkey);
+        _recordMenuItem.Click += (_, _) => ToggleRecordFromHotkey();
+        menu.Items.Add(_recordMenuItem);
+
         _toggleMenuItem = CreateMenuItem(
             Localization.Text("L.Tray.Toggle"),
             _config.ToggleReplayHotkey);
@@ -2632,15 +2719,16 @@ public partial class App : Application
     {
         if (_hotkeys is null)
         {
-            _hotkeys = new HotkeyManager(config.Hotkey, config.ToggleReplayHotkey);
+            _hotkeys = new HotkeyManager(config.Hotkey, config.ToggleReplayHotkey, config.RecordHotkey);
             SubscribeHotkeys();
         }
         else
         {
-            _hotkeys.Rebind(config.Hotkey, config.ToggleReplayHotkey);
+            _hotkeys.Rebind(config.Hotkey, config.ToggleReplayHotkey, config.RecordHotkey);
         }
         _boundHotkey = config.Hotkey;
         _boundToggleHotkey = config.ToggleReplayHotkey;
+        _boundRecordHotkey = config.RecordHotkey;
     }
 
     private void SaveRollbackConfig(string operation)
@@ -2717,6 +2805,30 @@ public partial class App : Application
             return app.SaveReplayGuardedAsync(engine);
         }
 
+        public async Task<string> StartRecordingAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ObsReplayEngine engine = _engine ?? throw new InvalidOperationException(
+                "Recording engine is not available.");
+            return await app.RunOnObsThreadAsync(() => engine.StartRecordingAsync()).Unwrap();
+        }
+
+        public async Task<string> StopRecordingAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ObsReplayEngine engine = _engine ?? throw new InvalidOperationException(
+                "Recording engine is not available.");
+            return await app.RunOnObsThreadAsync(() => engine.StopRecordingAsync(cancellationToken)).Unwrap();
+        }
+
+        public Task<bool> PauseRecordingAsync(bool pause, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ObsReplayEngine engine = _engine ?? throw new InvalidOperationException(
+                "Recording engine is not available.");
+            return app.RunOnObsThreadAsync(() => engine.PauseRecording(pause));
+        }
+
         public async ValueTask DisposeAsync()
         {
             if (_engine is null)
@@ -2737,6 +2849,9 @@ public partial class App : Application
     private void UpdateUiState()
     {
         bool active = IsReplayRunning;
+        bool isRecording = _replayRuntime?.Snapshot.IsRecording ?? _obs?.IsRecording ?? false;
+        bool isPaused = _replayRuntime?.Snapshot.IsRecordingPaused ?? _obs?.IsRecordingPaused ?? false;
+        TimeSpan duration = _obs?.RecordingDuration ?? TimeSpan.Zero;
         string codec = _obs?.ActiveCodec ?? _config?.Codec ?? "h264";
         int availableReplaySeconds = active
             ? _obs?.AvailableReplaySeconds ?? _config!.BufferSeconds
@@ -2748,24 +2863,37 @@ public partial class App : Application
             codec,
             _captureDescription,
             availableReplaySeconds);
+        _settingsWindow?.UpdateRecordingState(
+            isRecording,
+            isPaused,
+            duration);
         if (_tray is not null)
         {
-            if (_trayActiveState != active)
+            if (_trayActiveState != (active || isRecording))
             {
                 _tray.Icon = CreateIcon(
-                    active ? "Captail.ico" : "CaptailInactive.ico");
-                _trayActiveState = active;
+                    (active || isRecording) ? "Captail.ico" : "CaptailInactive.ico");
+                _trayActiveState = (active || isRecording);
             }
-            _tray.ToolTipText = active
-                ? Localization.Format(
-                    "L.Tray.Active",
-                    FormatDuration(_config!.BufferSeconds))
-                : Localization.Text("L.Tray.Disabled");
+            _tray.ToolTipText = isRecording
+                ? $"{Localization.Text("L.Brand")} — {Localization.Text("L.Record.Recording")} ({FormatDuration((int)duration.TotalSeconds)})"
+                : active
+                    ? Localization.Format(
+                        "L.Tray.Active",
+                        FormatDuration(_config!.BufferSeconds))
+                    : Localization.Text("L.Tray.Disabled");
         }
         if (_saveMenuItem is not null)
         {
             _saveMenuItem.InputGestureText = _config?.Hotkey ?? "";
             _saveMenuItem.IsEnabled = active && availableReplaySeconds > 0;
+        }
+        if (_recordMenuItem is not null)
+        {
+            _recordMenuItem.Header = isRecording
+                ? Localization.Text("L.Record.Stop")
+                : Localization.Text("L.Record.Start");
+            _recordMenuItem.InputGestureText = _config?.RecordHotkey ?? "";
         }
         if (_toggleMenuItem is not null)
             _toggleMenuItem.InputGestureText =
@@ -2775,9 +2903,10 @@ public partial class App : Application
 
     private void UpdateReplayIndicator()
     {
+        bool isRecording = _replayRuntime?.Snapshot.IsRecording ?? _obs?.IsRecording ?? false;
         if (_uiOnly || Volatile.Read(ref _exiting) != 0 ||
             _config?.ShowRecordingIndicator != true ||
-            _config.ReplayEnabled != true)
+            (!_config.ReplayEnabled && !isRecording))
         {
             _recordingIndicator?.HideIndicator();
             return;
@@ -2789,8 +2918,9 @@ public partial class App : Application
         _recordingIndicator.SetGameDetected(
             IsReplayRunning &&
             !string.IsNullOrWhiteSpace(_obs?.ActiveGameExecutable));
-        ReplayIndicatorState state =
-            _replayRuntime?.Snapshot.State == ReplayRuntimeState.Recovering
+        ReplayIndicatorState state = isRecording
+            ? ReplayIndicatorState.Recording
+            : _replayRuntime?.Snapshot.State == ReplayRuntimeState.Recovering
                 ? ReplayIndicatorState.Recovering
                 : IsReplayRunning
                     ? ReplayIndicatorState.Active
@@ -3130,6 +3260,13 @@ public partial class App : Application
 
         if (_saveMenuItem is not null)
             _saveMenuItem.Header = Localization.Text("L.Tray.Save");
+        if (_recordMenuItem is not null)
+        {
+            bool isRecording = _replayRuntime?.Snapshot.IsRecording ?? _obs?.IsRecording ?? false;
+            _recordMenuItem.Header = isRecording
+                ? Localization.Text("L.Record.Stop")
+                : Localization.Text("L.Record.Start");
+        }
         if (_toggleMenuItem is not null)
             _toggleMenuItem.Header = Localization.Text("L.Tray.Toggle");
         if (_openFolderMenuItem is not null)

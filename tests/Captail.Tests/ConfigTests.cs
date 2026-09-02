@@ -92,4 +92,34 @@ public sealed class ConfigTests
 
         Assert.True(config1.ValuesEqual(config2));
     }
+
+    [Fact]
+    public void ChangingRecordHotkeyChangesValuesEqualButNotPipelineEquals()
+    {
+        var original = new Config
+        {
+            RecordHotkey = "Ctrl+Shift+F11",
+        };
+        Config modified = original.Clone();
+        modified.RecordHotkey = "Ctrl+Shift+F8";
+
+        Assert.False(original.ValuesEqual(modified));
+        Assert.True(original.PipelineEquals(modified));
+    }
+
+    [Fact]
+    public void NormalizeResolvesRecordHotkeyCollision()
+    {
+        var config = new Config
+        {
+            Hotkey = "Ctrl+Shift+F10",
+            ToggleReplayHotkey = "Ctrl+Shift+F9",
+            RecordHotkey = "Ctrl+Shift+F10", // Collision with Hotkey
+        };
+
+        config.Normalize();
+
+        Assert.True(HotkeyManager.AreDistinct(config.Hotkey, config.ToggleReplayHotkey, config.RecordHotkey));
+        Assert.Equal("Ctrl+Shift+F11", config.RecordHotkey);
+    }
 }

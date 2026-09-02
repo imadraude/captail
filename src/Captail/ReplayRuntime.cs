@@ -13,6 +13,9 @@ internal enum ReplayRuntimeState
 internal sealed record ReplayRuntimeSnapshot(
     ReplayRuntimeState State,
     bool ReplayEnabled,
+    bool IsRecording = false,
+    bool IsRecordingPaused = false,
+    DateTime? RecordingStartedUtc = null,
     string? Error = null);
 
 internal sealed record ReplayCommandResult(
@@ -31,6 +34,15 @@ internal interface IReplayPipeline : IAsyncDisposable
     Task StartAsync(CancellationToken cancellationToken);
 
     Task<string> SaveAsync(CancellationToken cancellationToken);
+
+    Task<string> StartRecordingAsync(CancellationToken cancellationToken) =>
+        Task.FromResult("recording.mp4");
+
+    Task<string> StopRecordingAsync(CancellationToken cancellationToken) =>
+        Task.FromResult("recording.mp4");
+
+    Task<bool> PauseRecordingAsync(bool pause, CancellationToken cancellationToken) =>
+        Task.FromResult(true);
 }
 
 internal interface IReplayPipelineFactory
@@ -210,6 +222,134 @@ internal sealed class ReplayRuntime : IAsyncDisposable
         }
     }
 
+    internal async Task<string> StartRecordingAsync(
+        CancellationToken cancellationToken = default)
+    {
+        ThrowIfUnavailable();
+        await _commandGate.WaitAsync(cancellationToken);
+        try
+        {
+            ThrowIfUnavailable();
+            if (Snapshot.IsRecording)
+                throw new InvalidOperationException("Recording is already in progress.");
+
+            IReplayPipeline? pipeline = _pipeline;
+            bool pipelineCreatedForRecording = false;
+            if (pipeline is null)
+            {
+                Publish(ReplayRuntimeState.Starting, _configuration.ReplayEnabled);
+                Config recordingConfig = _configuration.Clone();
+                pipeline = _pipelineFactory.Create(recordingConfig);
+                await pipeline.StartAsync(cancellationToken);
+                _pipeline = pipeline;
+                pipelineCreatedForRecording = true;
+            }
+
+            try
+            {
+                string path = await pipeline.StartRecordingAsync(cancellationToken);
+                Publish(
+                    ReplayRuntimeState.Running,
+                    _configuration.ReplayEnabled,
+                    isRecording: true,
+                    isRecordingPaused: false,
+                    recordingStartedUtc: DateTime.UtcNow);
+                return path;
+            }
+            catch
+            {
+                if (pipelineCreatedForRecording && _pipeline is not null)
+                {
+                    IReplayPipeline failed = _pipeline;
+                    _pipeline = null;
+                    await failed.DisposeAsync();
+                    Publish(ReplayRuntimeState.Disabled, _configuration.ReplayEnabled);
+                }
+                throw;
+            }
+        }
+        finally
+        {
+            _commandGate.Release();
+        }
+    }
+
+    internal async Task<string> StopRecordingAsync(
+        CancellationToken cancellationToken = default)
+    {
+        ThrowIfUnavailable();
+        await _commandGate.WaitAsync(cancellationToken);
+        try
+        {
+            ThrowIfUnavailable();
+            if (!Snapshot.IsRecording || _pipeline is null)
+                throw new InvalidOperationException("Recording is not running.");
+
+            string savedPath = await _pipeline.StopRecordingAsync(cancellationToken);
+
+            if (!_configuration.ReplayEnabled)
+            {
+                Publish(
+                    ReplayRuntimeState.Stopping,
+                    _configuration.ReplayEnabled,
+                    isRecording: false,
+                    isRecordingPaused: false,
+                    recordingStartedUtc: null);
+                IReplayPipeline pipelineToDispose = _pipeline;
+                _pipeline = null;
+                await pipelineToDispose.DisposeAsync();
+                Publish(
+                    ReplayRuntimeState.Disabled,
+                    _configuration.ReplayEnabled,
+                    isRecording: false,
+                    isRecordingPaused: false,
+                    recordingStartedUtc: null);
+            }
+            else
+            {
+                Publish(
+                    ReplayRuntimeState.Running,
+                    _configuration.ReplayEnabled,
+                    isRecording: false,
+                    isRecordingPaused: false,
+                    recordingStartedUtc: null);
+            }
+
+            return savedPath;
+        }
+        finally
+        {
+            _commandGate.Release();
+        }
+    }
+
+    internal async Task<bool> PauseRecordingAsync(
+        bool pause,
+        CancellationToken cancellationToken = default)
+    {
+        ThrowIfUnavailable();
+        await _commandGate.WaitAsync(cancellationToken);
+        try
+        {
+            ThrowIfUnavailable();
+            if (!Snapshot.IsRecording || _pipeline is null)
+                return false;
+
+            bool paused = await _pipeline.PauseRecordingAsync(pause, cancellationToken);
+            Publish(
+                Snapshot.State,
+                Snapshot.ReplayEnabled,
+                isRecording: Snapshot.IsRecording,
+                isRecordingPaused: pause && paused,
+                recordingStartedUtc: Snapshot.RecordingStartedUtc);
+            return paused;
+        }
+        finally
+        {
+            _commandGate.Release();
+        }
+    }
+
     internal Task<ReplayCommandResult> RecoverAsync(
         string reason,
         CancellationToken cancellationToken = default)
@@ -362,6 +502,19 @@ internal sealed class ReplayRuntime : IAsyncDisposable
             return ReplayCommandResult.Success(Snapshot);
         }
 
+        if (Snapshot.IsRecording)
+        {
+            _configuration.ReplayEnabled = false;
+            _configStore.Save(_configuration.Clone());
+            Publish(
+                ReplayRuntimeState.Running,
+                replayEnabled: false,
+                isRecording: Snapshot.IsRecording,
+                isRecordingPaused: Snapshot.IsRecordingPaused,
+                recordingStartedUtc: Snapshot.RecordingStartedUtc);
+            return ReplayCommandResult.Success(Snapshot);
+        }
+
         Publish(ReplayRuntimeState.Stopping, replayEnabled: true);
         IReplayPipeline pipeline = _pipeline;
         _pipeline = null;
@@ -377,7 +530,33 @@ internal sealed class ReplayRuntime : IAsyncDisposable
         bool replayEnabled,
         string? error = null)
     {
-        Snapshot = new ReplayRuntimeSnapshot(state, replayEnabled, error);
+        bool isRecording = state != ReplayRuntimeState.Disabled && (Snapshot?.IsRecording ?? false);
+        bool isPaused = state != ReplayRuntimeState.Disabled && (Snapshot?.IsRecordingPaused ?? false);
+        DateTime? startedUtc = state != ReplayRuntimeState.Disabled ? Snapshot?.RecordingStartedUtc : null;
+        Publish(
+            state,
+            replayEnabled,
+            isRecording,
+            isPaused,
+            startedUtc,
+            error);
+    }
+
+    private void Publish(
+        ReplayRuntimeState state,
+        bool replayEnabled,
+        bool isRecording,
+        bool isRecordingPaused,
+        DateTime? recordingStartedUtc,
+        string? error = null)
+    {
+        Snapshot = new ReplayRuntimeSnapshot(
+            state,
+            replayEnabled,
+            isRecording,
+            isRecordingPaused,
+            recordingStartedUtc,
+            error);
         SnapshotChanged?.Invoke(this, Snapshot);
     }
 

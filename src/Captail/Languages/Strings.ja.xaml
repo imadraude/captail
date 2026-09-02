@@ -211,6 +211,14 @@
   <sys:String x:Key="L.Library.OverwriteMessage">選択した範囲と有効なオーディオ トラックは、元のファイルを置き換えます。これを元に戻すことはできません。</sys:String>
   <sys:String x:Key="L.Library.OverwriteMergeMessage">選択した範囲は元のファイルを置き換え、すべての有効なオーディオ トラックが 1 つにミックスされます。これを元に戻すことはできません。</sys:String>
 
+  <sys:String x:Key="L.Record.Start">録画</sys:String>
+  <sys:String x:Key="L.Record.Stop">録画停止</sys:String>
+  <sys:String x:Key="L.Record.Recording">録画中</sys:String>
+  <sys:String x:Key="L.Hotkey.Record">録画の開始 / 停止</sys:String>
+  <sys:String x:Key="L.Hotkey.RecordHint">手動録画を切り替えます</sys:String>
+  <sys:String x:Key="L.Notify.RecordingStarted">録画を開始しました</sys:String>
+  <sys:String x:Key="L.Notify.RecordingSaved">録画を保存しました</sys:String>
+  <sys:String x:Key="L.Tray.Record">録画</sys:String>
   <sys:String x:Key="L.Hotkey.SaveReplay">リプレイを保存する</sys:String>
   <sys:String x:Key="L.Hotkey.SaveHint">現在のバッファを保存します</sys:String>
   <sys:String x:Key="L.Hotkey.Toggle">有効/無効</sys:String>

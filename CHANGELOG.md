@@ -4,6 +4,15 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-09-02
+
+### Added
+
+- **Standard / Manual Recording**: Start and stop standard recording at any time using global hotkey `Ctrl+Shift+F11`, the tray menu, or the dashboard. Records directly to MP4/MKV without duplicate encoder load alongside Instant Replay.
+- **Dual-Action Dashboard**: Side-by-side Save Replay and Record buttons with a live duration stopwatch (`00:01:23`).
+- **HUD Indicator & Clip Badges**: Pulsating red overlay indicator during active recording and distinct `REC` / `REPLAY` badges in recent replays.
+- **Customizable 3-Way Hotkeys**: Dedicated hotkey configuration for save (`Ctrl+Shift+F10`), toggle (`Ctrl+Shift+F9`), and manual recording (`Ctrl+Shift+F11`) with interactive capture and collision prevention.
+
 ## [0.4.0] - 2026-09-02
 
 ### Added
