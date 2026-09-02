@@ -64,7 +64,9 @@ public partial class ReplayStatusIndicatorWindow : Window
         _positionTimer.Tick += (_, _) => PositionOnForegroundMonitor();
         _captureAffinityTimer = new DispatcherTimer
         {
-            Interval = TimeSpan.FromMilliseconds(100),
+            // Fast enough to notice the Windows snipping overlay before its
+            // capture, without waking the UI thread ten times per second.
+            Interval = TimeSpan.FromMilliseconds(250),
         };
         _captureAffinityTimer.Tick += (_, _) => UpdateCaptureAffinity();
         _transientTimer = new DispatcherTimer();

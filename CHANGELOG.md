@@ -16,6 +16,7 @@ All notable user-facing changes are documented here.
 - **Smarter automatic bitrate:** Auto now scales continuously with the actual output resolution and frame rate, accounts for H.264, HEVC, and AV1 efficiency, and favors clean fast motion without abrupt quality jumps between load tiers.
 - **Honest bitrate guidance:** The settings label and help text now describe Auto as a stable, high-quality calculation in every supported interface language.
 - **Fork-owned updates:** GitHub builds from this fork now check, download, and report issues against `imadraude/captail` instead of the upstream repository.
+- **Lighter background operation:** Capture detection now uses an adaptive polling cadence, avoids duplicate OBS state refreshes and unchanged UI updates, caches foreground-process metadata, and reduces recording-indicator wake-ups.
 
 ## [0.2.2] - 2026-08-25
 

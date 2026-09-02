@@ -6,6 +6,14 @@ namespace Captail.Interop;
 
 internal static class CaptureInterop
 {
+    private static readonly object ForegroundProcessCacheLock = new();
+    private static readonly TimeSpan ForegroundProcessCacheLifetime =
+        TimeSpan.FromSeconds(30);
+    private static uint _cachedForegroundProcessId;
+    private static string _cachedForegroundExecutable = "";
+    private static string _cachedForegroundPath = "";
+    private static DateTime _foregroundProcessCacheUtc;
+
     private delegate bool MonitorEnumProc(nint monitor, nint hdc, ref Rect rect, nint data);
 
     [DllImport("user32.dll")]
@@ -143,11 +151,24 @@ internal static class CaptureInterop
         nint window = GetForegroundWindow();
         if (window == 0 || GetWindowThreadProcessId(window, out uint processId) == 0)
             return new ForegroundAppInfo("", "", false);
+
+        (string executable, string fullPath)? cached =
+            CachedForegroundProcess(processId, DateTime.UtcNow);
+        if (cached is { } processInfo)
+        {
+            return new ForegroundAppInfo(
+                processInfo.executable,
+                processInfo.fullPath,
+                CoversMonitor(window));
+        }
+
+        string executable;
+        string fullPath;
         try
         {
             using Process process = Process.GetProcessById((int)processId);
-            string executable = process.ProcessName + ".exe";
-            string fullPath = "";
+            executable = process.ProcessName + ".exe";
+            fullPath = "";
             try
             {
                 fullPath = process.MainModule?.FileName ?? "";
@@ -159,6 +180,7 @@ internal static class CaptureInterop
                 // Process name still allows normal hook/foreground matching.
             }
 
+            CacheForegroundProcess(processId, executable, fullPath);
             return new ForegroundAppInfo(
                 executable,
                 fullPath,
@@ -168,6 +190,36 @@ internal static class CaptureInterop
             exception is ArgumentException or InvalidOperationException or Win32Exception)
         {
             return new ForegroundAppInfo("", "", false);
+        }
+    }
+
+    private static (string executable, string fullPath)? CachedForegroundProcess(
+        uint processId,
+        DateTime nowUtc)
+    {
+        lock (ForegroundProcessCacheLock)
+        {
+            if (_cachedForegroundProcessId != processId ||
+                nowUtc - _foregroundProcessCacheUtc >= ForegroundProcessCacheLifetime)
+            {
+                return null;
+            }
+
+            return (_cachedForegroundExecutable, _cachedForegroundPath);
+        }
+    }
+
+    private static void CacheForegroundProcess(
+        uint processId,
+        string executable,
+        string fullPath)
+    {
+        lock (ForegroundProcessCacheLock)
+        {
+            _cachedForegroundProcessId = processId;
+            _cachedForegroundExecutable = executable;
+            _cachedForegroundPath = fullPath;
+            _foregroundProcessCacheUtc = DateTime.UtcNow;
         }
     }
 
