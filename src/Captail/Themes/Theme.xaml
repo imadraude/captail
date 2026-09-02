@@ -873,6 +873,32 @@
     </Setter>
   </Style>
 
+  <Style x:Key="CloseIconButton" TargetType="Button" BasedOn="{StaticResource IconButton}">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border x:Name="Bd" Background="Transparent" CornerRadius="8">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="Bd" Property="Background" Value="#D8C42B1C"/>
+              <Setter Property="Foreground" Value="#FFFFFFFF"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+              <Setter TargetName="Bd" Property="Background" Value="#B0A02015"/>
+              <Setter Property="Foreground" Value="#FFFFFFFF"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter Property="Opacity" Value="0.4"/>
+              <Setter Property="Cursor" Value="Arrow"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
   <Style x:Key="LanguageTriggerButton" TargetType="ToggleButton">
     <Setter Property="Foreground" Value="#FF7D8891"/>
     <Setter Property="Width" Value="30"/>
