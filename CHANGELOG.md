@@ -4,6 +4,19 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-09-02
+
+### Added
+
+- **Resilient Replay Runtime**: Encapsulated the recording and OBS lifecycle into a dedicated state-managed module with serialized command processing, graceful shutdown prioritization, and automatic configuration rollback on failure.
+- **Automated Test Suite**: Added an xUnit test project (`Captail.Tests`) covering runtime state transitions, configuration transactions, encoding policies, and audio routing.
+- **Immutable Dependency Pins**: Pinned external FFmpeg runtimes to immutable versions and SHA-256 digests with automated CI verification gates.
+
+### Improved
+
+- **Settings Maintainability**: Replaced duplicate settings extraction and manual property comparisons with centralized configuration equality checks.
+- **Watchdog Recovery**: Watchdog recovery now coalesces concurrent recovery signals to prevent overlapping pipeline restarts during driver or game crashes.
+
 ## [0.3.3] - 2026-09-02
 
 ### Fixed

@@ -122,6 +122,6 @@ policy changes.
 ## Contact
 
 For privacy questions, open an issue in the
-[Captail repository](https://github.com/FaulMit/captail/issues). Do not include
+[Captail repository](https://github.com/imadraude/captail/issues). Do not include
 recordings, logs, local paths, or other sensitive information in a public
 issue.

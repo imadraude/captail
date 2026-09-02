@@ -3,8 +3,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/FaulMit/captail/actions/workflows/ci.yml"><img src="https://github.com/FaulMit/captail/actions/workflows/ci.yml/badge.svg" alt="Build"></a>
-  <a href="https://github.com/FaulMit/captail/releases"><img src="https://img.shields.io/github/v/release/FaulMit/captail?include_prereleases&sort=semver&color=65d9bd" alt="Latest release"></a>
+  <a href="https://github.com/imadraude/captail/actions/workflows/ci.yml"><img src="https://github.com/imadraude/captail/actions/workflows/ci.yml/badge.svg" alt="Build"></a>
+  <a href="https://github.com/imadraude/captail/releases"><img src="https://img.shields.io/github/v/release/imadraude/captail?include_prereleases&sort=semver&color=65d9bd" alt="Latest release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--2.0--or--later-65d9bd" alt="GPL-2.0-or-later"></a>
   <img src="https://img.shields.io/badge/platform-Windows%2010%2F11-252b2e" alt="Windows 10/11">
 </p>
@@ -17,28 +17,29 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/FaulMit/captail/releases/latest"><img src="docs/readme-download.svg" alt="Download latest Captail release for Windows" width="286"></a>
+  <a href="https://github.com/imadraude/captail/releases/latest"><img src="docs/readme-download.svg" alt="Download latest Captail release for Windows" width="286"></a>
   <a href="https://apps.microsoft.com/detail/9PKVNVLKPTPS"><img src="docs/readme-store.svg" alt="Get Captail from Microsoft Store" width="286"></a>
 </p>
 
 <p align="center">
-  <a href="https://faulmit.github.io/captail/">Visit the Captail website</a>
+  <a href="https://imadraude.github.io/captail/">Visit the Captail website</a>
   ·
-  <a href="https://github.com/FaulMit/captail/issues/new/choose">Report a problem</a>
+  <a href="https://github.com/imadraude/captail/issues/new/choose">Report a problem</a>
 </p>
 
 Captail is a focused alternative to NVIDIA ShadowPlay Instant Replay. It keeps the latest seconds or minutes in a rolling buffer, then saves them when you press a hotkey. No scenes, streaming setup, account, cloud upload, analytics, or telemetry.
 
 > [!WARNING]
-> Captail `v0.3.0` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA RTX 40 and RTX 50 series are tested; other GPUs need broader public testing.
+> Captail `v0.4.0` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA RTX 40 and RTX 50 series are tested; other GPUs need broader public testing.
 
-## What's new in Captail 0.3.0?
+## What's new in Captail 0.4.0?
 
-- Let Auto choose a smooth, quality-focused bitrate from the actual resolution, frame rate, and efficiency of H.264, HEVC, or AV1.
-- Choose from a broad set of video bitrate presets from 5 to 100 Mbps while seeing the matching replay-memory estimate before saving settings.
-- Choose balanced or low-overhead NVENC encoding, with optional lightweight adaptive quantization on supported NVIDIA hardware.
-- Keep manual bitrate choices predictable while preserving the Intel QSV safety limit.
-- Receive GitHub updates and open feedback links against the `imadraude/captail` fork.
+- Resilient Replay Runtime architecture with serialized commands and transactional settings rollback.
+- Full automated test suite verifying state machine, configuration transactions, and encoding policies.
+- Immutable runtime dependencies with SHA-256 integrity verification.
+- Streamlined settings draft management with centralized configuration equality checks.
+- Smooth automatic bitrate scaling with hardware NVENC/QSV safety rules and instant memory estimates.
+- Fork ownership and update channels directed to `imadraude/captail`.
 
 ## Is Captail for me?
 
@@ -82,7 +83,7 @@ Captail is not a streaming application, scene compositor, DRM bypass, or cloud c
 
 ## How do I install it?
 
-Install Captail from [Microsoft Store](https://apps.microsoft.com/detail/9PKVNVLKPTPS), or open [GitHub Releases](https://github.com/FaulMit/captail/releases) and choose a package:
+Install Captail from [Microsoft Store](https://apps.microsoft.com/detail/9PKVNVLKPTPS), or open [GitHub Releases](https://github.com/imadraude/captail/releases) and choose a package:
 
 | Package | Choose it when | Installation |
 | --- | --- | --- |
@@ -268,7 +269,7 @@ Codec options are based on detected encoder support. Captail falls back to anoth
 
 ## What information should I include in a bug report?
 
-First check [existing issues](https://github.com/FaulMit/captail/issues), then click **Report bug** in Captail or open the [bug report form](https://github.com/FaulMit/captail/issues/new/choose).
+First check [existing issues](https://github.com/imadraude/captail/issues), then click **Report bug** in Captail or open the [bug report form](https://github.com/imadraude/captail/issues/new/choose).
 
 The in-app button prefills Captail version, package channel, Windows build, GPU and driver when available, recording configuration, and a short recent diagnostic excerpt. Captail removes personal paths, network addresses, identifiers, window titles, device names, secrets, and uncontrolled third-party output before opening GitHub. Review the form before submitting it; the complete local log and recorded files are never attached automatically.
 
@@ -292,7 +293,7 @@ Have an improvement rather than a bug? Open **About → Feature** to use Captail
 Development requires Windows 10/11 x64, .NET 9 SDK, CMake 3.20+, and Visual Studio 2022 Build Tools with **Desktop development with C++**.
 
 ```powershell
-git clone https://github.com/FaulMit/captail.git
+git clone https://github.com/imadraude/captail.git
 cd captail
 dotnet restore .\src\Captail\Captail.csproj --locked-mode
 dotnet build .\Captail.sln -c Debug --no-restore

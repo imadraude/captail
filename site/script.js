@@ -65,7 +65,7 @@ async function resolveLatestDownloads() {
   downloadsResolved = true;
 
   try {
-    const response = await fetch('https://api.github.com/repos/FaulMit/captail/releases?per_page=10', {
+    const response = await fetch('https://api.github.com/repos/imadraude/captail/releases?per_page=10', {
       headers: { Accept: 'application/vnd.github+json' }
     });
     if (!response.ok) throw new Error(`GitHub API returned ${response.status}`);
@@ -87,8 +87,8 @@ async function resolveLatestDownloads() {
         : release.tag_name;
     });
   } catch (error) {
-    downloadStatus.textContent = 'Latest verified fallback · V0.2.2';
-    console.warn('Could not resolve latest Captail release; using v0.2.2 links.', error);
+    downloadStatus.textContent = 'Latest verified fallback · V0.4.0';
+    console.warn('Could not resolve latest Captail release; using v0.4.0 links.', error);
   }
 }
 

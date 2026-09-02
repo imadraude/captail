@@ -35,7 +35,9 @@ jobs:
         with:
           dotnet-version: 9.0.x
           cache: true
-          cache-dependency-path: src/Captail/packages.lock.json
+          cache-dependency-path: |
+            src/Captail/packages.lock.json
+            tests/Captail.Tests/packages.lock.json
 
       - name: Acquire minimal OBS runtime
         shell: pwsh
@@ -46,9 +48,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          dotnet restore ./src/Captail/Captail.csproj --locked-mode
+          dotnet restore ./Captail.sln --locked-mode
           dotnet build ./Captail.sln -c Release --no-restore `
             -p:ContinuousIntegrationBuild=true
+
+      - name: Run replay runtime tests
+        shell: pwsh
+        run: |
+          dotnet test ./tests/Captail.Tests/Captail.Tests.csproj -c Release --no-restore `
+            -p:BuildNativeDependencies=false `
+            -p:AcquireObsRuntimeOnBuild=false `
+            -p:AcquireFfmpegRuntimeOnBuild=false
 
       - name: Run full .NET analyzers
         shell: pwsh
@@ -165,6 +175,14 @@ jobs:
       - name: Test Microsoft Store release workflow
         shell: pwsh
         run: ./tools/TestStoreReleaseWorkflow.ps1
+
+      - name: Test release metadata consistency
+        shell: pwsh
+        run: ./tools/TestReleaseMetadata.ps1
+
+      - name: Test runtime dependency pins
+        shell: pwsh
+        run: ./tools/TestRuntimeDependencyPins.ps1
 
       - name: Test sanitized diagnostic log export
         shell: pwsh

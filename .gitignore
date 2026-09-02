@@ -1,11 +1,11 @@
 # Build output
 artifacts/
 runtime/
-src/**/bin/
-src/**/obj/
+bin/
+obj/
+**/bin/
+**/obj/
 native/**/build*/
-tools/**/bin/
-tools/**/obj/
 
 # IDE and user state
 .vs/
@@ -28,3 +28,6 @@ TestResults/
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Agent session logs
+codex-session-*.md

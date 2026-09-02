@@ -1054,7 +1054,7 @@ public partial class SettingsWindow : Window
             return;
 
         Config pending = CreatePendingConfig();
-        bool dirty = !SettingsValuesEqual(pending, _config) ||
+        bool dirty = !pending.ValuesEqual(_config) ||
                      (AutostartBox.IsChecked == true) != _savedAutostartEnabled;
         SetSettingsDirty(dirty);
     }
@@ -1103,61 +1103,6 @@ public partial class SettingsWindow : Window
         return candidate;
     }
 
-    private static bool SettingsValuesEqual(Config left, Config right) =>
-        left.ReplayEnabled == right.ReplayEnabled &&
-        left.WarnWhenGameStartsWithReplayOff == right.WarnWhenGameStartsWithReplayOff &&
-        left.ShowRecordingIndicator == right.ShowRecordingIndicator &&
-        string.Equals(
-            left.RecordingIndicatorPosition,
-            right.RecordingIndicatorPosition,
-            StringComparison.Ordinal) &&
-        left.BufferSeconds == right.BufferSeconds &&
-        left.MaxReplaySizeMb == right.MaxReplaySizeMb &&
-        string.Equals(left.CaptureSource, right.CaptureSource, StringComparison.Ordinal) &&
-        string.Equals(left.Codec, right.Codec, StringComparison.Ordinal) &&
-        left.BitrateMbps == right.BitrateMbps &&
-        string.Equals(left.NvencMode, right.NvencMode, StringComparison.Ordinal) &&
-        left.LowOverheadAdaptiveQuantization == right.LowOverheadAdaptiveQuantization &&
-        left.FrameRate == right.FrameRate &&
-        left.MonitorIndex == right.MonitorIndex &&
-        string.Equals(
-            left.RecordingResolution,
-            right.RecordingResolution,
-            StringComparison.Ordinal) &&
-        left.CaptureSystemAudio == right.CaptureSystemAudio &&
-        left.SystemAudioVolume == right.SystemAudioVolume &&
-        string.Equals(
-            left.SystemAudioDeviceId,
-            right.SystemAudioDeviceId,
-            StringComparison.Ordinal) &&
-        left.CaptureMicrophone == right.CaptureMicrophone &&
-        left.MicrophoneVolume == right.MicrophoneVolume &&
-        left.MicrophoneBoostDb == right.MicrophoneBoostDb &&
-        string.Equals(
-            left.MicrophoneDeviceId,
-            right.MicrophoneDeviceId,
-            StringComparison.Ordinal) &&
-        string.Equals(left.AudioCodec, right.AudioCodec, StringComparison.Ordinal) &&
-        left.SeparateAudioTracks == right.SeparateAudioTracks &&
-        string.Equals(
-            left.AudioRoutingMode,
-            right.AudioRoutingMode,
-            StringComparison.Ordinal) &&
-        left.AdvancedMicrophoneTrack == right.AdvancedMicrophoneTrack &&
-        ProcessAudioRoutesEqual(
-            left.ProcessAudioRoutes,
-            right.ProcessAudioRoutes) &&
-        string.Equals(
-            left.OutputDirectory,
-            right.OutputDirectory,
-            StringComparison.OrdinalIgnoreCase) &&
-        left.OrganizeReplaysByGame == right.OrganizeReplaysByGame &&
-        string.Equals(left.Hotkey, right.Hotkey, StringComparison.Ordinal) &&
-        string.Equals(
-            left.ToggleReplayHotkey,
-            right.ToggleReplayHotkey,
-            StringComparison.Ordinal);
-
     private static List<ProcessAudioRoute> CloneProcessAudioRoutes(
         IEnumerable<ProcessAudioRoute>? routes) =>
         (routes ?? [])
@@ -1169,22 +1114,6 @@ public partial class SettingsWindow : Window
             })
             .OrderBy(route => route.Executable, StringComparer.OrdinalIgnoreCase)
             .ToList();
-
-    private static bool ProcessAudioRoutesEqual(
-        IEnumerable<ProcessAudioRoute>? left,
-        IEnumerable<ProcessAudioRoute>? right)
-    {
-        ProcessAudioRoute[] leftRoutes = CloneProcessAudioRoutes(left).ToArray();
-        ProcessAudioRoute[] rightRoutes = CloneProcessAudioRoutes(right).ToArray();
-        return leftRoutes.Length == rightRoutes.Length &&
-               leftRoutes.Zip(rightRoutes).All(pair =>
-                   pair.First.Track == pair.Second.Track &&
-                   pair.First.Enabled == pair.Second.Enabled &&
-                   string.Equals(
-                       pair.First.Executable,
-                       pair.Second.Executable,
-                       StringComparison.OrdinalIgnoreCase));
-    }
 
     private void SetSettingsDirty(bool dirty, bool animate = true)
     {
@@ -2236,20 +2165,10 @@ public partial class SettingsWindow : Window
                 Localization.Text("L.Error.AdvancedAudioEmpty"));
             return;
         }
-        Config candidate = _config.Clone();
-        candidate.ReplayEnabled = SettingsReplayToggle.IsChecked == true;
-        candidate.WarnWhenGameStartsWithReplayOff = WarnGameOffBox.IsChecked == true;
-        candidate.ShowRecordingIndicator =
-            RecordingIndicatorBox.IsChecked == true;
-        candidate.RecordingIndicatorPosition = GetSelectedRadioTag(
-            RecordingIndicatorPositionOptions,
-            _config.RecordingIndicatorPosition);
-        candidate.BufferSeconds =
-            GetSelectedRadioInt(BufferOptions, _config.BufferSeconds);
-        candidate.MaxReplaySizeMb = GetSelectedInt(ReplaySizeLimitBox, 0);
-        candidate.CaptureSource = GetSelectedTag(CaptureSourceBox, "desktop");
-        string selectedCodec = GetSelectedTag(CodecBox, _config.Codec);
-        if (!_capabilities.Supports(selectedCodec))
+
+        Config candidate = CreatePendingConfig();
+        candidate.Normalize();
+        if (!_capabilities.Supports(candidate.Codec))
         {
             ShowError(
                 Localization.Text("L.Error.CodecTitle"),
@@ -2261,31 +2180,6 @@ public partial class SettingsWindow : Window
 
         try
         {
-            candidate.Codec = selectedCodec;
-            ApplyPerformanceSettings(candidate);
-            candidate.FrameRate = GetSelectedRadioInt(FpsOptions, _config.FrameRate);
-            candidate.MonitorIndex = GetSelectedInt(MonitorBox, _config.MonitorIndex);
-            candidate.RecordingResolution = GetSelectedTag(ResolutionBox, "source");
-            candidate.CaptureSystemAudio =
-                !advancedAudio && SystemAudioBox.IsChecked == true;
-            candidate.SystemAudioVolume = (int)Math.Round(SystemVolumeSlider.Value);
-            candidate.SystemAudioDeviceId = GetSelectedTag(AudioDeviceBox, "");
-            candidate.CaptureMicrophone = MicBox.IsChecked == true;
-            candidate.MicrophoneVolume = (int)Math.Round(MicVolumeSlider.Value);
-            candidate.MicrophoneBoostDb = (int)Math.Round(MicBoostSlider.Value);
-            candidate.MicrophoneDeviceId = GetSelectedTag(MicDeviceBox, "");
-            candidate.AudioCodec = GetSelectedTag(AudioCodecBox, "aac");
-            candidate.SeparateAudioTracks = separateAudioTracks;
-            candidate.AudioRoutingMode = advancedAudio ? "advanced" : "simple";
-            candidate.ProcessAudioRoutes = CloneProcessAudioRoutes(
-                _pendingProcessAudioRoutes);
-            candidate.AdvancedMicrophoneTrack = _pendingAdvancedMicrophoneTrack;
-            candidate.OutputDirectory = _outputDirectory;
-            candidate.OrganizeReplaysByGame = OrganizeByGameBox.IsChecked == true;
-            candidate.Hotkey = _pendingSaveHotkey;
-            candidate.ToggleReplayHotkey = _pendingToggleHotkey;
-            candidate.Normalize();
-
             if (!await _applySettings(
                     candidate,
                     AutostartBox.IsChecked == true))

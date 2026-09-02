@@ -14,12 +14,14 @@ Each release contains:
 Before running the workflow:
 
 1. Review changes since the previous tag.
-2. Move completed entries from `[Unreleased]` into a dated version section in `CHANGELOG.md`.
-3. Follow [RELEASE_NOTES.md](RELEASE_NOTES.md) for categories, wording, and required upgrade notices.
-4. Capture the complete README baseline from the exact release-candidate build by following [SCREENSHOTS.md](SCREENSHOTS.md). Replace every required screenshot even when its screen did not visibly change.
-5. Verify the screenshot build can actually record and reopen the README showcase profile: hardware AV1, 4K, 240 FPS, system audio, and microphone.
-6. Add a real screenshot for each significant new user-facing workflow or screen. Do not use mockups, concepts, generated UI, or screenshots from an older build.
-7. Preview the generated GitHub Release description locally:
+2. Update `src/Captail/Captail.csproj`, README and site fallback metadata to the release version.
+3. Move completed entries from `[Unreleased]` into a dated version section in `CHANGELOG.md`.
+4. Run `./tools/TestReleaseMetadata.ps1`. The project version and newest changelog section are the GitHub-channel source of truth; `store-listing/listing.json` tracks the independently published Microsoft Store version.
+5. Follow [RELEASE_NOTES.md](RELEASE_NOTES.md) for categories, wording, and required upgrade notices.
+6. Capture the complete README baseline from the exact release-candidate build by following [SCREENSHOTS.md](SCREENSHOTS.md). Replace every required screenshot even when its screen did not visibly change.
+7. Verify the screenshot build can actually record and reopen the README showcase profile: hardware AV1, 4K, 240 FPS, system audio, and microphone.
+8. Add a real screenshot for each significant new user-facing workflow or screen. Do not use mockups, concepts, generated UI, or screenshots from an older build.
+9. Preview the generated GitHub Release description locally:
 
 ```powershell
 .\tools\New-ReleaseNotes.ps1 `
@@ -44,7 +46,7 @@ From GitHub CLI:
 
 ```powershell
 gh workflow run release.yml `
-  --repo FaulMit/captail `
+  --repo imadraude/captail `
   --ref main `
   -f version=0.2.0 `
   -f prerelease=true

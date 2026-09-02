@@ -59,7 +59,7 @@
         "replay buffer",
         "AV1 recorder"
       ],
-      "LicenseTerms": "GNU General Public License v2.0 or later. Source and license: https://github.com/FaulMit/captail",
+      "LicenseTerms": "GNU General Public License v2.0 or later. Source and license: https://github.com/imadraude/captail",
       "CopyrightAndTrademarkInfo": "Copyright © 2026 faulmit and Captail contributors.",
       "DevStudio": "faulmit"
     },
@@ -94,7 +94,7 @@
         "буфер повтора",
         "запись AV1"
       ],
-      "LicenseTerms": "GNU General Public License v2.0 или новее. Исходный код и лицензия: https://github.com/FaulMit/captail",
+      "LicenseTerms": "GNU General Public License v2.0 или новее. Исходный код и лицензия: https://github.com/imadraude/captail",
       "CopyrightAndTrademarkInfo": "Copyright © 2026 faulmit и участники проекта Captail.",
       "DevStudio": "faulmit"
     }

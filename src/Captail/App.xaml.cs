@@ -16,6 +16,7 @@ namespace Captail;
 public partial class App : Application
 {
     private Config? _config;
+    private ReplayRuntime? _replayRuntime;
     private ObsReplayEngine? _obs;
     private HotkeyManager? _hotkeys;
     private string _boundHotkey = "";
@@ -38,7 +39,6 @@ public partial class App : Application
     private DateTime _pipelineStartedUtc;
     private DateTime _nextRecoveryUtc;
     private int _recoveryFailures;
-    private int _recoveryInProgress;
     private int _captureStateRefreshInProgress;
     private string _pendingReplayOffGame = "";
     private int _pendingReplayOffGameSamples;
@@ -386,11 +386,12 @@ public partial class App : Application
             StartHealthMonitor();
             StartCaptureStateMonitor();
             StartActivationServer();
+            InitializeReplayRuntime();
             if (!backgroundLaunch)
                 OpenSettings();
 
             if (_config.ReplayEnabled &&
-                await TryStartPipelineAsync(showError: true))
+                (await _replayRuntime!.SetEnabledAsync(true)).Succeeded)
             {
                 ShowOverlayNotification(
                     "●",
@@ -1652,17 +1653,20 @@ public partial class App : Application
         }
     }
 
-    private async Task<bool> TryStartPipelineCoreAsync(bool showError)
+    private async Task<bool> TryStartPipelineCoreAsync(
+        bool showError,
+        Config? requestedConfiguration = null)
     {
         if (IsReplayRunning)
             return true;
 
+        Config pipelineConfiguration = requestedConfiguration ?? _config!;
         ObsReplayEngine? engine = null;
         var stopwatch = Stopwatch.StartNew();
         try
         {
-            string requestedCodec = _config!.Codec;
-            engine = new ObsReplayEngine(_config);
+            string requestedCodec = pipelineConfiguration.Codec;
+            engine = new ObsReplayEngine(pipelineConfiguration);
             engine.Faulted += reason => OnPipelineFault(engine, reason);
             string description = await RunOnObsThreadAsync(() =>
             {
@@ -1675,10 +1679,10 @@ public partial class App : Application
             _capabilities = engine.Capabilities;
             _processAudioAvailability = engine.ProcessAudioAvailability;
             if (string.Equals(
-                _config.AudioRoutingMode,
+                pipelineConfiguration.AudioRoutingMode,
                 "advanced",
                 StringComparison.OrdinalIgnoreCase) &&
-                _config.ProcessAudioRoutes.Any(route => route.Enabled))
+                pipelineConfiguration.ProcessAudioRoutes.Any(route => route.Enabled))
             {
                 _processAudioMonitor = new ProcessAudioMonitor(
                     ProcessSnapshot.Capture,
@@ -1689,10 +1693,11 @@ public partial class App : Application
             }
             if (!string.Equals(
                     requestedCodec,
-                    _config.Codec,
+                    pipelineConfiguration.Codec,
                     StringComparison.OrdinalIgnoreCase))
             {
-                _config.Save();
+                if (requestedConfiguration is null)
+                    _config!.Save();
             }
             _pipelineStartedUtc = DateTime.UtcNow;
             _nextRecoveryUtc = DateTime.MinValue;
@@ -2028,7 +2033,7 @@ public partial class App : Application
     {
         if (_uiOnly ||
             _config?.ReplayEnabled != true ||
-            Interlocked.CompareExchange(ref _recoveryInProgress, 0, 0) != 0 ||
+            _replayRuntime?.Snapshot.State == ReplayRuntimeState.Recovering ||
             DateTime.UtcNow < _nextRecoveryUtc)
         {
             return;
@@ -2116,29 +2121,23 @@ public partial class App : Application
     {
         if (_config?.ReplayEnabled != true ||
             DateTime.UtcNow < _nextRecoveryUtc ||
-            Interlocked.Exchange(ref _recoveryInProgress, 1) != 0)
+            _replayRuntime is null)
         {
             return;
         }
 
-        bool gateHeld = false;
         try
         {
             UpdateReplayIndicator();
-            await _pipelineGate.WaitAsync();
-            gateHeld = true;
-            if (_config?.ReplayEnabled != true)
-                return;
-
             Log.Write($"Watchdog: {reason}");
             ShowOverlayNotification(
                 "↻",
                 Localization.Text("L.Notify.RecoveryTitle"),
                 reason,
                 OverlayTone.Warning);
-            await StopPipelineCoreAsync();
+            ReplayCommandResult result = await _replayRuntime.RecoverAsync(reason);
 
-            if (await TryStartPipelineCoreAsync(showError: false))
+            if (result.Succeeded)
             {
                 _recoveryFailures = 0;
                 _nextRecoveryUtc = DateTime.MinValue;
@@ -2177,9 +2176,6 @@ public partial class App : Application
         }
         finally
         {
-            if (gateHeld)
-                _pipelineGate.Release();
-            Interlocked.Exchange(ref _recoveryInProgress, 0);
             UpdateReplayIndicator();
         }
     }
@@ -2448,67 +2444,43 @@ public partial class App : Application
 
     private async Task<bool> SetReplayEnabledGuardedAsync(bool? requestedState)
     {
-        await _pipelineGate.WaitAsync();
-        bool enabled = requestedState ?? !_config!.ReplayEnabled;
-        bool previousEnabled = _config!.ReplayEnabled;
-        bool wasRunning = IsReplayRunning;
+        ReplayRuntime runtime = _replayRuntime ??
+            throw new InvalidOperationException("Replay runtime is not initialized.");
+        bool enabled = requestedState ?? !runtime.Snapshot.ReplayEnabled;
         try
         {
-            return await SetReplayEnabledCoreAsync(enabled);
+            ReplayCommandResult result = await runtime.SetEnabledAsync(enabled);
+            UpdateUiState();
+            if (result.Succeeded)
+            {
+                ShowOverlayNotification(
+                    enabled ? "●" : "■",
+                    Localization.Text(
+                        enabled ? "L.Notify.EnabledTitle" : "L.Notify.DisabledTitle"),
+                    enabled
+                        ? Localization.Format(
+                            "L.Status.BufferLast",
+                            FormatDuration(_config!.BufferSeconds))
+                        : Localization.Text("L.Notify.DisabledDetail"),
+                    enabled ? OverlayTone.Success : OverlayTone.Neutral);
+            }
+            else if (result.Snapshot.Error is not null)
+            {
+                _settingsWindow?.ShowError(
+                    Localization.Text("L.Error.Attention"),
+                    result.Snapshot.Error);
+            }
+            return result.Snapshot.State == ReplayRuntimeState.Running;
         }
         catch (Exception exception)
         {
-            Log.Write($"Replay toggle failed; rolling back: {exception}");
-            _config.ReplayEnabled = previousEnabled;
-            SaveRollbackConfig("replay toggle");
-            if (wasRunning && !IsReplayRunning)
-                await TryStartPipelineCoreAsync(showError: false);
-            else if (!wasRunning && IsReplayRunning)
-                await StopPipelineCoreAsync();
+            Log.Write($"Replay toggle failed: {exception}");
             UpdateUiState();
             _settingsWindow?.ShowError(
                 Localization.Text("L.Error.Attention"),
                 exception.Message);
-            return IsReplayRunning;
+            return runtime.Snapshot.State == ReplayRuntimeState.Running;
         }
-        finally
-        {
-            _pipelineGate.Release();
-        }
-    }
-
-    private async Task<bool> SetReplayEnabledCoreAsync(bool enabled)
-    {
-        if (enabled)
-        {
-            bool started = await TryStartPipelineCoreAsync(showError: true);
-            if (started)
-            {
-                _config!.ReplayEnabled = true;
-                _config.Save();
-                ShowOverlayNotification(
-                    "●",
-                    Localization.Text("L.Notify.EnabledTitle"),
-                    Localization.Format(
-                        "L.Status.BufferLast",
-                        FormatDuration(_config.BufferSeconds)),
-                    OverlayTone.Success);
-            }
-            return started;
-        }
-
-        await StopPipelineCoreAsync();
-        _config!.ReplayEnabled = false;
-        _config.Save();
-        _nextRecoveryUtc = DateTime.MinValue;
-        _recoveryFailures = 0;
-        UpdateUiState();
-        ShowOverlayNotification(
-            "■",
-            Localization.Text("L.Notify.DisabledTitle"),
-            Localization.Text("L.Notify.DisabledDetail"),
-            OverlayTone.Neutral);
-        return false;
     }
 
     private async Task<bool> SetAudioSourcesAsync(
@@ -2517,122 +2489,56 @@ public partial class App : Application
         string systemAudioDeviceId,
         string microphoneDeviceId)
     {
-        await _pipelineGate.WaitAsync();
-        Config previous = _config!.Clone();
-        bool wasRunning = IsReplayRunning;
-        try
+        Config candidate = _config!.Clone();
+        if (candidate.CaptureSystemAudio == captureSystemAudio &&
+            candidate.CaptureMicrophone == captureMicrophone &&
+            candidate.SystemAudioDeviceId == systemAudioDeviceId &&
+            candidate.MicrophoneDeviceId == microphoneDeviceId)
         {
-            if (previous.CaptureSystemAudio == captureSystemAudio &&
-                previous.CaptureMicrophone == captureMicrophone &&
-                previous.SystemAudioDeviceId == systemAudioDeviceId &&
-                previous.MicrophoneDeviceId == microphoneDeviceId)
-            {
-                return true;
-            }
-
-            _config.CaptureSystemAudio = captureSystemAudio;
-            _config.CaptureMicrophone = captureMicrophone;
-            _config.SystemAudioDeviceId = systemAudioDeviceId;
-            _config.MicrophoneDeviceId = microphoneDeviceId;
-            _config.Normalize();
-
-            if (!IsReplayRunning)
-            {
-                _config.Save();
-                UpdateUiState();
-                return true;
-            }
-
-            await StopPipelineCoreAsync();
-            if (await TryStartPipelineCoreAsync(showError: true))
-            {
-                _config.Save();
-                return true;
-            }
-            throw new InvalidOperationException(
-                Localization.Text("L.Error.AudioSourceMessage"));
+            return true;
         }
-        catch (Exception exception)
-        {
-            Log.Write($"Audio source change failed; rolling back: {exception}");
-            if (IsReplayRunning)
-                await StopPipelineCoreAsync();
-            _config.CopyFrom(previous);
-            SaveRollbackConfig("audio source change");
-            if (wasRunning)
-                await TryStartPipelineCoreAsync(showError: false);
-            UpdateUiState();
-            return false;
-        }
-        finally
-        {
-            _pipelineGate.Release();
-        }
+
+        candidate.CaptureSystemAudio = captureSystemAudio;
+        candidate.CaptureMicrophone = captureMicrophone;
+        candidate.SystemAudioDeviceId = systemAudioDeviceId;
+        candidate.MicrophoneDeviceId = microphoneDeviceId;
+        candidate.Normalize();
+        ReplayCommandResult result = await _replayRuntime!
+            .ApplyConfigurationAsync(candidate);
+        UpdateUiState();
+        return result.Succeeded;
     }
 
     private async Task<bool> SetAdvancedAudioSourceEnabledAsync(
         string? executable,
         bool enabled)
     {
-        await _pipelineGate.WaitAsync();
-        Config previous = _config!.Clone();
-        bool wasRunning = IsReplayRunning;
-        try
+        Config candidate = _config!.Clone();
+        if (string.IsNullOrWhiteSpace(executable))
         {
-            if (string.IsNullOrWhiteSpace(executable))
-            {
-                if (_config.CaptureMicrophone == enabled)
-                    return true;
-                _config.CaptureMicrophone = enabled;
-            }
-            else
-            {
-                ProcessAudioRoute? route = _config.ProcessAudioRoutes
-                    .FirstOrDefault(candidate => string.Equals(
-                        candidate.Executable,
-                        executable,
-                        StringComparison.OrdinalIgnoreCase));
-                if (route is null)
-                    return false;
-                if (route.Enabled == enabled)
-                    return true;
-                route.Enabled = enabled;
-            }
-
-            _config.Normalize();
-            if (!wasRunning)
-            {
-                _config.Save();
-                UpdateUiState();
+            if (candidate.CaptureMicrophone == enabled)
                 return true;
-            }
-
-            await StopPipelineCoreAsync();
-            if (await TryStartPipelineCoreAsync(showError: true))
-            {
-                _config.Save();
-                UpdateUiState();
+            candidate.CaptureMicrophone = enabled;
+        }
+        else
+        {
+            ProcessAudioRoute? route = candidate.ProcessAudioRoutes
+                .FirstOrDefault(route => string.Equals(
+                    route.Executable,
+                    executable,
+                    StringComparison.OrdinalIgnoreCase));
+            if (route is null)
+                return false;
+            if (route.Enabled == enabled)
                 return true;
-            }
-            throw new InvalidOperationException(
-                Localization.Text("L.Error.AudioSourceMessage"));
+            route.Enabled = enabled;
         }
-        catch (Exception exception)
-        {
-            Log.Write($"Advanced audio source toggle failed; rolling back: {exception}");
-            if (IsReplayRunning)
-                await StopPipelineCoreAsync();
-            _config.CopyFrom(previous);
-            SaveRollbackConfig("advanced audio source toggle");
-            if (wasRunning)
-                await TryStartPipelineCoreAsync(showError: false);
-            UpdateUiState();
-            return false;
-        }
-        finally
-        {
-            _pipelineGate.Release();
-        }
+
+        candidate.Normalize();
+        ReplayCommandResult result = await _replayRuntime!
+            .ApplyConfigurationAsync(candidate);
+        UpdateUiState();
+        return result.Succeeded;
     }
 
     private async Task<bool> ApplySettingsAsync(
@@ -2665,37 +2571,19 @@ public partial class App : Application
             return true;
         }
 
-        await _pipelineGate.WaitAsync();
         Config previous = _config!.Clone();
         bool previousAutostart = await Autostart.IsEnabledAsync();
-        bool wasRunning = IsReplayRunning;
-        bool pipelineChanged = !previous.PipelineEquals(candidate);
-        bool pipelineTouched = false;
         try
         {
             ApplyHotkeys(candidate);
-
-            bool mustStop = wasRunning &&
-                (!candidate.ReplayEnabled || pipelineChanged);
-            if (mustStop)
-            {
-                pipelineTouched = true;
-                await StopPipelineCoreAsync();
-            }
-
-            _config.CopyFrom(candidate);
-            bool mustStart = candidate.ReplayEnabled &&
-                (!wasRunning || pipelineChanged);
-            if (mustStart)
-            {
-                pipelineTouched = true;
-                if (!await TryStartPipelineCoreAsync(showError: true))
-                    throw new InvalidOperationException(
-                        Localization.Text("L.Engine.BufferStartFailed"));
-            }
+            ReplayCommandResult result = await _replayRuntime!
+                .ApplyConfigurationAsync(candidate);
+            if (!result.Succeeded)
+                throw new InvalidOperationException(
+                    result.Snapshot.Error ??
+                    Localization.Text("L.Engine.BufferStartFailed"));
 
             await Autostart.SetEnabledAsync(autostartEnabled);
-            _config.Save();
             UpdateUiState();
 
             ShowOverlayNotification(
@@ -2712,11 +2600,10 @@ public partial class App : Application
         catch (Exception exception)
         {
             Log.Write($"Apply settings failed; rolling back: {exception}");
-            if (pipelineTouched && IsReplayRunning)
-                await StopPipelineCoreAsync();
-
-            _config.CopyFrom(previous);
-            SaveRollbackConfig("settings apply");
+            ReplayCommandResult rollback = await _replayRuntime!
+                .ApplyConfigurationAsync(previous);
+            if (!rollback.Succeeded)
+                Log.Write($"Settings pipeline rollback failed: {rollback.Snapshot.Error}");
             try
             {
                 ApplyHotkeys(previous);
@@ -2733,18 +2620,11 @@ public partial class App : Application
             {
                 Log.Write($"Autostart rollback failed: {rollbackException}");
             }
-            if (wasRunning && !IsReplayRunning)
-                await TryStartPipelineCoreAsync(showError: false);
-
             UpdateUiState();
             _settingsWindow?.ShowError(
                 Localization.Text("L.Error.Attention"),
                 exception.Message);
             return false;
-        }
-        finally
-        {
-            _pipelineGate.Release();
         }
     }
 
@@ -2772,6 +2652,85 @@ public partial class App : Application
         catch (Exception exception)
         {
             Log.Write($"Could not persist {operation} rollback: {exception}");
+        }
+    }
+
+    private void InitializeReplayRuntime()
+    {
+        _replayRuntime = new ReplayRuntime(
+            _config!,
+            new AppReplayPipelineFactory(this),
+            new AppReplayConfigStore(this));
+        _replayRuntime.SnapshotChanged += (_, _) => UpdateUiState();
+    }
+
+    private sealed class AppReplayPipelineFactory(App app)
+        : IReplayPipelineFactory
+    {
+        public IReplayPipeline Create(Config configuration) =>
+            new AppReplayPipeline(app, configuration);
+    }
+
+    private sealed class AppReplayConfigStore(App app) : IReplayConfigStore
+    {
+        public void Save(Config configuration)
+        {
+            app._config!.CopyFrom(configuration);
+            app._config.Save();
+        }
+    }
+
+    private sealed class AppReplayPipeline(App app, Config configuration)
+        : IReplayPipeline
+    {
+        private ObsReplayEngine? _engine;
+
+        public async Task StartAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await app._pipelineGate.WaitAsync(cancellationToken);
+            try
+            {
+                bool showError = app._replayRuntime?.Snapshot.State !=
+                    ReplayRuntimeState.Recovering;
+                if (!await app.TryStartPipelineCoreAsync(
+                        showError,
+                        configuration))
+                {
+                    throw new InvalidOperationException(
+                        Localization.Text("L.Engine.BufferStartFailed"));
+                }
+                _engine = app._obs ?? throw new InvalidOperationException(
+                    "Replay pipeline started without an engine.");
+            }
+            finally
+            {
+                app._pipelineGate.Release();
+            }
+        }
+
+        public Task<string> SaveAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ObsReplayEngine engine = _engine ?? throw new InvalidOperationException(
+                Localization.Text("L.Notify.EnableBeforeSave"));
+            return app.SaveReplayGuardedAsync(engine);
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            if (_engine is null)
+                return;
+            _engine = null;
+            await app._pipelineGate.WaitAsync();
+            try
+            {
+                await app.StopPipelineCoreAsync();
+            }
+            finally
+            {
+                app._pipelineGate.Release();
+            }
         }
     }
 
@@ -2831,7 +2790,7 @@ public partial class App : Application
             IsReplayRunning &&
             !string.IsNullOrWhiteSpace(_obs?.ActiveGameExecutable));
         ReplayIndicatorState state =
-            Interlocked.CompareExchange(ref _recoveryInProgress, 0, 0) != 0
+            _replayRuntime?.Snapshot.State == ReplayRuntimeState.Recovering
                 ? ReplayIndicatorState.Recovering
                 : IsReplayRunning
                     ? ReplayIndicatorState.Active
@@ -2896,7 +2855,9 @@ public partial class App : Application
                     FormatDuration(availableReplaySeconds)),
                 OverlayTone.Neutral,
                 30_000);
-            string path = await SaveReplayGuardedAsync(engine);
+            string path = _replayRuntime is null
+                ? await SaveReplayGuardedAsync(engine)
+                : await _replayRuntime.SaveAsync();
             _settingsWindow?.NotifyReplaySaved(path);
             ShowReplaySavedIndicator();
             ShowOverlayNotification(
@@ -3232,18 +3193,26 @@ public partial class App : Application
 
         _healthTimer?.Stop();
         _captureStateTimer?.Stop();
-        await _pipelineGate.WaitAsync();
         try
         {
-            await StopPipelineCoreAsync();
+            if (_replayRuntime is not null)
+                await _replayRuntime.ShutdownAsync();
+            else
+            {
+                await _pipelineGate.WaitAsync();
+                try
+                {
+                    await StopPipelineCoreAsync();
+                }
+                finally
+                {
+                    _pipelineGate.Release();
+                }
+            }
         }
         catch (Exception exception)
         {
             Log.Write($"Graceful shutdown failed: {exception}");
-        }
-        finally
-        {
-            _pipelineGate.Release();
         }
         Shutdown();
     }

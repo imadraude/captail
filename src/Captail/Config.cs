@@ -230,6 +230,24 @@ public sealed class Config
         string.Equals(OutputDirectory, other.OutputDirectory, StringComparison.OrdinalIgnoreCase) &&
         OrganizeReplaysByGame == other.OrganizeReplaysByGame;
 
+    public bool ValuesEqual(Config other)
+    {
+        ArgumentNullException.ThrowIfNull(other);
+        return ReplayEnabled == other.ReplayEnabled &&
+               WarnWhenGameStartsWithReplayOff == other.WarnWhenGameStartsWithReplayOff &&
+               ShowRecordingIndicator == other.ShowRecordingIndicator &&
+               string.Equals(
+                   RecordingIndicatorPosition,
+                   other.RecordingIndicatorPosition,
+                   StringComparison.Ordinal) &&
+               string.Equals(Hotkey, other.Hotkey, StringComparison.Ordinal) &&
+               string.Equals(
+                   ToggleReplayHotkey,
+                   other.ToggleReplayHotkey,
+                   StringComparison.Ordinal) &&
+               PipelineEquals(other);
+    }
+
     public void Normalize()
     {
         Language = NormalizeLanguage(Language);
