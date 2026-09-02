@@ -22,21 +22,27 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="CheckBox">
-                        <Border x:Name="Box"
-                                Background="{StaticResource BgControlBrush}"
-                                BorderBrush="{StaticResource BorderControlBrush}"
-                                BorderThickness="1"
-                                CornerRadius="5">
-                            <Path x:Name="Check"
-                                  Data="M4 9l3 3 7-7"
-                                  Stroke="{StaticResource OnAccentBrush}"
-                                  StrokeThickness="2"
-                                  StrokeStartLineCap="Round"
-                                  StrokeEndLineCap="Round"
-                                  StrokeLineJoin="Round"
-                                  Visibility="Collapsed"
-                                  Margin="3" Stretch="Uniform"/>
-                        </Border>
+                        <Grid>
+                            <Border x:Name="Box"
+                                    Background="{StaticResource BgControlBrush}"
+                                    BorderBrush="{StaticResource BorderControlBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="5">
+                                <Path x:Name="Check"
+                                      Data="M4 9l3 3 7-7"
+                                      Stroke="{StaticResource OnAccentBrush}"
+                                      StrokeThickness="2"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      StrokeLineJoin="Round"
+                                      Visibility="Collapsed"
+                                      Margin="3" Stretch="Uniform"/>
+                            </Border>
+                            <Border x:Name="FocusBorder" Margin="-3"
+                                    BorderBrush="{StaticResource AccentBrush}"
+                                    BorderThickness="1.5" CornerRadius="7"
+                                    Visibility="Collapsed" IsHitTestVisible="False"/>
+                        </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
                                 <Setter TargetName="Box" Property="Background"
@@ -49,6 +55,14 @@
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Box" Property="BorderBrush"
                                         Value="{StaticResource AccentDimBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="FocusBorder" Property="Visibility"
+                                        Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.45"/>
+                                <Setter Property="Cursor" Value="Arrow"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>

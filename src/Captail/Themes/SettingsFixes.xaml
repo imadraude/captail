@@ -11,6 +11,7 @@
     <Setter Property="FontWeight" Value="SemiBold"/>
     <Setter Property="MinHeight" Value="34"/>
     <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="FocusVisualStyle" Value="{StaticResource CaptailFocusVisual}"/>
     <Setter Property="ItemContainerStyle" Value="{StaticResource DarkComboItem}"/>
     <Setter Property="Template">
       <Setter.Value>
@@ -19,16 +20,17 @@
             <ToggleButton x:Name="Toggle"
                           Focusable="False"
                           IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                          BorderBrush="{StaticResource DividerBrush}"
                           ClickMode="Press"
                           Cursor="Hand">
               <ToggleButton.Template>
                 <ControlTemplate TargetType="ToggleButton">
                   <Border x:Name="Bd"
                           Background="{StaticResource BgControlBrush}"
-                          BorderBrush="{StaticResource DividerBrush}"
+                          BorderBrush="{TemplateBinding BorderBrush}"
                           BorderThickness="1"
                           CornerRadius="8">
-                    <Path Data="{StaticResource IconChevron}"
+                    <Path x:Name="Chevron" Data="{StaticResource IconChevron}"
                           Stroke="#FF7D8891"
                           StrokeThickness="2.4"
                           StrokeStartLineCap="Round"
@@ -43,6 +45,11 @@
                   <ControlTemplate.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
                       <Setter TargetName="Bd" Property="BorderBrush" Value="#FF3A4A45"/>
+                      <Setter TargetName="Chevron" Property="Stroke" Value="{StaticResource TextPrimaryBrush}"/>
+                    </Trigger>
+                    <Trigger Property="IsChecked" Value="True">
+                      <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource AccentDimBrush}"/>
+                      <Setter TargetName="Chevron" Property="Stroke" Value="{StaticResource AccentBrush}"/>
                     </Trigger>
                   </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -101,6 +108,9 @@
               <Setter TargetName="SelectionPresenter" Property="Visibility" Value="Collapsed"/>
               <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
             </Trigger>
+            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+              <Setter TargetName="Toggle" Property="BorderBrush" Value="{StaticResource AccentDimBrush}"/>
+            </Trigger>
             <Trigger Property="IsEnabled" Value="False">
               <Setter Property="Opacity" Value="0.45"/>
             </Trigger>
@@ -114,9 +124,10 @@
   <Style TargetType="CheckBox">
     <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
     <Setter Property="FontFamily" Value="{StaticResource FontUi}"/>
-    <Setter Property="FontSize" Value="10.5"/>
+    <Setter Property="FontSize" Value="11.5"/>
     <Setter Property="VerticalContentAlignment" Value="Center"/>
     <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="FocusVisualStyle" Value="{StaticResource CaptailFocusVisualSmall}"/>
   </Style>
 
 </ResourceDictionary>

@@ -4,6 +4,14 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-09-02
+
+### Improved
+
+- **WCAG AA Contrast Calibration**: Calibrated `ColorTextMuted` to `#7A878F` (4.6:1+ contrast ratio) and `ColorRingIdle` to `#606C74` (3.1:1+ ratio), significantly improving readability of section headers, hints, and idle status indicators on dark surfaces.
+- **Keyboard Navigation & Modern Focus**: Introduced unified Windows 11-style focus indicators (`CaptailFocusVisual`, `CaptailFocusVisualRound`, `CaptailFocusVisualSmall`) with mint accent borders across header buttons, link buttons, menu popups, switches, and route check boxes, eliminating invisible keyboard tab states.
+- **Interactive Control States**: Added tactile `IsPressed`, `Hover`, and `Disabled` visual states to accent buttons, subtle action buttons, toggle switches, audio chips, and editable comboboxes.
+
 ## [0.5.0] - 2026-09-02
 
 ### Added
