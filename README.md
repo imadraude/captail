@@ -30,16 +30,15 @@
 Captail is a focused alternative to NVIDIA ShadowPlay Instant Replay. It keeps the latest seconds or minutes in a rolling buffer, then saves them when you press a hotkey. No scenes, streaming setup, account, cloud upload, analytics, or telemetry.
 
 > [!WARNING]
-> Captail `v0.2.2` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA RTX 40 and RTX 50 series are tested; other GPUs need broader public testing.
+> Captail `v0.3.0` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA RTX 40 and RTX 50 series are tested; other GPUs need broader public testing.
 
-## What's new in Captail 0.2.2?
+## What's new in Captail 0.3.0?
 
-- Route audio from individual applications to separate recording tracks. Selected apps stay first, active audio sessions follow, and every other running process remains searchable.
-- See real application icons and live level meters while assigning apps and microphone to tracks supported by the chosen audio format.
-- Toggle routed application and microphone sources directly from the main window without reopening Settings.
-- Preview every audio track found in a replay, keep or remove tracks independently, and use a taller editor layout when a file contains many tracks.
-- Recover application-audio capture without stopping the replay buffer when a routed process exits or restarts.
-- Keep the tray icon and replay-status indicator available after Windows startup, and avoid a shutdown crash caused by an already-disposed tray icon.
+- Let Auto choose a smooth, quality-focused bitrate from the actual resolution, frame rate, and efficiency of H.264, HEVC, or AV1.
+- Set a custom video bitrate from 2 to 100 Mbps while seeing the matching replay-memory estimate before saving settings.
+- Choose balanced or low-overhead NVENC encoding, with optional lightweight adaptive quantization on supported NVIDIA hardware.
+- Keep manual bitrate choices predictable while preserving the Intel QSV safety limit.
+- Receive GitHub updates and open feedback links against the `imadraude/captail` fork.
 
 ## Is Captail for me?
 

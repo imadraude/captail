@@ -4,6 +4,19 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-02
+
+### Added
+
+- **Custom video bitrate:** Choose a preset or enter any video bitrate from 2 to 100 Mbps while keeping the replay memory estimate synchronized with the effective encoder value.
+- **NVENC performance controls:** Select balanced or low-overhead encoding on supported NVIDIA hardware, with an optional low-cost adaptive-quantization control.
+
+### Improved
+
+- **Smarter automatic bitrate:** Auto now scales continuously with the actual output resolution and frame rate, accounts for H.264, HEVC, and AV1 efficiency, and favors clean fast motion without abrupt quality jumps between load tiers.
+- **Honest bitrate guidance:** The settings label and help text now describe Auto as a stable, high-quality calculation in every supported interface language.
+- **Fork-owned updates:** GitHub builds from this fork now check, download, and report issues against `imadraude/captail` instead of the upstream repository.
+
 ## [0.2.2] - 2026-08-25
 
 ### Added
