@@ -977,6 +977,24 @@ public partial class App : Application
                 ObsReplayEngine.RecommendedNvencBFrames("h264", false) == 0 &&
                 windows10CaptureMethod == 0 &&
                 windows11CaptureMethod == 2 &&
+                CaptureStatePollMilliseconds(
+                    replayEnabled: true,
+                    running: true,
+                    gameCapture: true,
+                    outputActive: false,
+                    detectorActive: false) == 1000 &&
+                CaptureStatePollMilliseconds(
+                    replayEnabled: true,
+                    running: true,
+                    gameCapture: true,
+                    outputActive: false,
+                    detectorActive: true) == 250 &&
+                CaptureStatePollMilliseconds(
+                    replayEnabled: true,
+                    running: true,
+                    gameCapture: true,
+                    outputActive: true,
+                    detectorActive: true) == 500 &&
                 invalidConfig.PipelineEquals(hotkeyOnlyChange) &&
                 !invalidConfig.PipelineEquals(pipelineChange);
             Log.Write(
@@ -1856,7 +1874,7 @@ public partial class App : Application
     {
         _captureStateTimer = new DispatcherTimer
         {
-            Interval = TimeSpan.FromMilliseconds(500),
+            Interval = CaptureStatePollInterval(),
         };
         _captureStateTimer.Tick += async (_, _) =>
             await RefreshAutomaticCaptureStateSafeAsync();
@@ -1907,8 +1925,35 @@ public partial class App : Application
         }
         finally
         {
+            if (_captureStateTimer is not null)
+                _captureStateTimer.Interval = CaptureStatePollInterval();
             Interlocked.Exchange(ref _captureStateRefreshInProgress, 0);
         }
+    }
+
+    private TimeSpan CaptureStatePollInterval()
+    {
+        ObsReplayEngine? engine = _obs;
+        return TimeSpan.FromMilliseconds(CaptureStatePollMilliseconds(
+            _config?.ReplayEnabled == true,
+            IsReplayRunning,
+            engine?.IsGameCapture == true,
+            engine?.IsActive == true,
+            engine?.IsGameCaptureDetectorActive == true));
+    }
+
+    internal static int CaptureStatePollMilliseconds(
+        bool replayEnabled,
+        bool running,
+        bool gameCapture,
+        bool outputActive,
+        bool detectorActive)
+    {
+        if (!replayEnabled || !running)
+            return 1000;
+        if (!gameCapture || outputActive)
+            return 500;
+        return detectorActive ? 250 : 1000;
     }
 
     private void RefreshReplayOffGameWarning()
@@ -1993,6 +2038,7 @@ public partial class App : Application
             return;
 
         string? recoveryReason = null;
+        bool refreshUi = false;
         try
         {
             ObsReplayEngine? engine = _obs;
@@ -2008,13 +2054,23 @@ public partial class App : Application
                 (bool healthy, string? description) =
                     await RunOnObsThreadAsync(() =>
                     {
-                        engine.RefreshCaptureState();
                         return (
                             checkHealth ? engine.IsHealthy : true,
                             engine.Description);
                     });
                 if (healthy)
+                {
+                    refreshUi =
+                        !string.Equals(
+                            _captureDescription,
+                            description,
+                            StringComparison.Ordinal) ||
+                        _settingsWindow is not null ||
+                        (_saveMenuItem is not null &&
+                         _saveMenuItem.IsEnabled !=
+                         (engine.IsActive && engine.AvailableReplaySeconds > 0));
                     _captureDescription = description;
+                }
                 else
                     recoveryReason = Localization.Text(
                         "L.Recovery.NoFrames");
@@ -2027,7 +2083,7 @@ public partial class App : Application
 
         if (recoveryReason is not null)
             await RecoverPipelineAsync(recoveryReason);
-        else
+        else if (refreshUi)
             UpdateUiState();
     }
 
