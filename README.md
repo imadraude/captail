@@ -35,7 +35,7 @@ Captail is a focused alternative to NVIDIA ShadowPlay Instant Replay. It keeps t
 ## What's new in Captail 0.3.0?
 
 - Let Auto choose a smooth, quality-focused bitrate from the actual resolution, frame rate, and efficiency of H.264, HEVC, or AV1.
-- Set a custom video bitrate from 2 to 100 Mbps while seeing the matching replay-memory estimate before saving settings.
+- Choose from a broad set of video bitrate presets from 5 to 100 Mbps while seeing the matching replay-memory estimate before saving settings.
 - Choose balanced or low-overhead NVENC encoding, with optional lightweight adaptive quantization on supported NVIDIA hardware.
 - Keep manual bitrate choices predictable while preserving the Intel QSV safety limit.
 - Receive GitHub updates and open feedback links against the `imadraude/captail` fork.

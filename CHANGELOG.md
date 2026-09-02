@@ -4,11 +4,17 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.3.3] - 2026-09-02
+
+### Fixed
+
+- Replaced free-form bitrate entry with Auto and a broader set of reliable presets from 5 to 100 Mbps; legacy custom values now select the nearest preset.
+
 ## [0.3.2] - 2026-09-02
 
 ### Fixed
 
-- Kept the editable bitrate selector the same height as the other video controls.
+- Kept the bitrate selector the same height as the other video controls.
 - Added the missing NVENC help affordance and made tooltip spacing and hover behavior consistent across the settings window.
 
 ## [0.3.1] - 2026-09-02

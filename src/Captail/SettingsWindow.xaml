@@ -787,14 +787,18 @@
                                         </Button>
                                     </StackPanel>
                                     <ComboBox x:Name="BitrateBox" Grid.Row="1" Grid.ColumnSpan="2"
-                                              Style="{StaticResource DarkCombo}" Margin="0,8,0,0"
-                                              IsEditable="True" IsTextSearchEnabled="False"
-                                              ToolTip="{DynamicResource L.Video.BitrateCustomHint}">
+                                              Style="{StaticResource DarkCombo}" Margin="0,8,0,0">
                                         <ComboBoxItem Tag="0" Content="{DynamicResource L.Video.AutoLoad}"/>
+                                        <ComboBoxItem Tag="5" Content="5 Mbps"/>
                                         <ComboBoxItem Tag="10" Content="{DynamicResource L.Video.Mbps10}"/>
+                                        <ComboBoxItem Tag="15" Content="15 Mbps"/>
                                         <ComboBoxItem Tag="20" Content="{DynamicResource L.Video.Mbps20}"/>
+                                        <ComboBoxItem Tag="30" Content="30 Mbps"/>
+                                        <ComboBoxItem Tag="40" Content="40 Mbps"/>
                                         <ComboBoxItem Tag="50" Content="{DynamicResource L.Video.Mbps50}"/>
+                                        <ComboBoxItem Tag="65" Content="65 Mbps"/>
                                         <ComboBoxItem Tag="80" Content="{DynamicResource L.Video.Mbps80}"/>
+                                        <ComboBoxItem Tag="100" Content="100 Mbps"/>
                                     </ComboBox>
                                 </Grid>
                                 <Border Style="{StaticResource RowDivider}"/>

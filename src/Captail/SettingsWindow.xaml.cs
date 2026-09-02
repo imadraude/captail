@@ -106,8 +106,6 @@ public partial class SettingsWindow : Window
 
         InitializeComponent();
         AttachSettingsChangeTracking();
-        BitrateBox.AddHandler(TextBoxBase.TextChangedEvent,
-            new TextChangedEventHandler(BitrateText_Changed));
         LanguageList.ItemsSource = Localization.SupportedLanguages;
         UpdateLanguageMenuSelection();
         _replayLibrary = new ReplayLibrary(new FfmpegAdapter());
@@ -390,12 +388,9 @@ public partial class SettingsWindow : Window
             SelectRadioByTag(FpsOptions, _config.FrameRate.ToString());
             SelectByTag(CaptureSourceBox, _config.CaptureSource);
             SelectByTag(CodecBox, _config.Codec);
-            SelectByTag(BitrateBox, _config.BitrateMbps.ToString());
-            if (_config.BitrateMbps is not (0 or 10 or 20 or 50 or 80))
-            {
-                BitrateBox.SelectedItem = null;
-                BitrateBox.Text = _config.BitrateMbps.ToString();
-            }
+            SelectByTag(
+                BitrateBox,
+                ClosestBitratePreset(_config.BitrateMbps).ToString());
             SelectByTag(NvencModeBox, _config.NvencMode);
             LowOverheadAqBox.IsChecked = _config.LowOverheadAdaptiveQuantization;
             SelectByTag(MonitorBox, _config.MonitorIndex.ToString());
@@ -957,12 +952,6 @@ public partial class SettingsWindow : Window
         SelectionChangedEventArgs e)
     {
         UpdatePerformanceSettingsState();
-        QueueSettingsDirtyRefresh();
-    }
-
-    private void BitrateText_Changed(object sender, TextChangedEventArgs e)
-    {
-        UpdateRamEstimate();
         QueueSettingsDirtyRefresh();
     }
 
@@ -2303,14 +2292,11 @@ public partial class SettingsWindow : Window
                 // Keep pending choices visible so the failing setting can be corrected.
                 return;
 
-            int displayedBitrate = GetBitrateMbps(
+            int displayedBitrate = GetSelectedInt(
                 BitrateBox,
-                _config.BitrateMbps);
+                ClosestBitratePreset(_config.BitrateMbps));
             if (candidate.BitrateMbps != displayedBitrate)
-            {
-                BitrateBox.SelectedItem = null;
-                BitrateBox.Text = candidate.BitrateMbps.ToString();
-            }
+                SelectByTag(BitrateBox, candidate.BitrateMbps.ToString());
 
             Applied = true;
             _savedAutostartEnabled = AutostartBox.IsChecked == true;
@@ -2908,7 +2894,9 @@ public partial class SettingsWindow : Window
 
     private void ApplyPerformanceSettings(Config candidate)
     {
-        int configuredBitrate = GetBitrateMbps(BitrateBox, _config.BitrateMbps);
+        int configuredBitrate = GetSelectedInt(
+            BitrateBox,
+            ClosestBitratePreset(_config.BitrateMbps));
         string codec = GetSelectedTag(CodecBox, _config.Codec);
         string? encoderFamily = _capabilities.Preferred(codec)?.Family;
         candidate.BitrateMbps = string.Equals(
@@ -2921,14 +2909,12 @@ public partial class SettingsWindow : Window
         candidate.LowOverheadAdaptiveQuantization = LowOverheadAqBox.IsChecked == true;
     }
 
-    private static int GetBitrateMbps(ComboBox box, int fallback)
+    private static int ClosestBitratePreset(int bitrateMbps)
     {
-        if (box.SelectedItem is ComboBoxItem item &&
-            int.TryParse(item.Tag?.ToString(), out int selected))
-            return selected;
-        return int.TryParse(box.Text?.Trim(), out int typed)
-            ? Math.Clamp(typed, 2, 100)
-            : fallback;
+        int[] presets = [0, 5, 10, 15, 20, 30, 40, 50, 65, 80, 100];
+        if (bitrateMbps <= 0)
+            return 0;
+        return presets.Skip(1).MinBy(preset => Math.Abs(preset - bitrateMbps));
     }
 
     private static string FormatDuration(int seconds) =>
