@@ -106,7 +106,7 @@
   <sys:String x:Key="L.Video.Game">Jeu</sys:String>
   <sys:String x:Key="L.Video.Codec">Codec</sys:String>
   <sys:String x:Key="L.Video.Bitrate">Débit</sys:String>
-  <sys:String x:Key="L.Video.AutoLoad">Auto · charge adaptative</sys:String>
+  <sys:String x:Key="L.Video.AutoLoad">Auto · haute qualité</sys:String>
   <sys:String x:Key="L.Video.Mbps10">10 Mbit/s</sys:String>
   <sys:String x:Key="L.Video.Mbps20">20 Mbit/s</sys:String>
   <sys:String x:Key="L.Video.Mbps50">50 Mbit/s</sys:String>
@@ -126,7 +126,7 @@
   <sys:String x:Key="L.Help.VideoCodec.Av1">AV1 — le plus récent et le plus efficace. Plus propre au même débit ou des fichiers plus petits avec la même qualité. La prise en charge matérielle inclut GeForce RTX 40/50, Radeon RX 7000 et Intel Arc.</sys:String>
   <sys:String x:Key="L.Help.VideoCodec.Hevc">HEVC – presque aussi compact et pris en charge par des GPU plus modernes.</sys:String>
   <sys:String x:Key="L.Help.VideoCodec.H264">H.264 — utilise plus d'espace, mais s'ouvre presque partout.</sys:String>
-  <sys:String x:Key="L.Help.Bitrate">Combien de données vidéo sont écrites chaque seconde. Des valeurs plus élevées permettent de conserver des mouvements rapides plus propres, mais utilisent plus de RAM et d'espace disque. 50 Mbps équivaut à environ 375 Mo par minute. S'adapte automatiquement au codec, à la résolution et au FPS.</sys:String>
+  <sys:String x:Key="L.Help.Bitrate">Combien de données vidéo sont écrites chaque seconde. Des valeurs plus élevées permettent de conserver des mouvements rapides plus propres, mais utilisent plus de RAM et d'espace disque. 50 Mbps équivaut à environ 375 Mo par minute. Auto calcule un débit stable de haute qualité selon le codec, la résolution et le FPS.</sys:String>
   <sys:String x:Key="L.Help.Resolution">La source conserve les dimensions d'origine. Une résolution inférieure réduit la charge du GPU, l'utilisation de la RAM et la taille des fichiers, mais supprime également les détails. Cela ne change pas la résolution du moniteur.</sys:String>
   <sys:String x:Key="L.Help.FrameRate">60 FPS suffisent pour une lecture normale. 120 à 240 FPS enregistrent de vraies images supplémentaires pour un ralenti fluide ; Captail ne crée pas de fausses images. Le jeu doit produire assez d'images, et un FPS plus élevé augmente l'utilisation du GPU et de la mémoire.</sys:String>
 

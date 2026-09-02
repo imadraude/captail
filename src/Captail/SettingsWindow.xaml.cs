@@ -1011,15 +1011,12 @@ public partial class SettingsWindow : Window
             sourceWidth,
             sourceHeight,
             pending.RecordingResolution);
-        ObsReplayEngine.EncoderLoadProfile loadProfile =
-            ObsReplayEngine.SelectLoadProfile(
-                outputWidth,
-                outputHeight,
-                pending.FrameRate);
         string? encoderFamily = _capabilities.Preferred(pending.Codec)?.Family;
         int bitrate = ObsReplayEngine.EffectiveBitrateMbps(
             pending.BitrateMbps,
-            loadProfile,
+            outputWidth,
+            outputHeight,
+            pending.FrameRate,
             pending.Codec,
             encoderFamily);
         int tracks = ObsReplayEngine.AudioTrackCount(pending);

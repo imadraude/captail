@@ -941,14 +941,37 @@ public partial class App : Application
                 lowOverhead.BFrames == 0 &&
                 ObsReplayEngine.EffectiveBitrateMbps(
                     100,
-                    ObsReplayEngine.EncoderLoadProfile.Standard,
+                    1920,
+                    1080,
+                    60,
                     "h264",
                     "qsv") == 65 &&
                 ObsReplayEngine.EffectiveBitrateMbps(
                     0,
-                    ObsReplayEngine.EncoderLoadProfile.Standard,
+                    1920,
+                    1080,
+                    60,
                     "h264",
                     "nvenc") == 25 &&
+                ObsReplayEngine.AutomaticBitrateMbps(1280, 720, 30, "h264") == 9 &&
+                ObsReplayEngine.AutomaticBitrateMbps(1280, 720, 30, "hevc") == 7 &&
+                ObsReplayEngine.AutomaticBitrateMbps(1280, 720, 30, "av1") == 5 &&
+                ObsReplayEngine.AutomaticBitrateMbps(2560, 1440, 60, "h264") == 38 &&
+                ObsReplayEngine.AutomaticBitrateMbps(3840, 2160, 60, "hevc") == 53 &&
+                ObsReplayEngine.AutomaticBitrateMbps(1920, 1080, 240, "av1") == 34 &&
+                ObsReplayEngine.AutomaticBitrateMbps(3840, 2160, 120, "h264") == 100 &&
+                ObsReplayEngine.AutomaticBitrateMbps(1, 1, 1, "av1") == 4 &&
+                ObsReplayEngine.AutomaticBitrateMbps(1920, 1080, 60, "unknown") == 25 &&
+                Math.Abs(
+                    ObsReplayEngine.AutomaticBitrateMbps(2560, 1439, 60, "h264") -
+                    ObsReplayEngine.AutomaticBitrateMbps(2560, 1440, 60, "h264")) <= 1 &&
+                ObsReplayEngine.EffectiveBitrateMbps(
+                    0,
+                    3840,
+                    2160,
+                    240,
+                    "av1",
+                    "qsv") == 65 &&
                 ObsReplayEngine.RecommendedNvencBFrames("hevc", true) == 0 &&
                 ObsReplayEngine.RecommendedNvencBFrames("h264", true) == 2 &&
                 ObsReplayEngine.RecommendedNvencBFrames("h264", false) == 0 &&

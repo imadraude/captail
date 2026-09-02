@@ -106,7 +106,7 @@
   <sys:String x:Key="L.Video.Game">게임</sys:String>
   <sys:String x:Key="L.Video.Codec">코덱</sys:String>
   <sys:String x:Key="L.Video.Bitrate">비트레이트</sys:String>
-  <sys:String x:Key="L.Video.AutoLoad">자동 · 적응 부하</sys:String>
+  <sys:String x:Key="L.Video.AutoLoad">자동 · 고화질</sys:String>
   <sys:String x:Key="L.Video.Mbps10">10Mbps</sys:String>
   <sys:String x:Key="L.Video.Mbps20">20Mbps</sys:String>
   <sys:String x:Key="L.Video.Mbps50">50Mbps</sys:String>
@@ -126,7 +126,7 @@
   <sys:String x:Key="L.Help.VideoCodec.Av1">AV1 — 가장 최신이고 효율적인 코덱입니다. 같은 비트레이트에서 더 선명하거나, 같은 화질에서 파일이 더 작습니다. GeForce RTX 40/50, Radeon RX 7000, Intel Arc가 하드웨어 인코딩을 지원합니다.</sys:String>
   <sys:String x:Key="L.Help.VideoCodec.Hevc">HEVC — AV1에 가까운 압축 효율을 제공하며 더 많은 최신 GPU에서 지원됩니다.</sys:String>
   <sys:String x:Key="L.Help.VideoCodec.H264">H.264 — 파일 크기는 더 크지만 거의 모든 플레이어와 편집기에서 열립니다.</sys:String>
-  <sys:String x:Key="L.Help.Bitrate">초당 기록되는 비디오 데이터의 양입니다. 값이 높을수록 빠른 동작이 더 깔끔하게 유지되지만 RAM과 디스크 공간을 더 많이 사용합니다. 50Mbps는 대략 분당 375MB입니다. 코덱, 해상도, FPS에 자동으로 적응합니다.</sys:String>
+  <sys:String x:Key="L.Help.Bitrate">초당 기록되는 비디오 데이터의 양입니다. 값이 높을수록 빠른 동작이 더 깔끔하게 유지되지만 RAM과 디스크 공간을 더 많이 사용합니다. 50Mbps는 대략 분당 375MB입니다. 자동은 코덱, 해상도 및 FPS를 기준으로 안정적인 고화질 비트 전송률을 계산합니다.</sys:String>
   <sys:String x:Key="L.Help.Resolution">소스는 원래 크기를 유지합니다. 해상도가 낮을수록 GPU 로드, RAM 사용 및 파일 크기가 줄어들지만 세부 정보도 제거됩니다. 모니터 해상도는 변경되지 않습니다.</sys:String>
   <sys:String x:Key="L.Help.FrameRate">일반 재생에는 60 FPS면 충분합니다. 120~240 FPS는 부드러운 슬로 모션을 위한 실제 추가 프레임을 녹화하며 Captail은 가짜 프레임을 만들지 않습니다. 게임도 충분히 빠르게 렌더링해야 하며, FPS가 높을수록 GPU와 메모리 사용량이 늘어납니다.</sys:String>
 

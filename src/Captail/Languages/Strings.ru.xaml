@@ -109,7 +109,7 @@
   <sys:String x:Key="L.Video.Game">Игра</sys:String>
   <sys:String x:Key="L.Video.Codec">Кодек</sys:String>
   <sys:String x:Key="L.Video.Bitrate">Битрейт</sys:String>
-  <sys:String x:Key="L.Video.AutoLoad">Авто · по нагрузке</sys:String>
+  <sys:String x:Key="L.Video.AutoLoad">Авто · высокое качество</sys:String>
   <sys:String x:Key="L.Video.Mbps10">10 Мбит/с</sys:String>
   <sys:String x:Key="L.Video.Mbps20">20 Мбит/с</sys:String>
   <sys:String x:Key="L.Video.Mbps50">50 Мбит/с</sys:String>
@@ -129,7 +129,7 @@
   <sys:String x:Key="L.Help.VideoCodec.Av1">AV1 — самый современный и эффективный. Чище при том же битрейте или меньше файл при том же качестве. Поддержка есть на GeForce RTX 40/50, Radeon RX 7000 и Intel Arc.</sys:String>
   <sys:String x:Key="L.Help.VideoCodec.Hevc">HEVC — почти такой же компактный и поддерживается большим числом современных GPU.</sys:String>
   <sys:String x:Key="L.Help.VideoCodec.H264">H.264 — занимает больше места, зато открывается почти везде.</sys:String>
-  <sys:String x:Key="L.Help.Bitrate">Сколько видеоданных записывается каждую секунду. Чем выше значение, тем чище быстрое движение, но больше расход ОЗУ и диска. 50 Мбит/с — примерно 375 МБ в минуту. «Авто» учитывает кодек, разрешение и FPS.</sys:String>
+  <sys:String x:Key="L.Help.Bitrate">Сколько видеоданных записывается каждую секунду. Чем выше значение, тем чище быстрое движение, но больше расход ОЗУ и диска. 50 Мбит/с — примерно 375 МБ в минуту. «Авто» рассчитывает стабильный битрейт высокого качества с учётом кодека, разрешения и FPS.</sys:String>
   <sys:String x:Key="L.Help.Resolution">«Как у источника» сохраняет исходный размер кадра. Меньшее разрешение снижает нагрузку, расход ОЗУ и размер файла, но убирает детали. Разрешение монитора не меняется.</sys:String>
   <sys:String x:Key="L.Help.FrameRate">60 FPS достаточно для обычного просмотра. 120–240 FPS записывают реальные дополнительные кадры для плавного замедления — Captail не дорисовывает фейковые. Игра должна выдавать нужный FPS; нагрузка и расход памяти растут.</sys:String>
 

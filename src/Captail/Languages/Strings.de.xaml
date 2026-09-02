@@ -106,7 +106,7 @@
   <sys:String x:Key="L.Video.Game">Spiel</sys:String>
   <sys:String x:Key="L.Video.Codec">Codec</sys:String>
   <sys:String x:Key="L.Video.Bitrate">Bitrate</sys:String>
-  <sys:String x:Key="L.Video.AutoLoad">Automatisch · Adaptive Last</sys:String>
+  <sys:String x:Key="L.Video.AutoLoad">Automatisch · Hohe Qualität</sys:String>
   <sys:String x:Key="L.Video.Mbps10">10 Mbit/s</sys:String>
   <sys:String x:Key="L.Video.Mbps20">20 Mbit/s</sys:String>
   <sys:String x:Key="L.Video.Mbps50">50 Mbit/s</sys:String>
@@ -126,7 +126,7 @@
   <sys:String x:Key="L.Help.VideoCodec.Av1">AV1 – der neueste und effizienteste Codec. Klareres Bild bei gleicher Bitrate oder kleinere Dateien bei gleicher Qualität. Hardwareunterstützung bieten GeForce RTX 40/50, Radeon RX 7000 und Intel Arc.</sys:String>
   <sys:String x:Key="L.Help.VideoCodec.Hevc">HEVC – fast genauso kompakt und wird von moderneren GPUs unterstützt.</sys:String>
   <sys:String x:Key="L.Help.VideoCodec.H264">H.264 – verbraucht mehr Platz, öffnet sich aber fast überall.</sys:String>
-  <sys:String x:Key="L.Help.Bitrate">Gibt an, wie viele Videodaten pro Sekunde geschrieben werden. Höhere Werte halten schnelle Bewegungen klarer, verbrauchen aber mehr RAM und Speicherplatz. 50 Mbit/s entsprechen etwa 375 MB pro Minute. Auto passt sich an Codec, Auflösung und FPS an.</sys:String>
+  <sys:String x:Key="L.Help.Bitrate">Gibt an, wie viele Videodaten pro Sekunde geschrieben werden. Höhere Werte halten schnelle Bewegungen klarer, verbrauchen aber mehr RAM und Speicherplatz. 50 Mbit/s entsprechen etwa 375 MB pro Minute. Auto berechnet anhand von Codec, Auflösung und FPS eine stabile Bitrate für hohe Qualität.</sys:String>
   <sys:String x:Key="L.Help.Resolution">Die Quelle behält die ursprünglichen Abmessungen bei. Eine niedrigere Auflösung verringert die GPU-Auslastung, die RAM-Nutzung und die Dateigröße, entfernt aber auch Details. Die Monitorauflösung wird dadurch nicht geändert.</sys:String>
   <sys:String x:Key="L.Help.FrameRate">60 FPS reichen für die normale Wiedergabe. 120–240 FPS zeichnen echte zusätzliche Frames für flüssige Zeitlupe auf; Captail erzeugt keine künstlichen Frames. Das Spiel muss schnell genug rendern, und höhere FPS erhöhen die GPU- und Speichernutzung.</sys:String>
 

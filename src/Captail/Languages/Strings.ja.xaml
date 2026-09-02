@@ -106,7 +106,7 @@
   <sys:String x:Key="L.Video.Game">ゲーム</sys:String>
   <sys:String x:Key="L.Video.Codec">コーデック</sys:String>
   <sys:String x:Key="L.Video.Bitrate">ビットレート</sys:String>
-  <sys:String x:Key="L.Video.AutoLoad">自動・適応負荷</sys:String>
+  <sys:String x:Key="L.Video.AutoLoad">自動・高品質</sys:String>
   <sys:String x:Key="L.Video.Mbps10">10Mbps</sys:String>
   <sys:String x:Key="L.Video.Mbps20">20Mbps</sys:String>
   <sys:String x:Key="L.Video.Mbps50">50Mbps</sys:String>
@@ -126,7 +126,7 @@
   <sys:String x:Key="L.Help.VideoCodec.Av1">AV1 — 最新かつ最も効率的なコーデックです。同じビットレートならより鮮明に、同じ品質ならファイルを小さくできます。GeForce RTX 40/50、Radeon RX 7000、Intel Arc がハードウェア対応しています。</sys:String>
   <sys:String x:Key="L.Help.VideoCodec.Hevc">HEVC — AV1 に近い圧縮効率を持ち、より多くの最新 GPU で利用できます。</sys:String>
   <sys:String x:Key="L.Help.VideoCodec.H264">H.264 — ファイルは大きくなりますが、ほぼすべてのプレーヤーや編集ソフトで開けます。</sys:String>
-  <sys:String x:Key="L.Help.Bitrate">1 秒あたりに書き込まれるビデオ データの量。値を高くすると、高速モーションがよりクリーンになりますが、より多くの RAM とディスク領域を使用します。 50 Mbps は、1 分あたり約 375 MB に相当します。コーデック、解像度、FPS に自動的に適応します。</sys:String>
+  <sys:String x:Key="L.Help.Bitrate">1 秒あたりに書き込まれるビデオ データの量。値を高くすると、高速モーションがよりクリーンになりますが、より多くの RAM とディスク領域を使用します。50 Mbps は、1 分あたり約 375 MB に相当します。自動では、コーデック、解像度、FPS に基づいて安定した高品質ビットレートを計算します。</sys:String>
   <sys:String x:Key="L.Help.Resolution">ソースは元の寸法を維持します。解像度を低くすると、GPU の負荷、RAM の使用量、ファイル サイズが減りますが、細部も失われます。モニターの解像度は変わりません。</sys:String>
   <sys:String x:Key="L.Help.FrameRate">通常の再生には 60 FPS で十分です。120～240 FPS では、滑らかなスローモーション用の実際の追加フレームを録画します。Captail は偽のフレームを生成しません。ゲーム側も十分な速度で描画する必要があり、高い FPS は GPU とメモリの使用量を増やします。</sys:String>
 
