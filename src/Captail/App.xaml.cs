@@ -1794,7 +1794,7 @@ public partial class App : Application
                 return engine.Description;
             });
             _obs = engine;
-            _replayRunning = true;
+            _replayRunning = pipelineConfiguration.ReplayEnabled;
             _captureDescription = description;
             _capabilities = engine.Capabilities;
             _processAudioAvailability = engine.ProcessAudioAvailability;
@@ -3161,6 +3161,11 @@ public partial class App : Application
             {
                 throw new InvalidOperationException(
                     Localization.Text("L.Notify.EnableBeforeSave"));
+            }
+            if (engine.IsReplaySuspendedForManualRecording)
+            {
+                throw new InvalidOperationException(
+                    Localization.Text("L.Engine.ReplaySuspendedDuringRecording"));
             }
             ReplaySaveOperation operation = await RunOnObsThreadAsync(
                     () => engine.BeginSaveReplay())

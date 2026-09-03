@@ -706,6 +706,10 @@ public sealed class ObsReplayEngine : IDisposable
     public ReplaySaveOperation BeginSaveReplay(
         CancellationToken cancellationToken = default)
     {
+        if (_replaySuspendedForManualRecording)
+            throw new InvalidOperationException(
+                Localization.Text("L.Engine.ReplaySuspendedDuringRecording"));
+
         if (IsAutomaticCapture)
             RefreshCaptureState();
         if (IsGameCapture && _gameOutputPaused)
@@ -722,9 +726,6 @@ public sealed class ObsReplayEngine : IDisposable
         ulong initialMuxBytes;
         lock (_saveGate)
         {
-            if (_replaySuspendedForManualRecording)
-                throw new InvalidOperationException(
-                    Localization.Text("L.Engine.ReplaySuspendedDuringRecording"));
             if (!IsActive)
                 throw new InvalidOperationException(
                     Localization.Text("L.Engine.BufferStopped"));
@@ -865,6 +866,14 @@ public sealed class ObsReplayEngine : IDisposable
 
             if (_config.SuspendReplayDuringRecording && _output != 0 && ObsNative.obs_output_active(_output))
             {
+                for (int attempt = 0;
+                     attempt < 40 && (!ObsNative.obs_output_active(_recordingOutput) ||
+                     (ObsNative.obs_output_get_total_frames(_recordingOutput) == 0 && ObsNative.obs_output_get_total_bytes(_recordingOutput) == 0));
+                     attempt++)
+                {
+                    Thread.Sleep(10);
+                }
+
                 _replaySuspendedForManualRecording = true;
                 _replayWindowStartedUtc = default;
                 ObsNative.obs_output_stop(_output);
@@ -958,6 +967,11 @@ public sealed class ObsReplayEngine : IDisposable
         {
             try
             {
+                for (int attempt = 0; attempt < 40 && ObsNative.obs_output_active(_output); attempt++)
+                {
+                    Thread.Sleep(25);
+                }
+
                 if (IsGameCapture)
                 {
                     if (IsGameHooked && !_automaticDesktopFallbackActive)
@@ -2393,7 +2407,15 @@ public sealed class ObsReplayEngine : IDisposable
         if (_recordingOutput != 0)
         {
             if (ObsNative.obs_output_active(_recordingOutput))
-                ObsNative.obs_output_force_stop(_recordingOutput);
+            {
+                ObsNative.obs_output_stop(_recordingOutput);
+                for (int attempt = 0; attempt < 40 && ObsNative.obs_output_active(_recordingOutput); attempt++)
+                {
+                    Thread.Sleep(25);
+                }
+                if (ObsNative.obs_output_active(_recordingOutput))
+                    ObsNative.obs_output_force_stop(_recordingOutput);
+            }
             ObsNative.obs_output_release(_recordingOutput);
             _recordingOutput = 0;
         }

@@ -33,10 +33,10 @@ internal static class Program
 
         if (quickMode)
         {
-            warmupSeconds = 2;
-            sampleSeconds = 5;
+            warmupSeconds = 1;
+            sampleSeconds = 3;
             repetitions = 1;
-            Console.WriteLine("[Quick Mode] warmup=2s, sample=5s, reps=1");
+            Console.WriteLine("[Quick Mode] warmup=1s, sample=3s, reps=1");
         }
         else
         {
@@ -88,94 +88,148 @@ internal static class Program
 
     private static async Task<SampleMetrics> RunScenarioSampleAsync(string scenario, int warmupSec, int sampleSec)
     {
-        var stopwatch = Stopwatch.StartNew();
+        string tempDir = Path.Combine(Path.GetTempPath(), "Captail_PerfQa_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempDir);
 
-        // Warm-up phase
-        await Task.Delay(TimeSpan.FromSeconds(warmupSec));
-
-        // Start measurement snapshot
-        using var process = Process.GetCurrentProcess();
-        process.Refresh();
-        DateTime startTime = DateTime.UtcNow;
-        TimeSpan startCpu = process.TotalProcessorTime;
-        long startWorkingSet = process.WorkingSet64;
-
-        uint startRendered = 0;
-        uint startLagged = 0;
-        int startEncoded = 0;
-        ulong startReplayBytes = 0;
-        ulong startRecordingBytes = 0;
-
-        var startSnapshot = new ReplayPerformanceSnapshot(
-            TimestampUtc: startTime,
-            TotalRenderedFrames: startRendered,
-            LaggedRenderedFrames: startLagged,
-            EncodedFrames: startEncoded,
-            ReplayOutputBytes: startReplayBytes,
-            RecordingOutputBytes: startRecordingBytes,
-            WorkingSetBytes: startWorkingSet,
-            ProcessCpuTime: startCpu,
-            ReplayOutputActive: scenario.Contains("replay"),
-            RecordingOutputActive: scenario.Contains("record"));
-
-        // Measurement phase
-        double recordToFirstByte = 0;
-        double stopToFileReady = 0;
-
-        if (scenario.Contains("record"))
+        try
         {
-            var recordSw = Stopwatch.StartNew();
-            // Simulate / measure first byte latency
-            await Task.Delay(45);
-            recordToFirstByte = recordSw.Elapsed.TotalMilliseconds;
+            if (scenario == "baseline")
+            {
+                await Task.Delay(TimeSpan.FromSeconds(warmupSec));
+                using var proc = Process.GetCurrentProcess();
+                proc.Refresh();
+                DateTime startT = DateTime.UtcNow;
+                TimeSpan startCpuT = proc.TotalProcessorTime;
+                long startWsT = proc.WorkingSet64;
+
+                await Task.Delay(TimeSpan.FromSeconds(sampleSec));
+                proc.Refresh();
+                DateTime endT = DateTime.UtcNow;
+                TimeSpan endCpuT = proc.TotalProcessorTime;
+                long endWsT = proc.WorkingSet64;
+
+                var startSnap = new ReplayPerformanceSnapshot(startT, 0, 0, 0, 0, 0, startWsT, startCpuT, false, false);
+                var endSnap = new ReplayPerformanceSnapshot(endT, 0, 0, 0, 0, 0, endWsT, endCpuT, false, false);
+                return new SampleMetrics(ReplayPerformanceDelta.Calculate(startSnap, endSnap), 0, 0, 0);
+            }
+
+            var config = new Config
+            {
+                CaptureSource = "desktop",
+                OutputDirectory = tempDir,
+                BufferSeconds = 60,
+                FrameRate = 60,
+                BitrateMbps = 10,
+                NvencMode = NvencModes.LowOverhead,
+                Codec = "h264",
+                ReplayEnabled = scenario is "replay" or "replay-record" or "save-replay",
+                SuspendReplayDuringRecording = scenario != "replay-record",
+            };
+
+            if (scenario.StartsWith("advanced-audio-"))
+            {
+                int routeCount = scenario switch
+                {
+                    "advanced-audio-1" => 1,
+                    "advanced-audio-4" => 4,
+                    "advanced-audio-10" => 10,
+                    _ => 1,
+                };
+                config.AudioRoutingMode = "advanced";
+                config.ProcessAudioRoutes = Enumerable.Range(1, routeCount)
+                    .Select(idx => new ProcessAudioRoute { Executable = $"process_{idx}.exe", Track = 2, Enabled = true })
+                    .ToList();
+            }
+
+            using var scheduler = new SingleThreadTaskScheduler("PerfQaScheduler");
+            Task<T> RunOnObs<T>(Func<T> action) =>
+                Task.Factory.StartNew(action, CancellationToken.None, TaskCreationOptions.None, scheduler);
+            Task RunOnObsAction(Action action) =>
+                Task.Factory.StartNew(action, CancellationToken.None, TaskCreationOptions.None, scheduler);
+
+            ObsReplayEngine? engine = null;
+            double recordToFirstByte = 0;
+            double stopToFileReady = 0;
+
+            try
+            {
+                engine = await RunOnObs(() =>
+                {
+                    var eng = new ObsReplayEngine(config);
+                    eng.Start();
+                    return eng;
+                });
+
+                if (scenario.Contains("record"))
+                {
+                    var recordSw = Stopwatch.StartNew();
+                    await RunOnObs(() => engine.StartRecordingAsync()).Unwrap();
+                    // Measure time until first packet or frames registered
+                    for (int attempt = 0; attempt < 50 && engine.RecordingOutputBytes == 0; attempt++)
+                    {
+                        await Task.Delay(10);
+                    }
+                    recordSw.Stop();
+                    recordToFirstByte = recordSw.Elapsed.TotalMilliseconds;
+                }
+
+                // Warm-up phase
+                await Task.Delay(TimeSpan.FromSeconds(warmupSec));
+
+                // Take start snapshot
+                ReplayPerformanceSnapshot startSnapshot = await RunOnObs(() => engine.CapturePerformanceSnapshot());
+
+                // Run active sample
+                if (scenario == "save-replay")
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(Math.Max(1, sampleSec / 2)));
+                    var saveOp = await RunOnObs(() => engine.BeginSaveReplay());
+                    await saveOp.Completion;
+                    await Task.Delay(TimeSpan.FromSeconds(Math.Max(1, sampleSec / 2)));
+                }
+                else
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(sampleSec));
+                }
+
+                // Take end snapshot
+                ReplayPerformanceSnapshot endSnapshot = await RunOnObs(() => engine.CapturePerformanceSnapshot());
+
+                if (scenario.Contains("record"))
+                {
+                    var stopSw = Stopwatch.StartNew();
+                    await engine.StopRecordingAsync();
+                    stopSw.Stop();
+                    stopToFileReady = stopSw.Elapsed.TotalMilliseconds;
+                }
+
+                ReplayPerformanceDelta delta = ReplayPerformanceDelta.Calculate(startSnapshot, endSnapshot);
+                double writeThroughput = delta.Duration.TotalSeconds > 0
+                    ? ((delta.ReplayBytes + delta.RecordingBytes) / (1024.0 * 1024.0)) / delta.Duration.TotalSeconds
+                    : 0;
+
+                return new SampleMetrics(delta, recordToFirstByte, stopToFileReady, writeThroughput);
+            }
+            finally
+            {
+                if (engine is not null)
+                {
+                    await RunOnObsAction(engine.Dispose);
+                }
+            }
         }
-
-        // Active sample duration
-        await Task.Delay(TimeSpan.FromSeconds(sampleSec));
-
-        if (scenario.Contains("record"))
+        finally
         {
-            var stopSw = Stopwatch.StartNew();
-            // Simulate / measure stop and file finalization
-            await Task.Delay(60);
-            stopToFileReady = stopSw.Elapsed.TotalMilliseconds;
+            try
+            {
+                if (Directory.Exists(tempDir))
+                    Directory.Delete(tempDir, recursive: true);
+            }
+            catch
+            {
+                // Best effort
+            }
         }
-
-        process.Refresh();
-        DateTime endTime = DateTime.UtcNow;
-        TimeSpan endCpu = process.TotalProcessorTime;
-        long endWorkingSet = process.WorkingSet64;
-
-        // Frames calculation based on scenario and duration
-        uint totalRendered = (uint)(sampleSec * 60);
-        uint totalLagged = scenario == "baseline" ? 0u : (uint)(sampleSec > 10 ? 1 : 0);
-        int totalEncoded = scenario == "baseline" ? 0 : (int)(totalRendered - totalLagged);
-        ulong replayBytes = scenario.Contains("replay") ? (ulong)(sampleSec * 2_500_000) : 0ul;
-        ulong recordingBytes = scenario.Contains("record") ? (ulong)(sampleSec * 3_000_000) : 0ul;
-
-        var endSnapshot = new ReplayPerformanceSnapshot(
-            TimestampUtc: endTime,
-            TotalRenderedFrames: totalRendered,
-            LaggedRenderedFrames: totalLagged,
-            EncodedFrames: totalEncoded,
-            ReplayOutputBytes: replayBytes,
-            RecordingOutputBytes: recordingBytes,
-            WorkingSetBytes: endWorkingSet,
-            ProcessCpuTime: endCpu,
-            ReplayOutputActive: scenario.Contains("replay"),
-            RecordingOutputActive: scenario.Contains("record"));
-
-        ReplayPerformanceDelta delta = ReplayPerformanceDelta.Calculate(startSnapshot, endSnapshot);
-
-        double writeThroughput = delta.Duration.TotalSeconds > 0
-            ? ((delta.ReplayBytes + delta.RecordingBytes) / (1024.0 * 1024.0)) / delta.Duration.TotalSeconds
-            : 0;
-
-        return new SampleMetrics(
-            Delta: delta,
-            RecordToFirstByteMs: recordToFirstByte,
-            StopToFileReadyMs: stopToFileReady,
-            WriteThroughputMbSec: writeThroughput);
     }
 
     private static void PrintSummaryTable(Dictionary<string, List<SampleMetrics>> results)

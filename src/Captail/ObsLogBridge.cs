@@ -20,13 +20,31 @@ internal static class ObsLogBridge
 
     internal static bool Install()
     {
-        bool installed = captail_install_obs_log_handler(Callback);
-        if (!installed)
-            Log.Write("OBS log bridge could not be installed.");
-        return installed;
+        try
+        {
+            bool installed = captail_install_obs_log_handler(Callback);
+            if (!installed)
+                Log.Write("OBS log bridge could not be installed.");
+            return installed;
+        }
+        catch (Exception ex)
+        {
+            Log.Write($"OBS log bridge optional load skipped: {ex.Message}");
+            return false;
+        }
     }
 
-    internal static void Remove() => captail_remove_obs_log_handler();
+    internal static void Remove()
+    {
+        try
+        {
+            captail_remove_obs_log_handler();
+        }
+        catch (Exception ex)
+        {
+            Log.Write($"OBS log bridge optional unload skipped: {ex.Message}");
+        }
+    }
 
     private static void Write(int level, string message) =>
         Log.Write($"libobs[{level}]: {message}");
