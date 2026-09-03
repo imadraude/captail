@@ -885,9 +885,8 @@ public partial class ClipEditorWindow : Window
         double startEdge = _selectionStart / duration * width;
         double endEdge = _selectionEnd / duration * width;
 
-        double handleLimit = Math.Max(0, width - handleWidth);
-        Canvas.SetLeft(StartThumb, Math.Clamp(startEdge - handleWidth / 2, 0, handleLimit));
-        Canvas.SetLeft(EndThumb, Math.Clamp(endEdge - handleWidth / 2, 0, handleLimit));
+        Canvas.SetLeft(StartThumb, Math.Clamp(startEdge - handleWidth, -handleWidth, width - handleWidth));
+        Canvas.SetLeft(EndThumb, Math.Clamp(endEdge, 0, width));
         Canvas.SetLeft(LeftShade, 0);
         LeftShade.Width = Math.Max(0, startEdge);
         Canvas.SetLeft(RightShade, endEdge);

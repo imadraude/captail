@@ -377,20 +377,37 @@
                                TextAlignment="Center" HorizontalAlignment="Center"
                                VerticalAlignment="Center" Margin="0,0,6,0"
                                Visibility="Collapsed"/>
-                    <ScrollViewer x:Name="RecentReplaysScrollViewer" Grid.Row="1"
-                                  VerticalScrollBarVisibility="Auto"
-                                  HorizontalScrollBarVisibility="Disabled"
-                                  PanningMode="VerticalOnly" Padding="0,0,6,0"
-                                  Visibility="Collapsed">
-                <ItemsControl x:Name="RecentReplaysList"
-                              VirtualizingPanel.IsVirtualizing="True"
-                              VirtualizingPanel.VirtualizationMode="Recycling">
-                    <ItemsControl.ItemsPanel>
+                <ListBox x:Name="RecentReplaysList" Grid.Row="1"
+                         Background="Transparent" BorderThickness="0"
+                         Padding="0,0,6,0" Visibility="Collapsed"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ScrollViewer.CanContentScroll="True"
+                         VirtualizingPanel.IsVirtualizing="True"
+                         VirtualizingPanel.VirtualizationMode="Recycling"
+                         ScrollViewer.ScrollChanged="RecentReplays_ScrollChanged">
+                    <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <VirtualizingStackPanel/>
                         </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="0"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="Focusable" Value="False"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <ContentPresenter/>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Border x:Name="ClipCard" Height="74" Margin="0,0,0,8"
                                     Background="{StaticResource BgSurfaceBrush}"
@@ -510,9 +527,8 @@
                                 </EventTrigger>
                             </DataTemplate.Triggers>
                         </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-                    </ScrollViewer>
+                    </ListBox.ItemTemplate>
+                </ListBox>
                 </Grid>
             </Grid>
 
