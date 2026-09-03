@@ -17,6 +17,7 @@ public enum ReplayIndicatorState
     Error,
     Saved,
     Recording,
+    Suspended,
 }
 
 public enum ReplayIndicatorPlacement
@@ -261,6 +262,7 @@ public partial class ReplayStatusIndicatorWindow : Window
             ReplayIndicatorState.Recording => Color.FromRgb(255, 95, 99),
             ReplayIndicatorState.Recovering => Color.FromRgb(242, 194, 66),
             ReplayIndicatorState.Error => Color.FromRgb(255, 95, 99),
+            ReplayIndicatorState.Suspended => Color.FromRgb(160, 170, 185),
             _ => Color.FromRgb(99, 224, 189),
         };
         var brush = new SolidColorBrush(accent);
@@ -274,6 +276,9 @@ public partial class ReplayStatusIndicatorWindow : Window
                 break;
             case ReplayIndicatorState.Active:
                 StateRing.StrokeDashArray = new DoubleCollection([5.5, 2.5]);
+                break;
+            case ReplayIndicatorState.Suspended:
+                StateRing.StrokeDashArray = new DoubleCollection([2, 3]);
                 break;
             case ReplayIndicatorState.Recovering:
                 StateRing.StrokeDashArray = new DoubleCollection([1.8, 2]);

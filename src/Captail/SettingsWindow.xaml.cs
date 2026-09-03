@@ -406,6 +406,8 @@ public partial class SettingsWindow : Window
                 ClosestBitratePreset(_config.BitrateMbps).ToString());
             SelectByTag(NvencModeBox, _config.NvencMode);
             LowOverheadAqBox.IsChecked = _config.LowOverheadAdaptiveQuantization;
+            SuspendReplayDuringRecordingBox.IsChecked = _config.SuspendReplayDuringRecording;
+            KeepRecordingPipelineWarmBox.IsChecked = _config.KeepRecordingPipelineWarm;
             SelectByTag(MonitorBox, _config.MonitorIndex.ToString());
             SelectByTag(ResolutionBox, _config.RecordingResolution);
             SelectByTag(AudioDeviceBox, _config.SystemAudioDeviceId);
@@ -2903,6 +2905,8 @@ public partial class SettingsWindow : Window
                 : configuredBitrate;
         candidate.NvencMode = GetSelectedTag(NvencModeBox, _config.NvencMode);
         candidate.LowOverheadAdaptiveQuantization = LowOverheadAqBox.IsChecked == true;
+        candidate.SuspendReplayDuringRecording = SuspendReplayDuringRecordingBox.IsChecked == true;
+        candidate.KeepRecordingPipelineWarm = KeepRecordingPipelineWarmBox.IsChecked == true;
     }
 
     private static int ClosestBitratePreset(int bitrateMbps)

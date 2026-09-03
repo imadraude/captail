@@ -383,4 +383,10 @@
   <sys:String x:Key="L.Unit.Seconds">{0} с</sys:String>
   <sys:String x:Key="L.Unit.Minutes">{0} мин</sys:String>
   <sys:String x:Key="L.Unit.GB">{0} ГБ</sys:String>
+
+  <sys:String x:Key="L.Video.SuspendReplayDuringRecording">Приостанавливать Instant Replay во время записи для снижения нагрузки</sys:String>
+  <sys:String x:Key="L.Help.SuspendReplayDuringRecording">Освобождает ресурсы буфера повтора и память энкодера GPU во время ручной записи. Instant Replay начинается с 0 после остановки записи.</sys:String>
+  <sys:String x:Key="L.Engine.ReplaySuspendedDuringRecording">Instant Replay приостановлен на время ручной записи.</sys:String>
+  <sys:String x:Key="L.Video.KeepRecordingPipelineWarm">Держать конвейер записи прогретым</sys:String>
+  <sys:String x:Key="L.Help.KeepRecordingPipelineWarm">Предварительно инициализирует конвейер захвата, когда Instant Replay выключен, снижая задержку запуска записи за счёт фоновой памяти.</sys:String>
 </ResourceDictionary>

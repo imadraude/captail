@@ -380,4 +380,9 @@
   <sys:String x:Key="L.AdvancedAudio.ProcessCount">Procesy: {0}</sys:String>
   <sys:String x:Key="L.Error.AdvancedAudioTitle">Dźwięk aplikacji</sys:String>
   <sys:String x:Key="L.Error.AdvancedAudioEmpty">Przed zapisaniem wybierz aplikację lub włącz mikrofon.</sys:String>
+  <sys:String x:Key="L.Video.SuspendReplayDuringRecording">Wstrzymaj Instant Replay podczas nagrywania</sys:String>
+  <sys:String x:Key="L.Help.SuspendReplayDuringRecording">Zwalnia zasoby bufora powtórek i pamięć kodera GPU podczas ręcznego nagrywania. Instant Replay uruchamia się ponownie od zera po zatrzymaniu nagrywania.</sys:String>
+  <sys:String x:Key="L.Engine.ReplaySuspendedDuringRecording">Instant Replay jest wstrzymany podczas nagrywania ręcznego.</sys:String>
+  <sys:String x:Key="L.Video.KeepRecordingPipelineWarm">Utrzymuj potok nagrywania w gotowości</sys:String>
+  <sys:String x:Key="L.Help.KeepRecordingPipelineWarm">Wstępnie inicjuje potok przechwytywania przy wyłączonym Instant Replay, zmniejszając opóźnienie rozpoczęcia nagrywania kosztem niewielkiej ilości pamięci.</sys:String>
 </ResourceDictionary>

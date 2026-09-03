@@ -132,6 +132,7 @@ public sealed class ObsReplayEngine : IDisposable
     private string _pendingAutomaticGameExecutable = "";
     private int _automaticHookStableChecks;
     private string _lastRejectedAutomaticExecutable = "";
+    private bool _replaySuspendedForManualRecording;
 
     public event Action<string>? Faulted;
 
@@ -163,6 +164,7 @@ public sealed class ObsReplayEngine : IDisposable
         ObsNative.obs_output_active(_recordingOutput);
 
     public bool IsRecordingPaused => _isRecordingPaused;
+    public bool IsReplaySuspendedForManualRecording => _replaySuspendedForManualRecording;
 
     public TimeSpan RecordingDuration =>
         _isRecording ? DateTime.UtcNow - _recordingStartedUtc : TimeSpan.Zero;
@@ -361,7 +363,7 @@ public sealed class ObsReplayEngine : IDisposable
     {
         get
         {
-            if (!IsActive || _replayWindowStartedUtc == default)
+            if (!IsActive || _replayWindowStartedUtc == default || _replaySuspendedForManualRecording)
                 return 0;
 
             int elapsed = (int)Math.Floor(
@@ -720,6 +722,9 @@ public sealed class ObsReplayEngine : IDisposable
         ulong initialMuxBytes;
         lock (_saveGate)
         {
+            if (_replaySuspendedForManualRecording)
+                throw new InvalidOperationException(
+                    Localization.Text("L.Engine.ReplaySuspendedDuringRecording"));
             if (!IsActive)
                 throw new InvalidOperationException(
                     Localization.Text("L.Engine.BufferStopped"));
@@ -857,12 +862,22 @@ public sealed class ObsReplayEngine : IDisposable
             _isRecordingPaused = false;
             _recordingStartedUtc = DateTime.UtcNow;
             Log.Write($"Manual recording started: {fullPath}");
+
+            if (_config.SuspendReplayDuringRecording && _output != 0 && ObsNative.obs_output_active(_output))
+            {
+                _replaySuspendedForManualRecording = true;
+                _replayWindowStartedUtc = default;
+                ObsNative.obs_output_stop(_output);
+                Log.Write("Instant Replay buffer suspended during manual recording.");
+            }
+
             return Task.FromResult(fullPath);
         }
     }
 
     public async Task<string> StopRecordingAsync(CancellationToken cancellationToken = default)
     {
+        var stopStopwatch = Stopwatch.StartNew();
         Task<string> completionTask;
         lock (_recordingGate)
         {
@@ -904,6 +919,7 @@ public sealed class ObsReplayEngine : IDisposable
             lock (_recordingGate)
             {
                 CleanupRecordingOutput();
+                ResumeReplayAfterRecordingIfSuspended();
             }
         }
 
@@ -921,9 +937,66 @@ public sealed class ObsReplayEngine : IDisposable
             isGameHooked,
             hookedExecutable);
 
+        stopStopwatch.Stop();
+        long stopDurationMs = stopStopwatch.ElapsedMilliseconds;
         string finalPath = ReplayPaths.RouteSavedReplay(_config, rawPath, replayGameExecutable);
-        Log.Write($"Manual recording saved: {finalPath}");
+        Log.Write($"Manual recording saved in {stopDurationMs} ms: {finalPath}");
+        if (stopDurationMs > 2000)
+            Log.Write($"WARNING: Manual recording finalization exceeded threshold ({stopDurationMs} ms). Potential disk I/O bottleneck.");
         return finalPath;
+    }
+
+    private void ResumeReplayAfterRecordingIfSuspended()
+    {
+        if (!_replaySuspendedForManualRecording)
+            return;
+
+        _replaySuspendedForManualRecording = false;
+        _replayWindowStartedUtc = default;
+
+        if (_started && !_disposing && _config.ReplayEnabled && _output != 0)
+        {
+            try
+            {
+                if (IsGameCapture)
+                {
+                    if (IsGameHooked && !_automaticDesktopFallbackActive)
+                    {
+                        ResetObsVideo(_config.FrameRate);
+                        if (ObsNative.obs_output_start(_output))
+                        {
+                            _replayWindowStartedUtc = DateTime.UtcNow;
+                            _gameOutputPaused = false;
+                            _previousFrameCheckUtc = default;
+                            Log.Write("Instant Replay buffer resumed after manual recording (game capture).");
+                        }
+                        else
+                        {
+                            string error = PtrToString(ObsNative.obs_output_get_last_error(_output));
+                            Log.Write($"Failed to resume replay buffer after manual recording: {error}");
+                        }
+                    }
+                }
+                else
+                {
+                    if (ObsNative.obs_output_start(_output))
+                    {
+                        _replayWindowStartedUtc = DateTime.UtcNow;
+                        _previousFrameCheckUtc = default;
+                        Log.Write("Instant Replay buffer resumed after manual recording.");
+                    }
+                    else
+                    {
+                        string error = PtrToString(ObsNative.obs_output_get_last_error(_output));
+                        Log.Write($"Failed to resume replay buffer after manual recording: {error}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Write($"Exception while resuming replay buffer after recording: {ex.Message}");
+            }
+        }
     }
 
     public bool PauseRecording(bool pause)
@@ -2283,7 +2356,7 @@ public sealed class ObsReplayEngine : IDisposable
 
     private void OnOutputStopped(nint _, nint __)
     {
-        if (_disposing || _resettingReplayWindow || _idleOutputTransition)
+        if (_disposing || _resettingReplayWindow || _idleOutputTransition || _replaySuspendedForManualRecording)
             return;
         string error = PtrToString(ObsNative.obs_output_get_last_error(_output));
         Faulted?.Invoke(
@@ -2389,6 +2462,7 @@ public sealed class ObsReplayEngine : IDisposable
         if (_disposing)
             return;
         _disposing = true;
+        _replaySuspendedForManualRecording = false;
 
         lock (_saveGate)
         {

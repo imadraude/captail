@@ -380,4 +380,9 @@
   <sys:String x:Key="L.AdvancedAudio.ProcessCount">{0} processos</sys:String>
   <sys:String x:Key="L.Error.AdvancedAudioTitle">Áudio dos aplicativos</sys:String>
   <sys:String x:Key="L.Error.AdvancedAudioEmpty">Selecione um aplicativo ou ative o microfone antes de salvar.</sys:String>
+  <sys:String x:Key="L.Video.SuspendReplayDuringRecording">Suspender o Instant Replay durante a gravação</sys:String>
+  <sys:String x:Key="L.Help.SuspendReplayDuringRecording">Libera recursos do buffer de repetição e memória do codificador de GPU durante a gravação manual. O buffer do Instant Replay recomeça do zero ao parar a gravação.</sys:String>
+  <sys:String x:Key="L.Engine.ReplaySuspendedDuringRecording">O Instant Replay fica suspenso enquanto a gravação manual está ativa.</sys:String>
+  <sys:String x:Key="L.Video.KeepRecordingPipelineWarm">Manter pipeline de gravação pré-aquecido</sys:String>
+  <sys:String x:Key="L.Help.KeepRecordingPipelineWarm">Pré-inicializa o pipeline de captura quando o Instant Replay está desativado para reduzir o atraso de início da gravação com ligeiro uso de memória ociosa.</sys:String>
 </ResourceDictionary>

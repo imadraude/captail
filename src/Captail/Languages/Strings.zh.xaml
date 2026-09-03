@@ -382,4 +382,9 @@
   <sys:String x:Key="L.AdvancedAudio.ProcessCount">{0} 个进程</sys:String>
   <sys:String x:Key="L.Error.AdvancedAudioTitle">应用音频</sys:String>
   <sys:String x:Key="L.Error.AdvancedAudioEmpty">保存前请选择一个应用或启用麦克风。</sys:String>
+  <sys:String x:Key="L.Video.SuspendReplayDuringRecording">录制时暂停即时重放以降低开销</sys:String>
+  <sys:String x:Key="L.Help.SuspendReplayDuringRecording">在手动录制期间释放重放缓冲区资源和 GPU 编码内存。录制停止后即时重放缓冲区从 0 重新开始。</sys:String>
+  <sys:String x:Key="L.Engine.ReplaySuspendedDuringRecording">手动录制期间即时重放处于暂停状态。</sys:String>
+  <sys:String x:Key="L.Video.KeepRecordingPipelineWarm">保持录制管线处于预热就绪状态</sys:String>
+  <sys:String x:Key="L.Help.KeepRecordingPipelineWarm">在即时重放禁用时预初始化捕获管线，以微小的空闲内存代价缩短按下录制的启动延迟。</sys:String>
 </ResourceDictionary>

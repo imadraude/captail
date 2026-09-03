@@ -380,4 +380,9 @@
   <sys:String x:Key="L.AdvancedAudio.ProcessCount">{0} プロセス</sys:String>
   <sys:String x:Key="L.Error.AdvancedAudioTitle">アプリ音声</sys:String>
   <sys:String x:Key="L.Error.AdvancedAudioEmpty">保存する前にアプリを選択するか、マイクを有効にしてください。</sys:String>
+  <sys:String x:Key="L.Video.SuspendReplayDuringRecording">録画中にインスタントリプレイを一時停止</sys:String>
+  <sys:String x:Key="L.Help.SuspendReplayDuringRecording">手動録画中にリプレイバッファリソースとGPUエンコーダメモリを解放します。録画停止時にインスタントリプレイは0から再開されます。</sys:String>
+  <sys:String x:Key="L.Engine.ReplaySuspendedDuringRecording">手動録画中はインスタントリプレイが一時停止されます。</sys:String>
+  <sys:String x:Key="L.Video.KeepRecordingPipelineWarm">録画パイプラインをウォーム状態に維持</sys:String>
+  <sys:String x:Key="L.Help.KeepRecordingPipelineWarm">インスタントリプレイが無効な場合でもキャプチャパイプラインを事前初期化し、待機メモリをわずかに消費して録画開始遅延を短縮します。</sys:String>
 </ResourceDictionary>

@@ -380,4 +380,10 @@
   <sys:String x:Key="L.AdvancedAudio.ProcessCount">{0} Prozesse</sys:String>
   <sys:String x:Key="L.Error.AdvancedAudioTitle">App-Audio</sys:String>
   <sys:String x:Key="L.Error.AdvancedAudioEmpty">Vor dem Speichern eine App wählen oder Mikrofon aktivieren.</sys:String>
+
+  <sys:String x:Key="L.Video.SuspendReplayDuringRecording">Instant Replay während der Aufnahme anhalten</sys:String>
+  <sys:String x:Key="L.Help.SuspendReplayDuringRecording">Gibt Replay-Puffer-Ressourcen und GPU-Encoder-Speicher während der manuellen Aufnahme frei. Instant Replay startet nach dem Stoppen bei 0.</sys:String>
+  <sys:String x:Key="L.Engine.ReplaySuspendedDuringRecording">Instant Replay ist während der manuellen Aufnahme pausiert.</sys:String>
+  <sys:String x:Key="L.Video.KeepRecordingPipelineWarm">Aufnahme-Pipeline warmhalten</sys:String>
+  <sys:String x:Key="L.Help.KeepRecordingPipelineWarm">Initialisiert die Capture-Pipeline vorab bei deaktiviertem Instant Replay, um die Startlatenz auf Kosten von geringem Speicher im Leerlauf zu senken.</sys:String>
 </ResourceDictionary>

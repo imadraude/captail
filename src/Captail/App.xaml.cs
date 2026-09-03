@@ -3028,11 +3028,14 @@ public partial class App : Application
                 showBoth ? ReplayStatusIndicatorWindow.MultiIndicatorOffset : 0);
             _recordingIndicator.SetTargetGame(activeGame);
             ReplayIndicatorState replayState =
-                _replayRuntime?.Snapshot.State == ReplayRuntimeState.Recovering
-                ? ReplayIndicatorState.Recovering
-                : IsReplayRunning
-                    ? ReplayIndicatorState.Active
-                    : ReplayIndicatorState.Error;
+                _obs?.IsReplaySuspendedForManualRecording == true ||
+                _replayRuntime?.Snapshot.IsReplaySuspended == true
+                ? ReplayIndicatorState.Suspended
+                : _replayRuntime?.Snapshot.State == ReplayRuntimeState.Recovering
+                    ? ReplayIndicatorState.Recovering
+                    : IsReplayRunning
+                        ? ReplayIndicatorState.Active
+                        : ReplayIndicatorState.Error;
             _recordingIndicator.SetState(replayState);
         }
         else

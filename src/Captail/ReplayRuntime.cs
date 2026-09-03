@@ -212,6 +212,9 @@ internal sealed class ReplayRuntime : IAsyncDisposable
         try
         {
             ThrowIfUnavailable();
+            if (Snapshot.IsReplaySuspended)
+                throw new InvalidOperationException("Instant Replay is suspended while recording.");
+
             IReplayPipeline pipeline = _pipeline ??
                 throw new InvalidOperationException(
                     "Instant Replay must be running before a replay can be saved.");
@@ -254,7 +257,8 @@ internal sealed class ReplayRuntime : IAsyncDisposable
                     _configuration.ReplayEnabled,
                     isRecording: true,
                     isRecordingPaused: false,
-                    recordingStartedUtc: DateTime.UtcNow);
+                    recordingStartedUtc: DateTime.UtcNow,
+                    isReplaySuspended: _configuration.ReplayEnabled && _configuration.SuspendReplayDuringRecording);
                 return path;
             }
             catch
@@ -288,14 +292,15 @@ internal sealed class ReplayRuntime : IAsyncDisposable
 
             string savedPath = await _pipeline.StopRecordingAsync(cancellationToken);
 
-            if (!_configuration.ReplayEnabled)
+            if (!_configuration.ReplayEnabled && !_configuration.KeepRecordingPipelineWarm)
             {
                 Publish(
                     ReplayRuntimeState.Stopping,
                     _configuration.ReplayEnabled,
                     isRecording: false,
                     isRecordingPaused: false,
-                    recordingStartedUtc: null);
+                    recordingStartedUtc: null,
+                    isReplaySuspended: false);
                 IReplayPipeline pipelineToDispose = _pipeline;
                 _pipeline = null;
                 await pipelineToDispose.DisposeAsync();
@@ -304,7 +309,8 @@ internal sealed class ReplayRuntime : IAsyncDisposable
                     _configuration.ReplayEnabled,
                     isRecording: false,
                     isRecordingPaused: false,
-                    recordingStartedUtc: null);
+                    recordingStartedUtc: null,
+                    isReplaySuspended: false);
             }
             else
             {
@@ -313,7 +319,8 @@ internal sealed class ReplayRuntime : IAsyncDisposable
                     _configuration.ReplayEnabled,
                     isRecording: false,
                     isRecordingPaused: false,
-                    recordingStartedUtc: null);
+                    recordingStartedUtc: null,
+                    isReplaySuspended: false);
             }
 
             return savedPath;
@@ -534,13 +541,15 @@ internal sealed class ReplayRuntime : IAsyncDisposable
         bool isRecording = state != ReplayRuntimeState.Disabled && (Snapshot?.IsRecording ?? false);
         bool isPaused = state != ReplayRuntimeState.Disabled && (Snapshot?.IsRecordingPaused ?? false);
         DateTime? startedUtc = state != ReplayRuntimeState.Disabled ? Snapshot?.RecordingStartedUtc : null;
+        bool isSuspended = state != ReplayRuntimeState.Disabled && (Snapshot?.IsReplaySuspended ?? false);
         Publish(
             state,
             replayEnabled,
             isRecording,
             isPaused,
             startedUtc,
-            error);
+            error,
+            isSuspended);
     }
 
     private void Publish(
@@ -549,7 +558,8 @@ internal sealed class ReplayRuntime : IAsyncDisposable
         bool isRecording,
         bool isRecordingPaused,
         DateTime? recordingStartedUtc,
-        string? error = null)
+        string? error = null,
+        bool isReplaySuspended = false)
     {
         Snapshot = new ReplayRuntimeSnapshot(
             state,
@@ -557,7 +567,8 @@ internal sealed class ReplayRuntime : IAsyncDisposable
             isRecording,
             isRecordingPaused,
             recordingStartedUtc,
-            error);
+            error,
+            isReplaySuspended);
         SnapshotChanged?.Invoke(this, Snapshot);
     }
 

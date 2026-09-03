@@ -383,4 +383,10 @@
   <sys:String x:Key="L.Unit.Seconds">{0} sec</sys:String>
   <sys:String x:Key="L.Unit.Minutes">{0} min</sys:String>
   <sys:String x:Key="L.Unit.GB">{0} GB</sys:String>
+
+  <sys:String x:Key="L.Video.SuspendReplayDuringRecording">Suspend Instant Replay during recording</sys:String>
+  <sys:String x:Key="L.Help.SuspendReplayDuringRecording">Frees replay buffer resources and GPU encoding memory while manual recording is active. Instant Replay restarts from 0 when recording stops.</sys:String>
+  <sys:String x:Key="L.Engine.ReplaySuspendedDuringRecording">Instant Replay is paused while manual recording is active.</sys:String>
+  <sys:String x:Key="L.Video.KeepRecordingPipelineWarm">Keep recording pipeline warm</sys:String>
+  <sys:String x:Key="L.Help.KeepRecordingPipelineWarm">Pre-initializes the capture pipeline when Instant Replay is disabled to reduce record start latency at the cost of slight idle background memory.</sys:String>
 </ResourceDictionary>
