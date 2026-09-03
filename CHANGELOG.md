@@ -4,6 +4,20 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-09-03
+
+### Improved
+
+- **Replay Library Virtualization & Pagination**: Switched the replay library to incrementally load pages of 64 items with native WPF container recycling and thumbnail decoding at 224px display width, reducing memory overhead by up to 95% in large libraries.
+- **Responsive Background Scanning**: Replaced full-directory enumeration and sorting with a min-heap candidate queue executed on a background thread, preventing UI stutters when opening Settings or scrolling the clip history.
+- **Bounded Thumbnail Cache**: Capped generated preview and thumbnail cache storage at 512 MB with periodic background cleanup of entries older than 30 days.
+
+### Fixed
+
+- **Dashboard Record Button Layout**: Corrected text and hotkey pill alignment within subtle action buttons so the manual recording button stretches symmetrically across the dashboard.
+- **Timeline Trimming Alignment**: Positioned range trim handles cleanly outside the active selection track, aligning cut boundaries exactly to the handles' edges rather than their centers to avoid obscuring video frames.
+- **Replay Refresh Concurrency**: Added queued refresh handling to prevent lost clip updates when file modifications or deletions occur during scroll-based pagination.
+
 ## [0.5.1] - 2026-09-02
 
 ### Improved

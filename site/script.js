@@ -102,9 +102,9 @@ async function resolveLatestDownloads() {
           : release.tag_name;
     });
   } catch (error) {
-    downloadStatus.textContent = "Latest verified fallback · V0.5.1";
+    downloadStatus.textContent = "Latest verified fallback · V0.5.2";
     console.warn(
-      "Could not resolve latest Captail release; using v0.5.1 links.",
+      "Could not resolve latest Captail release; using v0.5.2 links.",
       error
     );
   }

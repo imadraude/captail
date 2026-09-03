@@ -30,17 +30,15 @@
 Captail is a focused alternative to NVIDIA ShadowPlay Instant Replay. It keeps the latest seconds or minutes in a rolling buffer, then saves them when you press a hotkey. No scenes, streaming setup, account, cloud upload, analytics, or telemetry.
 
 > [!WARNING]
-> Captail `v0.5.1` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA RTX 40 and RTX 50 series are tested; other GPUs need broader public testing.
+> Captail `v0.5.2` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA RTX 40 and RTX 50 series are tested; other GPUs need broader public testing.
 
-## What's new in Captail 0.5.1?
+## What's new in Captail 0.5.2?
 
-- **UI Polish & WCAG AA Contrast:** Calibrated text and idle indicator contrast for dark surfaces, ensuring clear readability across section headers and metadata.
-- **Modern Keyboard Navigation:** Unified Windows 11-style focus indicators across all buttons, controls, and dialogs.
-- **Interactive Control States:** Added tactile pressed, hover, and disabled states to buttons, toggle switches, and menus.
-- **Standard / Manual Recording:** Start and stop standard recording at any time (`Ctrl+Shift+F11`) alongside Instant Replay without dual-encoder overhead.
-- **Dual-Action Dashboard:** Side-by-side Save Replay and Record buttons with a live duration stopwatch (`00:01:23`).
-- **HUD Indicator & Badges:** Red pulsating status overlay and distinct `REC` / `REPLAY` badges in recent replays.
-- **Customizable 3-Way Hotkeys:** Dedicated hotkey configuration for save, toggle, and manual recording with collision resolution.
+- **Replay Library Performance & Pagination:** Incremental page loading (64 items) with native WPF UI virtualization recycling and display-sized thumbnail decoding, reducing library memory usage by up to 95%.
+- **Non-Blocking Background Scanning:** Offloaded clip scanning to a background task with priority-queue selection to keep the Settings window fast and smooth.
+- **Bounded Thumbnail Storage:** Capped thumbnail cache at 512 MB with automatic background pruning of entries older than 30 days.
+- **Timeline Trimming Alignment:** Moved range trim handles outside the active selection track so sliders no longer obscure the video frames being trimmed.
+- **Dashboard Button Symmetry:** Fixed alignment in the manual recording button so text and hotkey pill badges stretch symmetrically.
 
 ## Is Captail for me?
 
