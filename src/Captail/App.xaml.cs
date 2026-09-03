@@ -372,6 +372,7 @@ public partial class App : Application
                     _recordingIndicator = new ReplayStatusIndicatorWindow
                     {
                         AllowCaptureForQa = !recordingIndicatorProtectedTest,
+                        RequiresTargetGame = false,
                     };
                     _recordingIndicator.SetPlacement(
                         recordingIndicatorTestPosition ?? "top-right");
@@ -3021,6 +3022,7 @@ public partial class App : Application
         if (showReplay)
         {
             _recordingIndicator ??= new ReplayStatusIndicatorWindow();
+            _recordingIndicator.RequiresTargetGame = true;
             _recordingIndicator.SetPlacement(_config.RecordingIndicatorPosition);
             _recordingIndicator.SetInwardOffset(
                 showBoth ? ReplayStatusIndicatorWindow.MultiIndicatorOffset : 0);
@@ -3041,6 +3043,7 @@ public partial class App : Application
         if (isRecording)
         {
             _manualRecordingIndicator ??= new ReplayStatusIndicatorWindow();
+            _manualRecordingIndicator.RequiresTargetGame = !string.IsNullOrWhiteSpace(activeGame);
             _manualRecordingIndicator.SetPlacement(_config.RecordingIndicatorPosition);
             _manualRecordingIndicator.SetInwardOffset(0);
             _manualRecordingIndicator.SetTargetGame(activeGame);
@@ -3061,6 +3064,7 @@ public partial class App : Application
         }
 
         _recordingIndicator ??= new ReplayStatusIndicatorWindow();
+        _recordingIndicator.RequiresTargetGame = true;
         _recordingIndicator.SetPlacement(
             _config.RecordingIndicatorPosition);
         _recordingIndicator.SetInwardOffset(

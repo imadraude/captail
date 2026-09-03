@@ -4,6 +4,17 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.11] - 2026-09-03
+
+### Improved
+
+- **Tighter Indicator Margins**: Reduced corner border insets to 4 px so the recording indicator tucks neatly against the screen or window corner without distracting from game UI.
+
+### Fixed
+
+- **Exclusive Game Window Overlay**: Fixed an issue where recording indicators floated over the desktop and other applications (browser, Discord). The indicator now hides immediately whenever the captured game is minimized or out of focus, and instantly reappears when the game returns to the foreground.
+- **Equal Window Border Insets**: Corrected an alignment issue on windowed games where DWM invisible resize margins skewed indicator positioning. Indicators now use Desktop Window Manager extended frame bounds, ensuring exact 4 px margins from all adjacent window borders.
+
 ## [0.5.10] - 2026-09-03
 
 ### Improved

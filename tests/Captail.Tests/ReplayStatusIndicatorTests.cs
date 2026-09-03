@@ -9,7 +9,7 @@ public sealed class ReplayStatusIndicatorTests
     public void IndicatorConstantsAreCompactAndTranslucent()
     {
         Assert.Equal(18, ReplayStatusIndicatorWindow.BaseWindowSize);
-        Assert.Equal(8, ReplayStatusIndicatorWindow.BaseEdgeInset);
+        Assert.Equal(4, ReplayStatusIndicatorWindow.BaseEdgeInset);
         Assert.Equal(4, ReplayStatusIndicatorWindow.BaseIndicatorGap);
         Assert.Equal(22, ReplayStatusIndicatorWindow.MultiIndicatorOffset);
         Assert.Equal(0.75, ReplayStatusIndicatorWindow.BaseIndicatorOpacity);
@@ -155,5 +155,49 @@ public sealed class ReplayStatusIndicatorTests
     {
         bool result = ReplayStatusIndicatorWindow.IsExecutableMatch(candidate, target);
         Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData(ReplayIndicatorPlacement.TopRight)]
+    [InlineData(ReplayIndicatorPlacement.TopLeft)]
+    [InlineData(ReplayIndicatorPlacement.BottomRight)]
+    [InlineData(ReplayIndicatorPlacement.BottomLeft)]
+    public void IndicatorHasEqualMarginsFromWindowBordersWhenWindowed(ReplayIndicatorPlacement placement)
+    {
+        var windowBounds = new ReplayStatusIndicatorWindow.Rect
+        {
+            Left = 250,
+            Top = 180,
+            Right = 1530,
+            Bottom = 900,
+        };
+        const int size = ReplayStatusIndicatorWindow.BaseWindowSize;
+        const int inset = ReplayStatusIndicatorWindow.BaseEdgeInset;
+
+        (int left, int top) = ReplayStatusIndicatorWindow.CalculateIndicatorPosition(
+            windowBounds,
+            size,
+            inset,
+            inwardOffset: 0,
+            placement);
+
+        int horizontalMargin = placement is ReplayIndicatorPlacement.TopRight or ReplayIndicatorPlacement.BottomRight
+            ? windowBounds.Right - (left + size)
+            : left - windowBounds.Left;
+
+        int verticalMargin = placement is ReplayIndicatorPlacement.BottomLeft or ReplayIndicatorPlacement.BottomRight
+            ? windowBounds.Bottom - (top + size)
+            : top - windowBounds.Top;
+
+        Assert.Equal(inset, horizontalMargin);
+        Assert.Equal(inset, verticalMargin);
+        Assert.Equal(horizontalMargin, verticalMargin);
+    }
+
+    [Fact]
+    public void IsGameWindowForegroundReturnsFalseForInvalidHandle()
+    {
+        Assert.False(ReplayStatusIndicatorWindow.IsGameWindowForeground(0, "game.exe"));
+        Assert.False(ReplayStatusIndicatorWindow.IsGameWindowForeground(-1, "game.exe"));
     }
 }

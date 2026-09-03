@@ -30,7 +30,7 @@ public enum ReplayIndicatorPlacement
 public partial class ReplayStatusIndicatorWindow : Window
 {
     internal const int BaseWindowSize = 18;
-    internal const int BaseEdgeInset = 8;
+    internal const int BaseEdgeInset = 4;
     internal const int BaseIndicatorGap = 4;
     internal const int MultiIndicatorOffset = BaseWindowSize + BaseIndicatorGap;
     internal const double BaseIndicatorOpacity = 0.75;
@@ -44,12 +44,22 @@ public partial class ReplayStatusIndicatorWindow : Window
     private const uint MonitorDefaultToPrimary = 0x00000001;
     private const uint MonitorDefaultToNearest = 0x00000002;
     private const uint GwOwner = 4;
+    private const uint SwpNoMove = 0x0002;
+    private const uint SwpNoSize = 0x0001;
     private const uint SwpNoZOrder = 0x0004;
     private const uint SwpNoActivate = 0x0010;
+    private const uint SwpShowWindow = 0x0040;
+    private const uint SwpHideWindow = 0x0080;
+    private const int DwmwaExtendedFrameBounds = 9;
+    private const uint EventSystemForeground = 0x0003;
+    private const uint WineventOutofcontext = 0x0000;
+    private const uint WineventSkipownprocess = 0x0002;
 
     private readonly DispatcherTimer _positionTimer;
     private readonly DispatcherTimer _captureAffinityTimer;
     private readonly DispatcherTimer _transientTimer;
+    private WinEventDelegate? _winEventDelegate;
+    private nint _winEventHook;
     private ReplayIndicatorState? _state;
     private ReplayIndicatorPlacement _placement = ReplayIndicatorPlacement.TopRight;
     private ReplayIndicatorState _resumeState = ReplayIndicatorState.Active;
@@ -68,6 +78,7 @@ public partial class ReplayStatusIndicatorWindow : Window
     private int _lastTop = int.MinValue;
     private int _lastWidth = int.MinValue;
     private int _lastHeight = int.MinValue;
+    internal bool RequiresTargetGame { get; set; } = true;
 #if DEBUG
     internal bool AllowCaptureForQa { get; set; }
 #endif
@@ -77,7 +88,7 @@ public partial class ReplayStatusIndicatorWindow : Window
         InitializeComponent();
         _positionTimer = new DispatcherTimer
         {
-            Interval = TimeSpan.FromMilliseconds(750),
+            Interval = TimeSpan.FromMilliseconds(200),
         };
         _positionTimer.Tick += (_, _) => PositionOnForegroundMonitor();
         _captureAffinityTimer = new DispatcherTimer
@@ -97,6 +108,10 @@ public partial class ReplayStatusIndicatorWindow : Window
             {
                 e.Cancel = true;
                 HideIndicator();
+            }
+            else
+            {
+                UnregisterForegroundHook();
             }
         };
     }
@@ -125,8 +140,7 @@ public partial class ReplayStatusIndicatorWindow : Window
             return;
 
         _placement = normalized;
-        if (IsVisible)
-            PositionOnForegroundMonitor();
+        PositionOnForegroundMonitor();
     }
 
     internal void SetTargetGame(string? gameExecutable)
@@ -138,8 +152,7 @@ public partial class ReplayStatusIndicatorWindow : Window
         _targetGameExecutable = normalized;
         _gameDetected = !string.IsNullOrEmpty(normalized);
         _targetGameHwnd = 0;
-        if (IsVisible)
-            PositionOnForegroundMonitor();
+        PositionOnForegroundMonitor();
     }
 
     internal void SetGameDetected(bool gameDetected)
@@ -157,8 +170,7 @@ public partial class ReplayStatusIndicatorWindow : Window
             _targetGameHwnd = 0;
         }
 
-        if (IsVisible)
-            PositionOnForegroundMonitor();
+        PositionOnForegroundMonitor();
     }
 
     internal void SetInwardOffset(int offset)
@@ -168,8 +180,7 @@ public partial class ReplayStatusIndicatorWindow : Window
             return;
 
         _inwardOffset = normalized;
-        if (IsVisible)
-            PositionOnForegroundMonitor();
+        PositionOnForegroundMonitor();
     }
 
     internal void ShowTransient(
@@ -205,6 +216,7 @@ public partial class ReplayStatusIndicatorWindow : Window
     internal void ClosePermanently()
     {
         _allowClose = true;
+        UnregisterForegroundHook();
         _transientTimer.Stop();
         _positionTimer.Stop();
         _captureAffinityTimer.Stop();
@@ -338,9 +350,53 @@ public partial class ReplayStatusIndicatorWindow : Window
         if (previousStyles == 0 && error != 0)
             Log.Write($"Could not make recording indicator click-through: Win32 error {error}.");
 
+        RegisterForegroundHook();
         PositionOnForegroundMonitor();
     }
-    private void CompleteFirstFrame()
+
+    private void RegisterForegroundHook()
+    {
+        if (_winEventHook != 0)
+            return;
+
+        _winEventDelegate = OnForegroundChanged;
+        _winEventHook = SetWinEventHook(
+            EventSystemForeground,
+            EventSystemForeground,
+            0,
+            _winEventDelegate,
+            0,
+            0,
+            WineventOutofcontext | WineventSkipownprocess);
+    }
+
+    private void UnregisterForegroundHook()
+    {
+        if (_winEventHook != 0)
+        {
+            UnhookWinEvent(_winEventHook);
+            _winEventHook = 0;
+        }
+    }
+
+    private void OnForegroundChanged(
+        nint hWinEventHook,
+        uint eventType,
+        nint hwnd,
+        int idObject,
+        int idChild,
+        uint dwEventThread,
+        uint dwmsEventTime)
+    {
+        if (eventType == EventSystemForeground)
+        {
+            Dispatcher.BeginInvoke(
+                DispatcherPriority.Normal,
+                () => PositionOnForegroundMonitor());
+        }
+    }
+
+    private void CompleteFirstFrame()
     {
         if (_firstFrameRendered)
             return;
@@ -447,9 +503,29 @@ public partial class ReplayStatusIndicatorWindow : Window
         if (hwnd == 0)
             return;
 
-        nint gameHwnd = !string.IsNullOrWhiteSpace(_targetGameExecutable)
+        bool hasTargetGame = !string.IsNullOrWhiteSpace(_targetGameExecutable);
+
+        nint gameHwnd = hasTargetGame
             ? ResolveTargetGameWindow(_targetGameExecutable)
             : 0;
+
+        // When capturing a game, the indicator must ONLY be shown when the game is active/foreground.
+        // It must NOT overlay on top of the entire screen when the user is in other apps or on desktop.
+        if (hasTargetGame)
+        {
+            if (gameHwnd == 0 || !IsGameWindowForeground(gameHwnd, _targetGameExecutable))
+            {
+                HideWindowVisually(hwnd);
+                return;
+            }
+        }
+        else if (RequiresTargetGame)
+        {
+            // If this indicator requires a target game (e.g. Instant Replay) and no game is running,
+            // do not display it over the desktop.
+            HideWindowVisually(hwnd);
+            return;
+        }
 
         nint targetWindow = gameHwnd != 0 ? gameHwnd : GetForegroundWindow();
         nint monitor = MonitorFromWindow(
@@ -474,7 +550,7 @@ public partial class ReplayStatusIndicatorWindow : Window
 
         Rect gameRect = default;
         bool hasGameRect = gameHwnd != 0 &&
-            GetWindowRect(gameHwnd, out gameRect) &&
+            TryGetVisibleWindowRect(gameHwnd, out gameRect) &&
             !IsIconic(gameHwnd);
 
         Rect bounds = CalculateIndicatorBounds(
@@ -490,6 +566,12 @@ public partial class ReplayStatusIndicatorWindow : Window
             inset,
             inwardOffset,
             _placement);
+
+        if (Visibility != Visibility.Visible)
+        {
+            Visibility = Visibility.Visible;
+            Opacity = BaseIndicatorOpacity;
+        }
 
         if (left == _lastLeft &&
             top == _lastTop &&
@@ -508,12 +590,32 @@ public partial class ReplayStatusIndicatorWindow : Window
             top,
             size,
             size,
-            SwpNoActivate | SwpNoZOrder))
+            SwpNoActivate | SwpNoZOrder | SwpShowWindow))
         {
             _lastLeft = left;
             _lastTop = top;
             _lastWidth = size;
             _lastHeight = size;
+        }
+    }
+
+    private void HideWindowVisually(nint hwnd)
+    {
+        if (Visibility != Visibility.Hidden)
+        {
+            Visibility = Visibility.Hidden;
+            _lastLeft = int.MinValue;
+            _lastTop = int.MinValue;
+            _lastWidth = int.MinValue;
+            _lastHeight = int.MinValue;
+            SetWindowPos(
+                hwnd,
+                0,
+                0,
+                0,
+                0,
+                0,
+                SwpNoActivate | SwpNoZOrder | SwpNoMove | SwpNoSize | SwpHideWindow);
         }
     }
 
@@ -565,6 +667,85 @@ public partial class ReplayStatusIndicatorWindow : Window
         return (left, top);
     }
 
+    internal static bool IsGameWindowForeground(nint gameHwnd, string targetExecutable)
+    {
+        if (gameHwnd == 0 || !IsWindow(gameHwnd) || IsIconic(gameHwnd))
+            return false;
+
+        nint foreground = GetForegroundWindow();
+        if (foreground == 0)
+            return false;
+
+        if (foreground == gameHwnd)
+            return true;
+
+        if (GetWindowThreadProcessId(foreground, out uint foregroundPid) != 0 &&
+            GetWindowThreadProcessId(gameHwnd, out uint gamePid) != 0 &&
+            foregroundPid == gamePid)
+        {
+            return true;
+        }
+
+        if (foregroundPid != 0 &&
+            TryGetProcessExecutable(foregroundPid, out string fgExe) &&
+            IsExecutableMatch(fgExe, targetExecutable))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    internal static bool TryGetVisibleWindowRect(nint hwnd, out Rect rect)
+    {
+        rect = default;
+        if (hwnd == 0 || !IsWindow(hwnd))
+            return false;
+
+        try
+        {
+            if (DwmGetWindowAttribute(
+                    hwnd,
+                    DwmwaExtendedFrameBounds,
+                    out Rect frameRect,
+                    Marshal.SizeOf<Rect>()) == 0 &&
+                !frameRect.IsEmpty &&
+                frameRect.Width > 0 &&
+                frameRect.Height > 0)
+            {
+                rect = frameRect;
+                return true;
+            }
+        }
+        catch
+        {
+            // DWM may fail in certain environments; fallback to GetWindowRect.
+        }
+
+        return GetWindowRect(hwnd, out rect);
+    }
+
+    private static bool TryGetProcessExecutable(uint pid, out string executable)
+    {
+        executable = "";
+        if (pid == 0)
+            return false;
+
+        if (CaptureInterop.TryGetProcessImageInfo(pid, out executable, out _))
+            return true;
+
+        try
+        {
+            using Process process = Process.GetProcessById((int)pid);
+            executable = process.ProcessName + ".exe";
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     private nint ResolveTargetGameWindow(string targetExecutable)
     {
         if (string.IsNullOrWhiteSpace(targetExecutable))
@@ -573,24 +754,28 @@ public partial class ReplayStatusIndicatorWindow : Window
         string targetName = Path.GetFileName(targetExecutable);
 
         nint foreground = GetForegroundWindow();
-        if (foreground != 0 && IsWindowValidForGame(foreground, targetName))
+        if (foreground != 0 && IsWindowValidForGame(foreground, targetName, isForeground: true))
         {
             _targetGameHwnd = foreground;
             return foreground;
         }
 
-        if (_targetGameHwnd != 0 && IsWindowValidForGame(_targetGameHwnd, targetName))
+        if (_targetGameHwnd != 0 && IsWindowValidForGame(_targetGameHwnd, targetName, isForeground: false))
         {
             return _targetGameHwnd;
         }
 
         nint found = 0;
+        int maxArea = 0;
         EnumWindows((candidateHwnd, _) =>
         {
-            if (IsWindowValidForGame(candidateHwnd, targetName))
+            if (IsWindowValidForGame(candidateHwnd, targetName, isForeground: false, out int area))
             {
-                found = candidateHwnd;
-                return false;
+                if (area > maxArea)
+                {
+                    maxArea = area;
+                    found = candidateHwnd;
+                }
             }
             return true;
         }, 0);
@@ -604,28 +789,40 @@ public partial class ReplayStatusIndicatorWindow : Window
         return _targetGameHwnd != 0 && IsWindow(_targetGameHwnd) ? _targetGameHwnd : 0;
     }
 
-    private static bool IsWindowValidForGame(nint hwnd, string targetName)
+    private static bool IsWindowValidForGame(
+        nint hwnd,
+        string targetName,
+        bool isForeground,
+        out int area)
     {
+        area = 0;
         if (hwnd == 0 || !IsWindow(hwnd) || !IsWindowVisible(hwnd) || IsIconic(hwnd))
             return false;
 
-        if (GetWindow(hwnd, GwOwner) != 0)
+        if (!isForeground && GetWindow(hwnd, GwOwner) != 0)
             return false;
 
         if (GetWindowThreadProcessId(hwnd, out uint pid) == 0 || pid == 0)
             return false;
 
-        if (!CaptureInterop.TryGetProcessImageInfo(pid, out string exe, out _))
+        if (!TryGetProcessExecutable(pid, out string exe))
             return false;
 
         if (!IsExecutableMatch(exe, targetName))
             return false;
 
-        if (!GetWindowRect(hwnd, out Rect rect))
+        if (!TryGetVisibleWindowRect(hwnd, out Rect rect))
             return false;
 
-        return (rect.Right - rect.Left) > 100 && (rect.Bottom - rect.Top) > 100;
+        if (rect.Width <= 100 || rect.Height <= 100)
+            return false;
+
+        area = rect.Width * rect.Height;
+        return true;
     }
+
+    private static bool IsWindowValidForGame(nint hwnd, string targetName, bool isForeground = false) =>
+        IsWindowValidForGame(hwnd, targetName, isForeground, out _);
 
     internal static bool IsExecutableMatch(string? candidatePathOrExe, string? targetPathOrExe)
     {
@@ -728,4 +925,34 @@ public partial class ReplayStatusIndicatorWindow : Window
         int width,
         int height,
         uint flags);
+
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmGetWindowAttribute(
+        nint hwnd,
+        int dwAttribute,
+        out Rect pvAttribute,
+        int cbAttribute);
+
+    private delegate void WinEventDelegate(
+        nint hWinEventHook,
+        uint eventType,
+        nint hwnd,
+        int idObject,
+        int idChild,
+        uint dwEventThread,
+        uint dwmsEventTime);
+
+    [DllImport("user32.dll")]
+    private static extern nint SetWinEventHook(
+        uint eventMin,
+        uint eventMax,
+        nint hmodWinEventProc,
+        WinEventDelegate lpfnWinEventProc,
+        uint idProcess,
+        uint idThread,
+        uint dwFlags);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool UnhookWinEvent(nint hWinEventHook);
 }
