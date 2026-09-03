@@ -4,6 +4,12 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.7] - 2026-09-03
+
+### Improved
+
+- **Overlay Notification Layout**: Kept the notification lifetime indicator inside the card instead of overlapping its content and escaping the rounded boundary, while refining spacing, typography, state colors, and empty-detail handling to match Captail's visual language.
+
 ## [0.5.6] - 2026-09-03
 
 ### Improved

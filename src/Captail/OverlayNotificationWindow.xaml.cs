@@ -60,15 +60,33 @@ public partial class OverlayNotificationWindow : Window
             OverlayTone.Neutral => Color.FromRgb(148, 163, 171),
             _ => Color.FromRgb(99, 224, 189),
         });
+        Brush accentSurface = new SolidColorBrush(tone switch
+        {
+            OverlayTone.Warning => Color.FromArgb(34, 224, 179, 99),
+            OverlayTone.Error => Color.FromArgb(34, 224, 130, 99),
+            OverlayTone.Neutral => Color.FromArgb(30, 148, 163, 171),
+            _ => Color.FromArgb(32, 99, 224, 189),
+        });
+        Brush accentRing = new SolidColorBrush(tone switch
+        {
+            OverlayTone.Warning => Color.FromArgb(128, 224, 179, 99),
+            OverlayTone.Error => Color.FromArgb(128, 224, 130, 99),
+            OverlayTone.Neutral => Color.FromArgb(112, 148, 163, 171),
+            _ => Color.FromArgb(128, 99, 224, 189),
+        });
 
         _sequence++;
 
         IconText.Text = glyph;
         IconText.Foreground = accent;
-        IconRing.Stroke = accent;
+        IconSurface.Fill = accentSurface;
+        IconRing.Stroke = accentRing;
         LifeBar.Background = accent;
         TitleText.Text = title;
         DetailText.Text = detail;
+        DetailText.Visibility = string.IsNullOrWhiteSpace(detail)
+            ? Visibility.Collapsed
+            : Visibility.Visible;
 
         // Card keeps 8 px of transparent room for its shadow. Position the
         // visible card, rather than the layered window, 16 px from the edge.
