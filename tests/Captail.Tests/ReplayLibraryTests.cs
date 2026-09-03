@@ -1,5 +1,7 @@
 namespace Captail.Tests;
 
+using System.Security.Cryptography;
+using System.Text;
 using Xunit;
 
 public sealed class ReplayLibraryTests : IDisposable
@@ -158,6 +160,103 @@ public sealed class ReplayLibraryTests : IDisposable
 
         await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
             library.GetPageAsync(_directory, -1, 10));
+    }
+
+    [Fact]
+    public async Task GetPageAsyncUsesCachedDurationFromMetaFile()
+    {
+        Directory.CreateDirectory(_directory);
+        string thumbCache = Path.Combine(_directory, "thumb_cache");
+        Directory.CreateDirectory(thumbCache);
+
+        string ffmpegExe = Path.Combine(_directory, "ffmpeg.exe");
+        string ffprobeExe = Path.Combine(_directory, "ffprobe.exe");
+        File.WriteAllText(ffmpegExe, "dummy");
+        File.WriteAllText(ffprobeExe, "dummy");
+
+        FileInfo file = CreateFile(1);
+        string key = $"{file.FullName}|{file.Length}|{file.LastWriteTimeUtc.Ticks}";
+        string hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(key)));
+
+        TimeSpan expectedDuration = TimeSpan.FromSeconds(42.5);
+        string metaPath = Path.Combine(thumbCache, $"{hash}.meta");
+        await File.WriteAllTextAsync(metaPath, expectedDuration.Ticks.ToString());
+
+        var library = new ReplayLibrary(
+            new FfmpegAdapter(_directory),
+            thumbCache);
+
+        IReadOnlyList<ReplayClip> clips = await library.GetPageAsync(_directory, 0, 10);
+
+        Assert.Single(clips);
+        Assert.Equal(expectedDuration, clips[0].Duration);
+    }
+
+    [Fact]
+    public void DeleteToRecycleBinDeletesThumbnailAndMetaFiles()
+    {
+        Directory.CreateDirectory(_directory);
+        string thumbCache = Path.Combine(_directory, "thumb_cache");
+        Directory.CreateDirectory(thumbCache);
+
+        FileInfo file = CreateFile(1);
+        string key = $"{file.FullName}|{file.Length}|{file.LastWriteTimeUtc.Ticks}";
+        string hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(key)));
+
+        string thumbPath = Path.Combine(thumbCache, $"{hash}.jpg");
+        string metaPath = Path.Combine(thumbCache, $"{hash}.meta");
+        File.WriteAllText(thumbPath, "dummy-thumb");
+        File.WriteAllText(metaPath, "dummy-meta");
+
+        var library = new ReplayLibrary(
+            new FfmpegAdapter(_directory),
+            thumbCache);
+
+        var clip = new ReplayClip(
+            file.FullName,
+            file.Name,
+            null,
+            file.LastWriteTime,
+            file.Length,
+            TimeSpan.FromSeconds(10),
+            thumbPath);
+
+        library.DeleteToRecycleBin(_directory, clip);
+
+        Assert.False(File.Exists(thumbPath));
+        Assert.False(File.Exists(metaPath));
+    }
+
+    [Fact]
+    public void DeleteToRecycleBinDeletesMetaFileEvenWhenThumbnailPathIsNull()
+    {
+        Directory.CreateDirectory(_directory);
+        string thumbCache = Path.Combine(_directory, "thumb_cache");
+        Directory.CreateDirectory(thumbCache);
+
+        FileInfo file = CreateFile(2);
+        string key = $"{file.FullName}|{file.Length}|{file.LastWriteTimeUtc.Ticks}";
+        string hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(key)));
+
+        string metaPath = Path.Combine(thumbCache, $"{hash}.meta");
+        File.WriteAllText(metaPath, "dummy-meta");
+
+        var library = new ReplayLibrary(
+            new FfmpegAdapter(_directory),
+            thumbCache);
+
+        var clip = new ReplayClip(
+            file.FullName,
+            file.Name,
+            null,
+            file.LastWriteTime,
+            file.Length,
+            TimeSpan.FromSeconds(10),
+            null);
+
+        library.DeleteToRecycleBin(_directory, clip);
+
+        Assert.False(File.Exists(metaPath));
     }
 
     private FileInfo CreateFile(int index)

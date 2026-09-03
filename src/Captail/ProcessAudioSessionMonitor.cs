@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
+using Captail.Interop;
 
 namespace Captail;
 
@@ -183,20 +184,32 @@ internal static class ProcessAudioSessionDiscovery
 
         try
         {
-            using Process process = Process.GetProcessById(checked((int)processId));
-            string executable = Config.NormalizeExecutableName(process.ProcessName);
+            string executable;
+            string? executablePath = null;
+            if (CaptureInterop.TryGetProcessImageInfo(processId, out string imageExe, out string imagePath))
+            {
+                executable = Config.NormalizeExecutableName(Path.GetFileNameWithoutExtension(imageExe));
+                executablePath = imagePath;
+            }
+            else
+            {
+                using Process process = Process.GetProcessById(checked((int)processId));
+                executable = Config.NormalizeExecutableName(process.ProcessName);
+                if (executable.Length == 0)
+                    return null;
+
+                try
+                {
+                    executablePath = process.MainModule?.FileName;
+                }
+                catch
+                {
+                    // Elevated and protected processes may hide their image path.
+                }
+            }
+
             if (executable.Length == 0)
                 return null;
-
-            string? executablePath = null;
-            try
-            {
-                executablePath = process.MainModule?.FileName;
-            }
-            catch
-            {
-                // Elevated and protected processes may hide their image path.
-            }
 
             string displayName = FriendlyName(executable, executablePath);
             var metadata = new ProcessMetadata(

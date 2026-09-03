@@ -4,6 +4,16 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.6] - 2026-09-03
+
+### Improved
+
+- **Replay Library Duration Caching**: Added persistent disk-based `.meta` file and in-memory caching for clip durations in the replay library, eliminating up to 128 redundant `ffprobe` and `ffmpeg` process executions when opening or scrolling clip pages.
+- **Hot Path Native Interop Optimization**: Optimized libobs status and procedure callbacks (`ReadBoolProcedure`, `ReadStringProcedure`, `TryReadProcessAudioStatus`) by switching from repeated unmanaged heap allocations and manual zeroing loops to zero-allocation stack buffers (`stackalloc`), eliminating micro-stutter and memory churn during active gameplay.
+- **Lightweight Process Inspection**: Replaced heavyweight `Process.GetProcessById` instantiations in foreground detection and audio monitoring with direct Win32 `QueryFullProcessImageNameW` P/Invoke calls using stack-allocated buffers, significantly reducing garbage collection pressure.
+- **Display Window Manager (DWM) Compositor Decoupling**: Added coordinate and dimension change tracking to the replay status indicator window, eliminating redundant Win32 `SetWindowPos` calls every 750ms and preventing unnecessary compositor invalidations.
+- **Log File Rotation & Size Protection**: Enforced an automatic 10 MB file rotation threshold on `log.txt` with graceful rollover (`log.old.txt`) and concurrency lock backoff, protecting disk space from unbounded log accumulation during extended tray uptime.
+
 ## [0.5.5] - 2026-09-03
 
 ### Fixed

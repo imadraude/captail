@@ -1,6 +1,8 @@
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 
 namespace Captail.Interop;
 
@@ -166,6 +168,15 @@ internal static class CaptureInterop
         string fullPath;
         try
         {
+            if (TryGetProcessImageInfo(processId, out executable, out fullPath))
+            {
+                CacheForegroundProcess(processId, executable, fullPath);
+                return new ForegroundAppInfo(
+                    executable,
+                    fullPath,
+                    CoversMonitor(window));
+            }
+
             using Process process = Process.GetProcessById((int)processId);
             executable = process.ProcessName + ".exe";
             fullPath = "";
@@ -190,6 +201,42 @@ internal static class CaptureInterop
             exception is ArgumentException or InvalidOperationException or Win32Exception)
         {
             return new ForegroundAppInfo("", "", false);
+        }
+    }
+
+    internal static unsafe bool TryGetProcessImageInfo(
+        uint processId,
+        out string executable,
+        out string fullPath)
+    {
+        executable = "";
+        fullPath = "";
+        try
+        {
+            using SafeProcessHandle handle = ProcessNative.OpenProcess(
+                ProcessNative.ProcessQueryLimitedInformation,
+                false,
+                processId);
+            if (handle.IsInvalid)
+                return false;
+
+            uint size = 1024;
+            char* buffer = stackalloc char[(int)size];
+            if (!ProcessNative.QueryFullProcessImageName(handle, 0, buffer, ref size) || size == 0)
+                return false;
+
+            fullPath = new string(buffer, 0, (int)size);
+            string fileName = Path.GetFileName(fullPath);
+            if (string.IsNullOrEmpty(fileName))
+                return false;
+            executable = fileName.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)
+                ? fileName
+                : fileName + ".exe";
+            return true;
+        }
+        catch
+        {
+            return false;
         }
     }
 

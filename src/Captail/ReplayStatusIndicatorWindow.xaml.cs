@@ -1,10 +1,12 @@
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using Captail.Interop;
 
 namespace Captail;
 
@@ -51,6 +53,10 @@ public partial class ReplayStatusIndicatorWindow : Window
     private bool _lastForegroundIsScreenCapture;
     private bool _gameDetected;
     private bool _firstFrameRendered;
+    private int _lastLeft = int.MinValue;
+    private int _lastTop = int.MinValue;
+    private int _lastWidth = int.MinValue;
+    private int _lastHeight = int.MinValue;
 #if DEBUG
     internal bool AllowCaptureForQa { get; set; }
 #endif
@@ -143,6 +149,10 @@ public partial class ReplayStatusIndicatorWindow : Window
         _captureAffinityTimer.Stop();
         _transientActive = false;
         _state = null;
+        _lastLeft = int.MinValue;
+        _lastTop = int.MinValue;
+        _lastWidth = int.MinValue;
+        _lastHeight = int.MinValue;
         StopAnimations();
         Hide();
     }
@@ -370,20 +380,16 @@ public partial class ReplayStatusIndicatorWindow : Window
         _lastForegroundProcessId = processId;
         try
         {
+            if (CaptureInterop.TryGetProcessImageInfo(processId, out string executable, out _))
+            {
+                string processName = Path.GetFileNameWithoutExtension(executable);
+                _lastForegroundIsScreenCapture = IsScreenCaptureProcessName(processName);
+                return _lastForegroundIsScreenCapture;
+            }
+
             using Process process = Process.GetProcessById((int)processId);
-            string processName = process.ProcessName;
-            _lastForegroundIsScreenCapture = processName.Equals(
-                    "SnippingTool",
-                    StringComparison.OrdinalIgnoreCase) ||
-                processName.Equals(
-                    "ScreenClippingHost",
-                    StringComparison.OrdinalIgnoreCase) ||
-                processName.Equals(
-                    "ScreenSketch",
-                    StringComparison.OrdinalIgnoreCase) ||
-                processName.Equals(
-                    "SnipAndSketch",
-                    StringComparison.OrdinalIgnoreCase);
+            string fallbackName = process.ProcessName;
+            _lastForegroundIsScreenCapture = IsScreenCaptureProcessName(fallbackName);
         }
         catch (ArgumentException)
         {
@@ -400,6 +406,12 @@ public partial class ReplayStatusIndicatorWindow : Window
 
         return _lastForegroundIsScreenCapture;
     }
+
+    private static bool IsScreenCaptureProcessName(string processName) =>
+        processName.Equals("SnippingTool", StringComparison.OrdinalIgnoreCase) ||
+        processName.Equals("ScreenClippingHost", StringComparison.OrdinalIgnoreCase) ||
+        processName.Equals("ScreenSketch", StringComparison.OrdinalIgnoreCase) ||
+        processName.Equals("SnipAndSketch", StringComparison.OrdinalIgnoreCase);
 
     private void SetCaptureAffinity(nint hwnd, uint affinity)
     {
@@ -454,16 +466,31 @@ public partial class ReplayStatusIndicatorWindow : Window
         int top = placeBottom
             ? bounds.Bottom - size - inset
             : bounds.Top + inset;
+
+        if (left == _lastLeft &&
+            top == _lastTop &&
+            size == _lastWidth &&
+            size == _lastHeight)
+        {
+            return;
+        }
+
         // Preserve current topmost-band order. Raising the window on every
         // timer tick would cover newer system overlays such as Snipping Tool.
-        SetWindowPos(
+        if (SetWindowPos(
             hwnd,
             0,
             left,
             top,
             size,
             size,
-            SwpNoActivate | SwpNoZOrder);
+            SwpNoActivate | SwpNoZOrder))
+        {
+            _lastLeft = left;
+            _lastTop = top;
+            _lastWidth = size;
+            _lastHeight = size;
+        }
     }
 
     [StructLayout(LayoutKind.Sequential)]

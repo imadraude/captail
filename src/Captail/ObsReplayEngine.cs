@@ -1529,7 +1529,7 @@ public sealed class ObsReplayEngine : IDisposable
         return status;
     }
 
-    private static bool TryReadProcessAudioStatus(
+    private static unsafe bool TryReadProcessAudioStatus(
         nint source,
         out ProcessAudioSourceStatus status)
     {
@@ -1539,42 +1539,34 @@ public sealed class ObsReplayEngine : IDisposable
             return false;
 
         const int stackSize = 256;
-        nint stack = Marshal.AllocHGlobal(stackSize);
-        try
+        byte* pStack = stackalloc byte[stackSize];
+        new Span<byte>(pStack, stackSize).Clear();
+        var callData = new ObsNative.CallData
         {
-            for (int offset = 0; offset < stackSize; offset += sizeof(long))
-                Marshal.WriteInt64(stack, offset, 0);
-            var callData = new ObsNative.CallData
-            {
-                Stack = stack,
-                Size = (nuint)nint.Size,
-                Capacity = stackSize,
-                Fixed = true,
-            };
-            if (!ObsNative.proc_handler_call(handler, "get_status", ref callData) ||
-                !ObsNative.calldata_get_data(
-                    ref callData,
-                    "state",
-                    out long state,
-                    sizeof(long)) ||
-                !ObsNative.calldata_get_data(
-                    ref callData,
-                    "error_code",
-                    out long errorCode,
-                    sizeof(long)) ||
-                !Enum.IsDefined((ProcessAudioSourceState)state))
-            {
-                return false;
-            }
-            status = new ProcessAudioSourceStatus(
-                (ProcessAudioSourceState)state,
-                errorCode);
-            return true;
-        }
-        finally
+            Stack = (nint)pStack,
+            Size = (nuint)nint.Size,
+            Capacity = stackSize,
+            Fixed = true,
+        };
+        if (!ObsNative.proc_handler_call(handler, "get_status", ref callData) ||
+            !ObsNative.calldata_get_data(
+                ref callData,
+                "state",
+                out long state,
+                sizeof(long)) ||
+            !ObsNative.calldata_get_data(
+                ref callData,
+                "error_code",
+                out long errorCode,
+                sizeof(long)) ||
+            !Enum.IsDefined((ProcessAudioSourceState)state))
         {
-            Marshal.FreeHGlobal(stack);
+            return false;
         }
+        status = new ProcessAudioSourceStatus(
+            (ProcessAudioSourceState)state,
+            errorCode);
+        return true;
     }
 
     private void CreateEncoders()
@@ -2306,70 +2298,54 @@ public sealed class ObsReplayEngine : IDisposable
         _isRecordingPaused = false;
     }
 
-    private static bool ReadBoolProcedure(nint handler, string procedure, string name)
+    private static unsafe bool ReadBoolProcedure(nint handler, string procedure, string name)
     {
         if (handler == 0)
             return false;
 
         const int stackSize = 4096;
-        nint stack = Marshal.AllocHGlobal(stackSize);
-        try
+        byte* pStack = stackalloc byte[stackSize];
+        new Span<byte>(pStack, stackSize).Clear();
+        var callData = new ObsNative.CallData
         {
-            for (int offset = 0; offset < stackSize; offset += sizeof(long))
-                Marshal.WriteInt64(stack, offset, 0);
-            var callData = new ObsNative.CallData
-            {
-                Stack = stack,
-                Size = (nuint)nint.Size,
-                Capacity = stackSize,
-                Fixed = true,
-            };
-            if (!ObsNative.proc_handler_call(handler, procedure, ref callData) ||
-                !ObsNative.calldata_get_data(
-                    ref callData,
-                    name,
-                    out byte value,
-                    1))
-            {
-                return false;
-            }
-            return value != 0;
-        }
-        finally
+            Stack = (nint)pStack,
+            Size = (nuint)nint.Size,
+            Capacity = stackSize,
+            Fixed = true,
+        };
+        if (!ObsNative.proc_handler_call(handler, procedure, ref callData) ||
+            !ObsNative.calldata_get_data(
+                ref callData,
+                name,
+                out byte value,
+                1))
         {
-            Marshal.FreeHGlobal(stack);
+            return false;
         }
+        return value != 0;
     }
 
-    private static string ReadStringProcedure(nint handler, string procedure, string name)
+    private static unsafe string ReadStringProcedure(nint handler, string procedure, string name)
     {
         if (handler == 0)
             return "";
 
         const int stackSize = 4096;
-        nint stack = Marshal.AllocHGlobal(stackSize);
-        try
+        byte* pStack = stackalloc byte[stackSize];
+        new Span<byte>(pStack, stackSize).Clear();
+        var callData = new ObsNative.CallData
         {
-            for (int offset = 0; offset < stackSize; offset += sizeof(long))
-                Marshal.WriteInt64(stack, offset, 0);
-            var callData = new ObsNative.CallData
-            {
-                Stack = stack,
-                Size = (nuint)nint.Size,
-                Capacity = stackSize,
-                Fixed = true,
-            };
-            if (!ObsNative.proc_handler_call(handler, procedure, ref callData) ||
-                !ObsNative.calldata_get_string(ref callData, name, out nint value))
-            {
-                return "";
-            }
-            return PtrToString(value);
-        }
-        finally
+            Stack = (nint)pStack,
+            Size = (nuint)nint.Size,
+            Capacity = stackSize,
+            Fixed = true,
+        };
+        if (!ObsNative.proc_handler_call(handler, procedure, ref callData) ||
+            !ObsNative.calldata_get_string(ref callData, name, out nint value))
         {
-            Marshal.FreeHGlobal(stack);
+            return "";
         }
+        return PtrToString(value);
     }
 
     private static string ObsVersion() =>

@@ -1,4 +1,6 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -29,6 +31,7 @@ public sealed class ReplayLibrary
     private static readonly HashSet<string> VideoExtensions = new(
         [".mp4", ".mkv", ".mov", ".webm"],
         StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, TimeSpan> _durationCache = new(StringComparer.Ordinal);
     private readonly FfmpegAdapter _ffmpeg;
     private readonly string _thumbnailDirectory;
 
@@ -162,6 +165,9 @@ public sealed class ReplayLibrary
             RecycleOption.SendToRecycleBin,
             UICancelOption.ThrowException);
         DeleteThumbnail(clip.ThumbnailPath);
+        string metaPath = MetadataPathFromClip(clip);
+        DeleteThumbnail(metaPath);
+        _durationCache.TryRemove(CacheKey(clip), out _);
     }
 
     public async Task<string> TrimAsync(
@@ -343,8 +349,11 @@ public sealed class ReplayLibrary
         {
             try
             {
-                duration = await _ffmpeg.ReadDurationAsync(file.FullName, cancellationToken);
-                thumbnail = ThumbnailPath(file);
+                string cacheKey = CacheKey(file);
+                string prefix = CachePathPrefix(cacheKey);
+                string metaPath = prefix + ".meta";
+                thumbnail = prefix + ".jpg";
+                duration = await GetOrFetchDurationAsync(file, cacheKey, metaPath, cancellationToken);
                 if (!File.Exists(thumbnail))
                     await _ffmpeg.CreateThumbnailAsync(file.FullName, thumbnail, duration, cancellationToken);
             }
@@ -372,11 +381,88 @@ public sealed class ReplayLibrary
             thumbnail);
     }
 
-    private string ThumbnailPath(FileInfo file)
+    private async Task<TimeSpan> GetOrFetchDurationAsync(
+        FileInfo file,
+        string cacheKey,
+        string metaPath,
+        CancellationToken cancellationToken)
     {
-        string key = $"{file.FullName}|{file.Length}|{file.LastWriteTimeUtc.Ticks}";
-        byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(key));
-        return Path.Combine(_thumbnailDirectory, Convert.ToHexString(hash) + ".jpg");
+        if (_durationCache.TryGetValue(cacheKey, out TimeSpan cachedDuration))
+            return cachedDuration;
+
+        if (File.Exists(metaPath))
+        {
+            try
+            {
+                string text = await File.ReadAllTextAsync(metaPath, cancellationToken);
+                if (long.TryParse(text.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out long ticks) &&
+                    ticks > 0)
+                {
+                    TimeSpan duration = TimeSpan.FromTicks(ticks);
+                    RecordCachedDuration(cacheKey, duration);
+                    return duration;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch
+            {
+                // Ignore corrupted or inaccessible cache file
+            }
+        }
+
+        TimeSpan fetched = await _ffmpeg.ReadDurationAsync(file.FullName, cancellationToken);
+        if (fetched > TimeSpan.Zero)
+        {
+            RecordCachedDuration(cacheKey, fetched);
+            try
+            {
+                Directory.CreateDirectory(_thumbnailDirectory);
+                await File.WriteAllTextAsync(
+                    metaPath,
+                    fetched.Ticks.ToString(CultureInfo.InvariantCulture),
+                    cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch
+            {
+                // Cache write failure is non-fatal
+            }
+        }
+
+        return fetched;
+    }
+
+    private void RecordCachedDuration(string key, TimeSpan duration)
+    {
+        if (_durationCache.Count > 10000)
+            _durationCache.Clear();
+        _durationCache[key] = duration;
+    }
+
+    private static string CacheKey(FileInfo file) =>
+        $"{file.FullName}|{file.Length}|{file.LastWriteTimeUtc.Ticks}";
+
+    private static string CacheKey(ReplayClip clip) =>
+        $"{clip.Path}|{clip.SizeBytes}|{clip.SavedAt.ToUniversalTime().Ticks}";
+
+    private string CachePathPrefix(string cacheKey)
+    {
+        byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(cacheKey));
+        return Path.Combine(_thumbnailDirectory, Convert.ToHexString(hash));
+    }
+
+    private string MetadataPathFromClip(ReplayClip clip)
+    {
+        if (clip.ThumbnailPath is not null)
+            return Path.ChangeExtension(clip.ThumbnailPath, ".meta");
+
+        return CachePathPrefix(CacheKey(clip)) + ".meta";
     }
 
     private static string ValidateClipPath(string rootDirectory, string clipPath)

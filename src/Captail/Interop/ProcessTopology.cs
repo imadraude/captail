@@ -223,13 +223,13 @@ internal sealed class ProcessSnapshot
             executable));
     }
 
-    private static string QueryExecutable(SafeProcessHandle process)
+    private static unsafe string QueryExecutable(SafeProcessHandle process)
     {
-        uint capacity = 1024;
-        var buffer = new StringBuilder(checked((int)capacity));
-        if (!ProcessNative.QueryFullProcessImageName(process, 0, buffer, ref capacity))
+        uint size = 1024;
+        char* buffer = stackalloc char[(int)size];
+        if (!ProcessNative.QueryFullProcessImageName(process, 0, buffer, ref size) || size == 0)
             return "";
-        return NormalizeExecutable(buffer.ToString());
+        return NormalizeExecutable(new string(buffer, 0, (int)size));
     }
 
     private bool HasSelectedAncestor(
@@ -357,10 +357,10 @@ internal static class ProcessNative
     [DllImport("kernel32.dll", EntryPoint = "QueryFullProcessImageNameW",
         CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    internal static extern bool QueryFullProcessImageName(
+    internal static extern unsafe bool QueryFullProcessImageName(
         SafeProcessHandle process,
         uint flags,
-        StringBuilder executableName,
+        char* executableName,
         ref uint size);
 
     [DllImport("kernel32.dll", SetLastError = true)]
