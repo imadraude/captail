@@ -3016,14 +3016,15 @@ public partial class App : Application
 
         bool showReplay = _config.ReplayEnabled;
         bool showBoth = showReplay && isRecording;
+        string? activeGame = _obs?.ActiveGameExecutable;
+
         if (showReplay)
         {
             _recordingIndicator ??= new ReplayStatusIndicatorWindow();
             _recordingIndicator.SetPlacement(_config.RecordingIndicatorPosition);
-            _recordingIndicator.SetInwardOffset(showBoth ? 29 : 0);
-            _recordingIndicator.SetGameDetected(
-                IsReplayRunning &&
-                !string.IsNullOrWhiteSpace(_obs?.ActiveGameExecutable));
+            _recordingIndicator.SetInwardOffset(
+                showBoth ? ReplayStatusIndicatorWindow.MultiIndicatorOffset : 0);
+            _recordingIndicator.SetTargetGame(activeGame);
             ReplayIndicatorState replayState =
                 _replayRuntime?.Snapshot.State == ReplayRuntimeState.Recovering
                 ? ReplayIndicatorState.Recovering
@@ -3042,8 +3043,7 @@ public partial class App : Application
             _manualRecordingIndicator ??= new ReplayStatusIndicatorWindow();
             _manualRecordingIndicator.SetPlacement(_config.RecordingIndicatorPosition);
             _manualRecordingIndicator.SetInwardOffset(0);
-            _manualRecordingIndicator.SetGameDetected(
-                !string.IsNullOrWhiteSpace(_obs?.ActiveGameExecutable));
+            _manualRecordingIndicator.SetTargetGame(activeGame);
             _manualRecordingIndicator.SetState(ReplayIndicatorState.Recording);
         }
         else
@@ -3065,10 +3065,9 @@ public partial class App : Application
             _config.RecordingIndicatorPosition);
         _recordingIndicator.SetInwardOffset(
             (_replayRuntime?.Snapshot.IsRecording ?? _obs?.IsRecording ?? false)
-                ? 29
+                ? ReplayStatusIndicatorWindow.MultiIndicatorOffset
                 : 0);
-        _recordingIndicator.SetGameDetected(
-            !string.IsNullOrWhiteSpace(_obs?.ActiveGameExecutable));
+        _recordingIndicator.SetTargetGame(_obs?.ActiveGameExecutable);
         _recordingIndicator.ShowTransient(
             ReplayIndicatorState.Saved,
             ReplayIndicatorState.Active,

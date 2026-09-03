@@ -4,6 +4,17 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.10] - 2026-09-03
+
+### Improved
+
+- **Translucent & Compact Recording Indicators**: Reduced status indicators to a sleek 18×18 px footprint with 75% opacity, soft dark glass backing, and balanced 8 px margins from both edges in all four screen corners.
+- **Dual Indicator Alignment**: Arranged simultaneous Instant Replay and manual recording indicators on a unified coordinate axis with a clean 4 px separation.
+
+### Fixed
+
+- **Game Window Indicator Anchoring**: Fixed an issue where the recording indicator jumped across monitors to foreground windows (Discord, browser) while capturing a game. Indicators now firmly resolve and lock to the target game window and its display.
+
 ## [0.5.9] - 2026-09-03
 
 ### Improved
