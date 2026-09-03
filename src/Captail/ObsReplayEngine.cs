@@ -1,4 +1,5 @@
 using System.IO;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Captail.Interop;
@@ -327,6 +328,35 @@ public sealed class ObsReplayEngine : IDisposable
 
     public ulong BufferedBytes =>
         _output == 0 ? 0 : ObsNative.obs_output_get_total_bytes(_output);
+
+    public ulong RecordingOutputBytes =>
+        _recordingOutput == 0 ? 0 : ObsNative.obs_output_get_total_bytes(_recordingOutput);
+
+    internal ReplayPerformanceSnapshot CapturePerformanceSnapshot()
+    {
+        using var process = Process.GetCurrentProcess();
+        process.Refresh();
+        bool replayActive = _output != 0 && ObsNative.obs_output_active(_output);
+        bool recordingActive = _recordingOutput != 0 && ObsNative.obs_output_active(_recordingOutput);
+        int encodedFrames = replayActive
+            ? ObsNative.obs_output_get_total_frames(_output)
+            : (recordingActive
+                ? ObsNative.obs_output_get_total_frames(_recordingOutput)
+                : (_output != 0 ? ObsNative.obs_output_get_total_frames(_output) : 0));
+
+        return new ReplayPerformanceSnapshot(
+            TimestampUtc: DateTime.UtcNow,
+            TotalRenderedFrames: ObsNative.obs_get_total_frames(),
+            LaggedRenderedFrames: ObsNative.obs_get_lagged_frames(),
+            EncodedFrames: encodedFrames,
+            ReplayOutputBytes: _output != 0 ? ObsNative.obs_output_get_total_bytes(_output) : 0,
+            RecordingOutputBytes: _recordingOutput != 0 ? ObsNative.obs_output_get_total_bytes(_recordingOutput) : 0,
+            WorkingSetBytes: process.WorkingSet64,
+            ProcessCpuTime: process.TotalProcessorTime,
+            ReplayOutputActive: replayActive,
+            RecordingOutputActive: recordingActive);
+    }
+
     public int AvailableReplaySeconds
     {
         get
