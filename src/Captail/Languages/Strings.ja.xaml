@@ -217,6 +217,8 @@
   <sys:String x:Key="L.Record.Recording">録画中</sys:String>
   <sys:String x:Key="L.Hotkey.Record">録画の開始 / 停止</sys:String>
   <sys:String x:Key="L.Hotkey.RecordHint">手動録画を切り替えます</sys:String>
+  <sys:String x:Key="L.Hotkey.OpenApp">Captail を開く / 隠す</sys:String>
+  <sys:String x:Key="L.Hotkey.OpenAppHint">アプリのウィンドウを素早く表示または非表示にします</sys:String>
   <sys:String x:Key="L.Notify.RecordingStarted">録画を開始しました</sys:String>
   <sys:String x:Key="L.Notify.RecordingSaved">録画を保存しました</sys:String>
   <sys:String x:Key="L.Tray.Record">録画</sys:String>

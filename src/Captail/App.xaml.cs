@@ -22,6 +22,7 @@ public partial class App : Application
     private string _boundHotkey = "";
     private string _boundToggleHotkey = "";
     private string _boundRecordHotkey = "";
+    private string _boundOpenAppHotkey = "";
     private TaskbarIcon? _tray;
     private bool? _trayActiveState;
     private MenuItem? _saveMenuItem;
@@ -1536,12 +1537,14 @@ public partial class App : Application
         _boundHotkey = _config!.Hotkey;
         _boundToggleHotkey = _config.ToggleReplayHotkey;
         _boundRecordHotkey = _config.RecordHotkey;
+        _boundOpenAppHotkey = _config.OpenAppHotkey;
         try
         {
             _hotkeys = new HotkeyManager(
                 _config.Hotkey,
                 _config.ToggleReplayHotkey,
-                _config.RecordHotkey);
+                _config.RecordHotkey,
+                _config.OpenAppHotkey);
             SubscribeHotkeys();
         }
         catch (Exception exception)
@@ -1561,11 +1564,35 @@ public partial class App : Application
         _hotkeys!.SaveRequested += SaveReplay;
         _hotkeys.ToggleRequested += ToggleReplayFromHotkey;
         _hotkeys.RecordRequested += ToggleRecordFromHotkey;
+        _hotkeys.OpenAppRequested += ToggleAppWindowFromHotkey;
     }
 
     private void ToggleReplayFromHotkey() => _ = ToggleReplayAsync();
 
     private void ToggleRecordFromHotkey() => _ = ToggleRecordingAsync();
+
+    private void ToggleAppWindowFromHotkey()
+    {
+        if (_settingsWindow is not null &&
+            _settingsWindow.IsVisible &&
+            _settingsWindow.IsActive &&
+            _settingsWindow.WindowState != WindowState.Minimized)
+        {
+            _settingsWindow.Close();
+        }
+        else
+        {
+            OpenSettings();
+            if (_settingsWindow is not null)
+            {
+                if (_settingsWindow.WindowState == WindowState.Minimized)
+                    _settingsWindow.WindowState = WindowState.Normal;
+                _settingsWindow.Show();
+                _settingsWindow.Activate();
+                _settingsWindow.Focus();
+            }
+        }
+    }
 
     internal async Task<string?> ToggleRecordingAsync()
     {
@@ -2786,16 +2813,17 @@ public partial class App : Application
     {
         if (_hotkeys is null)
         {
-            _hotkeys = new HotkeyManager(config.Hotkey, config.ToggleReplayHotkey, config.RecordHotkey);
+            _hotkeys = new HotkeyManager(config.Hotkey, config.ToggleReplayHotkey, config.RecordHotkey, config.OpenAppHotkey);
             SubscribeHotkeys();
         }
         else
         {
-            _hotkeys.Rebind(config.Hotkey, config.ToggleReplayHotkey, config.RecordHotkey);
+            _hotkeys.Rebind(config.Hotkey, config.ToggleReplayHotkey, config.RecordHotkey, config.OpenAppHotkey);
         }
         _boundHotkey = config.Hotkey;
         _boundToggleHotkey = config.ToggleReplayHotkey;
         _boundRecordHotkey = config.RecordHotkey;
+        _boundOpenAppHotkey = config.OpenAppHotkey;
     }
 
     private void SaveRollbackConfig(string operation)
@@ -2965,6 +2993,9 @@ public partial class App : Application
         if (_toggleMenuItem is not null)
             _toggleMenuItem.InputGestureText =
                 _config?.ToggleReplayHotkey ?? "";
+        if (_settingsMenuItem is not null)
+            _settingsMenuItem.InputGestureText =
+                _config?.OpenAppHotkey ?? "";
         UpdateReplayIndicator();
     }
 

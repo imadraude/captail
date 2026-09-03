@@ -220,6 +220,8 @@
   <sys:String x:Key="L.Record.Recording">录制中</sys:String>
   <sys:String x:Key="L.Hotkey.Record">开始 / 停止录制</sys:String>
   <sys:String x:Key="L.Hotkey.RecordHint">切换手动录制</sys:String>
+  <sys:String x:Key="L.Hotkey.OpenApp">打开 / 隐藏 Captail</sys:String>
+  <sys:String x:Key="L.Hotkey.OpenAppHint">快速显示或隐藏应用窗口</sys:String>
   <sys:String x:Key="L.Notify.RecordingStarted">录制已开始</sys:String>
   <sys:String x:Key="L.Notify.RecordingSaved">录制已保存</sys:String>
   <sys:String x:Key="L.Tray.Record">录制</sys:String>

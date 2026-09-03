@@ -217,6 +217,8 @@
   <sys:String x:Key="L.Record.Recording">Enregistrement</sys:String>
   <sys:String x:Key="L.Hotkey.Record">Démarrer / Arrêter l'enregistrement</sys:String>
   <sys:String x:Key="L.Hotkey.RecordHint">Bascule l'enregistrement manuel</sys:String>
+  <sys:String x:Key="L.Hotkey.OpenApp">Ouvrir / masquer Captail</sys:String>
+  <sys:String x:Key="L.Hotkey.OpenAppHint">Affiche ou masque rapidement la fenêtre de l'application</sys:String>
   <sys:String x:Key="L.Notify.RecordingStarted">Enregistrement démarré</sys:String>
   <sys:String x:Key="L.Notify.RecordingSaved">Enregistrement enregistré</sys:String>
   <sys:String x:Key="L.Tray.Record">Enregistrement</sys:String>
@@ -349,8 +351,8 @@
   <sys:String x:Key="L.Video.RamEstimate">≈ {0:0} Mo pour {1:0.#} min · {2} piste(s) audio · vidéo {4} Mbit/s</sys:String>
   <sys:String x:Key="L.Video.RamEstimateCapped">≈ {0:0} Mo pour {1:0.#} min · {2} piste(s) audio · limite {3} Mo · vidéo {4} Mbit/s</sys:String>
 
-  <sys:String x:Key="L.Unit.Seconds">{0} secondes</sys:String>
-  <sys:String x:Key="L.Unit.Minutes">{0} minutes</sys:String>
+  <sys:String x:Key="L.Unit.Seconds">{0} s</sys:String>
+  <sys:String x:Key="L.Unit.Minutes">{0} min</sys:String>
   <sys:String x:Key="L.Unit.GB">{0} Go</sys:String>
   <sys:String x:Key="L.Audio.PerAppRouting">Par application</sys:String>
   <sys:String x:Key="L.Audio.ConfigureRouting">Configurer</sys:String>

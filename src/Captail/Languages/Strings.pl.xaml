@@ -217,6 +217,8 @@
   <sys:String x:Key="L.Record.Recording">Nagrywanie</sys:String>
   <sys:String x:Key="L.Hotkey.Record">Rozpocznij / Zatrzymaj nagrywanie</sys:String>
   <sys:String x:Key="L.Hotkey.RecordHint">Przełącza nagrywanie ręczne</sys:String>
+  <sys:String x:Key="L.Hotkey.OpenApp">Otwórz / ukryj Captail</sys:String>
+  <sys:String x:Key="L.Hotkey.OpenAppHint">Szybko pokazuje lub ukrywa okno aplikacji</sys:String>
   <sys:String x:Key="L.Notify.RecordingStarted">Rozpoczęto nagrywanie</sys:String>
   <sys:String x:Key="L.Notify.RecordingSaved">Nagranie zapisane</sys:String>
   <sys:String x:Key="L.Tray.Record">Nagrywanie</sys:String>

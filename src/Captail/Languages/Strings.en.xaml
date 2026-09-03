@@ -220,6 +220,8 @@
   <sys:String x:Key="L.Record.Recording">Recording</sys:String>
   <sys:String x:Key="L.Hotkey.Record">Start / Stop recording</sys:String>
   <sys:String x:Key="L.Hotkey.RecordHint">Toggles manual recording</sys:String>
+  <sys:String x:Key="L.Hotkey.OpenApp">Open / Hide Captail</sys:String>
+  <sys:String x:Key="L.Hotkey.OpenAppHint">Quickly shows or hides the app window</sys:String>
   <sys:String x:Key="L.Notify.RecordingStarted">Recording started</sys:String>
   <sys:String x:Key="L.Notify.RecordingSaved">Recording saved</sys:String>
   <sys:String x:Key="L.Tray.Record">Recording</sys:String>

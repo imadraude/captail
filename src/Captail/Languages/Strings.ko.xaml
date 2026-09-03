@@ -217,6 +217,8 @@
   <sys:String x:Key="L.Record.Recording">녹화 중</sys:String>
   <sys:String x:Key="L.Hotkey.Record">녹화 시작 / 중지</sys:String>
   <sys:String x:Key="L.Hotkey.RecordHint">수동 녹화를 전환합니다</sys:String>
+  <sys:String x:Key="L.Hotkey.OpenApp">Captail 열기 / 숨기기</sys:String>
+  <sys:String x:Key="L.Hotkey.OpenAppHint">앱 창을 빠르게 표시하거나 숨깁니다</sys:String>
   <sys:String x:Key="L.Notify.RecordingStarted">녹화 시작됨</sys:String>
   <sys:String x:Key="L.Notify.RecordingSaved">녹화 저장됨</sys:String>
   <sys:String x:Key="L.Tray.Record">녹화</sys:String>

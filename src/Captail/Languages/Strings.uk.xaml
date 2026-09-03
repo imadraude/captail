@@ -217,6 +217,8 @@
   <sys:String x:Key="L.Record.Recording">Запис</sys:String>
   <sys:String x:Key="L.Hotkey.Record">Почати / Зупинити запис</sys:String>
   <sys:String x:Key="L.Hotkey.RecordHint">Вмикає або вимикає ручний запис</sys:String>
+  <sys:String x:Key="L.Hotkey.OpenApp">Відкрити / сховати Captail</sys:String>
+  <sys:String x:Key="L.Hotkey.OpenAppHint">Швидко показує або ховає вікно програми</sys:String>
   <sys:String x:Key="L.Notify.RecordingStarted">Запис розпочато</sys:String>
   <sys:String x:Key="L.Notify.RecordingSaved">Запис збережено</sys:String>
   <sys:String x:Key="L.Tray.Record">Запис</sys:String>
@@ -376,7 +378,7 @@
   <sys:String x:Key="L.Video.RamEstimate">≈ {0:0} МБ на {1:0.#} хв · аудіодоріжок: {2} · відео {4} Мбіт/с</sys:String>
   <sys:String x:Key="L.Video.RamEstimateCapped">≈ {0:0} МБ на {1:0.#} хв · аудіодоріжок: {2} · ліміт {3} МБ · відео {4} Мбіт/с</sys:String>
 
-  <sys:String x:Key="L.Unit.Seconds">{0} сек</sys:String>
+  <sys:String x:Key="L.Unit.Seconds">{0} с</sys:String>
   <sys:String x:Key="L.Unit.Minutes">{0} хв</sys:String>
   <sys:String x:Key="L.Unit.GB">{0} ГБ</sys:String>
 </ResourceDictionary>

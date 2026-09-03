@@ -40,6 +40,7 @@ public partial class SettingsWindow : Window
     private string _pendingSaveHotkey;
     private string _pendingToggleHotkey;
     private string _pendingRecordHotkey;
+    private string _pendingOpenAppHotkey;
     private Button? _capturingHotkeyButton;
     private bool _updatingUi;
     private bool _runtimeActive;
@@ -111,6 +112,7 @@ public partial class SettingsWindow : Window
         _pendingSaveHotkey = config.Hotkey;
         _pendingToggleHotkey = config.ToggleReplayHotkey;
         _pendingRecordHotkey = config.RecordHotkey;
+        _pendingOpenAppHotkey = config.OpenAppHotkey;
         _runtimeActive = runtimeActive;
         _pendingProcessAudioRoutes = CloneProcessAudioRoutes(config.ProcessAudioRoutes);
         _pendingAdvancedMicrophoneTrack = config.AdvancedMicrophoneTrack;
@@ -440,9 +442,11 @@ public partial class SettingsWindow : Window
             _pendingSaveHotkey = _config.Hotkey;
             _pendingToggleHotkey = _config.ToggleReplayHotkey;
             _pendingRecordHotkey = _config.RecordHotkey;
+            _pendingOpenAppHotkey = _config.OpenAppHotkey;
             SaveHotkeyButton.Content = _pendingSaveHotkey;
             ToggleHotkeyButton.Content = _pendingToggleHotkey;
             RecordHotkeyButton.Content = _pendingRecordHotkey;
+            OpenAppHotkeyButton.Content = _pendingOpenAppHotkey;
 
             _outputDirectory = _config.OutputDirectory;
             OutputDirText.Text = _outputDirectory;
@@ -541,6 +545,9 @@ public partial class SettingsWindow : Window
                     : _config.BufferSeconds));
         HotkeySummaryText.Text = _config.Hotkey;
         RecordHotkeySummaryText.Text = _config.RecordHotkey;
+        SaveReplayButton.ToolTip = $"{SaveButtonText.Text} ({_config.Hotkey})";
+        if (!_isRecording)
+            RecordButton.ToolTip = $"{RecordButtonText.Text} ({_config.RecordHotkey})";
         OutputFolderSummaryText.Text = _config.OutputDirectory;
     }
 
@@ -1159,6 +1166,7 @@ public partial class SettingsWindow : Window
         candidate.Hotkey = _pendingSaveHotkey;
         candidate.ToggleReplayHotkey = _pendingToggleHotkey;
         candidate.RecordHotkey = _pendingRecordHotkey;
+        candidate.OpenAppHotkey = _pendingOpenAppHotkey;
         return candidate;
     }
 
@@ -2139,21 +2147,26 @@ public partial class SettingsWindow : Window
         }
 
         string hotkey = FormatHotkey(modifiers, key);
-        bool captureSave = Equals(_capturingHotkeyButton.Tag, "save");
-        bool captureRecord = Equals(_capturingHotkeyButton.Tag, "record");
-        string other1 = captureSave ? _pendingToggleHotkey : (captureRecord ? _pendingSaveHotkey : _pendingSaveHotkey);
-        string other2 = captureSave ? _pendingRecordHotkey : (captureRecord ? _pendingToggleHotkey : _pendingRecordHotkey);
-        if (!HotkeyManager.AreDistinct(hotkey, other1, other2))
+        string tag = _capturingHotkeyButton.Tag as string ?? "";
+        var others = new List<string>(3);
+        if (tag != "save") others.Add(_pendingSaveHotkey);
+        if (tag != "toggle") others.Add(_pendingToggleHotkey);
+        if (tag != "record") others.Add(_pendingRecordHotkey);
+        if (tag != "openApp") others.Add(_pendingOpenAppHotkey);
+
+        if (others.Any(o => !HotkeyManager.AreDistinct(hotkey, o)))
         {
             _capturingHotkeyButton.Content =
                 Localization.Text("L.Hotkey.InUse");
             return;
         }
 
-        if (captureSave)
+        if (tag == "save")
             _pendingSaveHotkey = hotkey;
-        else if (captureRecord)
+        else if (tag == "record")
             _pendingRecordHotkey = hotkey;
+        else if (tag == "openApp")
+            _pendingOpenAppHotkey = hotkey;
         else
             _pendingToggleHotkey = hotkey;
         _capturingHotkeyButton.Content = hotkey;
@@ -2166,10 +2179,13 @@ public partial class SettingsWindow : Window
         if (_capturingHotkeyButton is null)
             return;
 
-        if (Equals(_capturingHotkeyButton.Tag, "save"))
+        string tag = _capturingHotkeyButton.Tag as string ?? "";
+        if (tag == "save")
             _capturingHotkeyButton.Content = _pendingSaveHotkey;
-        else if (Equals(_capturingHotkeyButton.Tag, "record"))
+        else if (tag == "record")
             _capturingHotkeyButton.Content = _pendingRecordHotkey;
+        else if (tag == "openApp")
+            _capturingHotkeyButton.Content = _pendingOpenAppHotkey;
         else
             _capturingHotkeyButton.Content = _pendingToggleHotkey;
         _capturingHotkeyButton = null;
@@ -2181,7 +2197,12 @@ public partial class SettingsWindow : Window
         if (!HotkeyManager.IsValid(_pendingSaveHotkey) ||
             !HotkeyManager.IsValid(_pendingToggleHotkey) ||
             !HotkeyManager.IsValid(_pendingRecordHotkey) ||
-            !HotkeyManager.AreDistinct(_pendingSaveHotkey, _pendingToggleHotkey, _pendingRecordHotkey))
+            !HotkeyManager.IsValid(_pendingOpenAppHotkey) ||
+            !HotkeyManager.AreDistinct(
+                _pendingSaveHotkey,
+                _pendingToggleHotkey,
+                _pendingRecordHotkey,
+                _pendingOpenAppHotkey))
         {
             ShowError(
                 Localization.Text("L.Error.HotkeysTitle"),

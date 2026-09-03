@@ -128,4 +128,39 @@ public sealed class ConfigTests
         Assert.True(HotkeyManager.AreDistinct(config.Hotkey, config.ToggleReplayHotkey, config.RecordHotkey));
         Assert.Equal("Ctrl+Shift+F11", config.RecordHotkey);
     }
+
+    [Fact]
+    public void ChangingOpenAppHotkeyChangesValuesEqualButNotPipelineEquals()
+    {
+        var original = new Config
+        {
+            OpenAppHotkey = "Ctrl+Shift+F8",
+        };
+        Config modified = original.Clone();
+        modified.OpenAppHotkey = "Ctrl+Shift+F7";
+
+        Assert.False(original.ValuesEqual(modified));
+        Assert.True(original.PipelineEquals(modified));
+    }
+
+    [Fact]
+    public void NormalizeResolvesOpenAppHotkeyCollision()
+    {
+        var config = new Config
+        {
+            Hotkey = "Ctrl+Shift+F10",
+            ToggleReplayHotkey = "Ctrl+Shift+F9",
+            RecordHotkey = "Ctrl+Shift+F11",
+            OpenAppHotkey = "Ctrl+Shift+F10", // Collision with Hotkey
+        };
+
+        config.Normalize();
+
+        Assert.True(HotkeyManager.AreDistinct(
+            config.Hotkey,
+            config.ToggleReplayHotkey,
+            config.RecordHotkey,
+            config.OpenAppHotkey));
+        Assert.Equal("Ctrl+Shift+F8", config.OpenAppHotkey);
+    }
 }

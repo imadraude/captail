@@ -217,6 +217,8 @@
   <sys:String x:Key="L.Record.Recording">Aufnahme</sys:String>
   <sys:String x:Key="L.Hotkey.Record">Aufnahme starten / beenden</sys:String>
   <sys:String x:Key="L.Hotkey.RecordHint">Schaltet manuelle Aufnahme um</sys:String>
+  <sys:String x:Key="L.Hotkey.OpenApp">Captail öffnen / ausblenden</sys:String>
+  <sys:String x:Key="L.Hotkey.OpenAppHint">Blendet das Anwendungsfenster schnell ein oder aus</sys:String>
   <sys:String x:Key="L.Notify.RecordingStarted">Aufnahme gestartet</sys:String>
   <sys:String x:Key="L.Notify.RecordingSaved">Aufnahme gespeichert</sys:String>
   <sys:String x:Key="L.Tray.Record">Aufnahme</sys:String>

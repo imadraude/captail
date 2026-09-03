@@ -4,6 +4,20 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.4] - 2026-09-03
+
+### Added
+
+- **Open / Hide Global Hotkey**: Added a customizable global hotkey (`Ctrl+Shift+F8` by default) to quickly show and focus Captail or minimize it back to the system tray, complete with Settings capture UI, collision resolution, and tray menu integration.
+
+### Improved
+
+- **Compact & Restrained Overlay Notifications**: Redesigned overlay notifications according to antislop principles—reduced window size from 384×110 to 310×68 px, refined 9px corner radius, subtle drop shadow, 22×22 icon badge, 1.5px flush lifebar, and snappier 160–200ms slide-in animation.
+
+### Fixed
+
+- **Action Buttons Text Trimming & Unit Formatting**: Replaced unconstrained horizontal button layouts with a 3-column grid (`Auto`, `*`, `Auto`), preventing text overflow and clipping in the Save Replay button, normalized Ukrainian seconds abbreviation to standard `с`, and added hover tooltips showing the full action title and keybinding.
+
 ## [0.5.3] - 2026-09-03
 
 ### Added

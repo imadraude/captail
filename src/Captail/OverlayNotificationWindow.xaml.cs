@@ -70,10 +70,10 @@ public partial class OverlayNotificationWindow : Window
         TitleText.Text = title;
         DetailText.Text = detail;
 
-        // Card keeps 12 px of transparent room for its shadow. Position the
-        // visible card, rather than the layered window, 24 px from the edge.
-        Left = SystemParameters.WorkArea.Right - Width - 12;
-        Top = SystemParameters.WorkArea.Top + 12;
+        // Card keeps 8 px of transparent room for its shadow. Position the
+        // visible card, rather than the layered window, 16 px from the edge.
+        Left = SystemParameters.WorkArea.Right - Width - 8;
+        Top = SystemParameters.WorkArea.Top + 14;
         _hideTimer.Stop();
         _hideTimer.Interval = TimeSpan.FromMilliseconds(durationMilliseconds);
         _hideTimer.Start();
@@ -82,13 +82,13 @@ public partial class OverlayNotificationWindow : Window
             Show();
 
         Opacity = 0;
-        _translate.X = 26;
-        BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(170))
+        _translate.X = 14;
+        BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(160))
         {
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
         });
         _translate.BeginAnimation(TranslateTransform.XProperty,
-            new DoubleAnimation(26, 0, TimeSpan.FromMilliseconds(230))
+            new DoubleAnimation(14, 0, TimeSpan.FromMilliseconds(200))
             {
                 EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
             });
@@ -106,7 +106,7 @@ public partial class OverlayNotificationWindow : Window
     {
         _hideTimer.Stop();
         long token = _sequence;
-        var fade = new DoubleAnimation(Opacity, 0, TimeSpan.FromMilliseconds(160));
+        var fade = new DoubleAnimation(Opacity, 0, TimeSpan.FromMilliseconds(150));
         fade.Completed += (_, _) =>
         {
             // A newer notification may have appeared during the fade — don't hide it.
@@ -115,7 +115,7 @@ public partial class OverlayNotificationWindow : Window
         };
         BeginAnimation(OpacityProperty, fade);
         _translate.BeginAnimation(TranslateTransform.XProperty,
-            new DoubleAnimation(0, 18, TimeSpan.FromMilliseconds(180))
+            new DoubleAnimation(0, 10, TimeSpan.FromMilliseconds(160))
             {
                 EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn },
             });
