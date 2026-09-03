@@ -58,6 +58,7 @@ public partial class SettingsWindow : Window
     private bool _updateCheckInProgress;
     private bool _updateInstallInProgress;
     private int _libraryRefreshInProgress;
+    private bool _libraryRefreshQueued;
     private readonly ObservableCollection<ReplayClipItem> _replayItems = [];
     private bool _hasMoreReplays;
     private ReplayClip? _pendingDeleteClip;
@@ -2406,7 +2407,10 @@ public partial class SettingsWindow : Window
     private async Task RefreshReplayLibraryAsync()
     {
         if (Interlocked.Exchange(ref _libraryRefreshInProgress, 1) != 0)
+        {
+            _libraryRefreshQueued = true;
             return;
+        }
         SetReplayLibraryState(loading: true);
         try
         {
@@ -2419,9 +2423,7 @@ public partial class SettingsWindow : Window
                 return;
 
             _replayItems.Clear();
-            foreach (ReplayClip clip in clips)
-                _replayItems.Add(CreateReplayClipItem(clip));
-            _hasMoreReplays = clips.Count == ReplayPageSize;
+            AppendReplayClips(clips);
             SetReplayLibraryState(empty: clips.Count == 0);
         }
         catch (OperationCanceledException) when (_lifetimeCts.IsCancellationRequested)
@@ -2437,7 +2439,19 @@ public partial class SettingsWindow : Window
         finally
         {
             Interlocked.Exchange(ref _libraryRefreshInProgress, 0);
+            if (_libraryRefreshQueued && !_lifetimeCts.IsCancellationRequested)
+            {
+                _libraryRefreshQueued = false;
+                _ = RefreshReplayLibraryAsync();
+            }
         }
+    }
+
+    private void AppendReplayClips(IReadOnlyList<ReplayClip> clips)
+    {
+        foreach (ReplayClip clip in clips)
+            _replayItems.Add(CreateReplayClipItem(clip));
+        _hasMoreReplays = clips.Count == ReplayPageSize;
     }
 
     private void SetReplayLibraryState(
@@ -2479,9 +2493,7 @@ public partial class SettingsWindow : Window
                 _replayItems.Count,
                 ReplayPageSize,
                 _lifetimeCts.Token);
-            foreach (ReplayClip clip in clips)
-                _replayItems.Add(CreateReplayClipItem(clip));
-            _hasMoreReplays = clips.Count == ReplayPageSize;
+            AppendReplayClips(clips);
         }
         catch (OperationCanceledException) when (_lifetimeCts.IsCancellationRequested)
         {
@@ -2489,12 +2501,17 @@ public partial class SettingsWindow : Window
         }
         catch (Exception exception)
         {
-            Log.Write($"Replay library page failed: {exception.Message}");
+            Log.Write($"Replay library page failed: {exception}");
             _hasMoreReplays = false;
         }
         finally
         {
             Interlocked.Exchange(ref _libraryRefreshInProgress, 0);
+            if (_libraryRefreshQueued && !_lifetimeCts.IsCancellationRequested)
+            {
+                _libraryRefreshQueued = false;
+                _ = RefreshReplayLibraryAsync();
+            }
         }
     }
 
