@@ -424,6 +424,16 @@
                     </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
+                            <DataTemplate.Resources>
+                                <Style x:Key="ReplayCardActionButton"
+                                       TargetType="Button"
+                                       BasedOn="{StaticResource ClipActionButton}">
+                                    <Setter Property="Width" Value="27"/>
+                                    <Setter Property="Height" Value="27"/>
+                                    <Setter Property="Padding" Value="7"/>
+                                    <Setter Property="Margin" Value="2,0,0,0"/>
+                                </Style>
+                            </DataTemplate.Resources>
                             <Border x:Name="ClipCard" Height="74" Margin="0,0,0,8"
                                     Background="{StaticResource BgSurfaceBrush}"
                                     BorderBrush="{StaticResource DividerBrush}"
@@ -468,7 +478,7 @@
                                     </StackPanel>
                                     <Border x:Name="ClipActionTray" Grid.Column="1"
                                             HorizontalAlignment="Right" VerticalAlignment="Center"
-                                            Margin="8" Padding="2" CornerRadius="8"
+                                            Margin="8" Padding="1" CornerRadius="7"
                                             Background="#F615191C" BorderBrush="{StaticResource BorderControlBrush}"
                                             BorderThickness="1" Opacity="0" IsHitTestVisible="False"
                                             RenderTransformOrigin="0.5,0.5">
@@ -479,25 +489,25 @@
                                             <TranslateTransform x:Name="ClipActionTranslate" X="8"/>
                                         </Border.RenderTransform>
                                         <StackPanel Orientation="Horizontal">
-                                            <Button Style="{StaticResource ClipActionButton}"
+                                            <Button Style="{StaticResource ReplayCardActionButton}"
                                                     Click="PlayReplay_Click" ToolTip="{DynamicResource L.Library.Preview}"
                                                     IsEnabled="{Binding CanTrim}">
                                                 <Path Data="{StaticResource IconPlay}"
                                                       Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                                                       Stretch="Uniform"/>
                                             </Button>
-                                            <Button Style="{StaticResource ClipActionButton}"
+                                            <Button Style="{StaticResource ReplayCardActionButton}"
                                                     Click="RevealReplay_Click" ToolTip="{DynamicResource L.Library.Open}">
                                                 <Path Data="{StaticResource IconFolder}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                                                       StrokeThickness="1.8" Stretch="Uniform"/>
                                             </Button>
-                                            <Button Style="{StaticResource ClipActionButton}"
+                                            <Button Style="{StaticResource ReplayCardActionButton}"
                                                     Click="TrimReplay_Click" ToolTip="{DynamicResource L.Library.Trim}"
                                                     IsEnabled="{Binding CanTrim}">
                                                 <Path Data="{StaticResource IconScissors}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                                                       StrokeThickness="1.8" Stretch="Uniform"/>
                                             </Button>
-                                            <Button Style="{StaticResource ClipActionButton}"
+                                            <Button Style="{StaticResource ReplayCardActionButton}"
                                                     Click="RequestDeleteReplay_Click" ToolTip="{DynamicResource L.Library.Delete}">
                                                 <Path Data="{StaticResource IconTrash}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                                                       StrokeThickness="1.8" Stretch="Uniform"/>

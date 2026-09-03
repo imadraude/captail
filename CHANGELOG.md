@@ -4,6 +4,12 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.8] - 2026-09-03
+
+### Improved
+
+- **Compact Replay Card Actions**: Reduced the hover action tray and its four controls so replay titles stay visible longer while preview, folder, trim, and delete remain immediately accessible.
+
 ## [0.5.7] - 2026-09-03
 
 ### Improved
