@@ -419,6 +419,7 @@ public partial class App : Application
         }
         catch (Exception exception)
         {
+            Log.Write($"Startup failed: {exception}");
             MessageBox.Show(
                 Localization.Format("L.App.StartError", exception.Message),
                 Localization.Text("L.Brand"),

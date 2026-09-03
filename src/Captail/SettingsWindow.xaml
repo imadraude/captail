@@ -935,12 +935,10 @@
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                         <TextBlock Text="{DynamicResource L.Video.SuspendReplayDuringRecording}" Style="{StaticResource RowLabelText}"/>
-                                        <Button Style="{StaticResource HelpInfoButton}"
+                                        <Button Style="{StaticResource HelpIconButton}"
                                                 Margin="6,0,0,0"
                                                 ToolTip="{DynamicResource L.Help.SuspendReplayDuringRecording}"
-                                                AutomationProperties.Name="{DynamicResource L.Video.SuspendReplayDuringRecording}">
-                                            <Path Data="{StaticResource IconInfo}" Style="{StaticResource HelpInfoIcon}"/>
-                                        </Button>
+                                                AutomationProperties.Name="{DynamicResource L.Video.SuspendReplayDuringRecording}"/>
                                     </StackPanel>
                                     <CheckBox x:Name="SuspendReplayDuringRecordingBox" Grid.Column="1"
                                               Style="{StaticResource CompactCheckBox}"/>
@@ -953,12 +951,10 @@
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                         <TextBlock Text="{DynamicResource L.Video.KeepRecordingPipelineWarm}" Style="{StaticResource RowLabelText}"/>
-                                        <Button Style="{StaticResource HelpInfoButton}"
+                                        <Button Style="{StaticResource HelpIconButton}"
                                                 Margin="6,0,0,0"
                                                 ToolTip="{DynamicResource L.Help.KeepRecordingPipelineWarm}"
-                                                AutomationProperties.Name="{DynamicResource L.Video.KeepRecordingPipelineWarm}">
-                                            <Path Data="{StaticResource IconInfo}" Style="{StaticResource HelpInfoIcon}"/>
-                                        </Button>
+                                                AutomationProperties.Name="{DynamicResource L.Video.KeepRecordingPipelineWarm}"/>
                                     </StackPanel>
                                     <CheckBox x:Name="KeepRecordingPipelineWarmBox" Grid.Column="1"
                                               Style="{StaticResource CompactCheckBox}"/>

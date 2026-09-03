@@ -4,6 +4,14 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.13] - 2026-09-03
+
+### Fixed
+
+- **Startup crash:** Replaced two references to missing XAML styles in the new recording-efficiency settings, preventing Captail from failing while opening the settings window.
+- **XAML resource validation:** Added regression coverage that rejects unresolved `StaticResource` keys before release.
+- **Startup diagnostics:** Startup exceptions are now written to the Captail log with their full stack trace.
+
 ## [0.5.12] - 2026-09-03
 
 ### Added
