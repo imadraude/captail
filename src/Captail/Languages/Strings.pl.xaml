@@ -343,8 +343,8 @@
   <sys:String x:Key="L.Video.BitrateCustomHint">Auto lub własna wartość od 2 do 100 Mb/s</sys:String>
   <sys:String x:Key="L.Video.NvencMode">Tryb NVENC</sys:String>
   <sys:String x:Key="L.Help.NvencLowOverhead">Niskie obciążenie używa P2 i małych opóźnień bez multipass, lookahead ani klatek B.</sys:String>
-  <sys:String x:Key="L.Video.NvencBalanced">Zrównoważony (domyślny)</sys:String>
-  <sys:String x:Key="L.Video.NvencLowOverhead">Niskie obciążenie</sys:String>
+  <sys:String x:Key="L.Video.NvencBalanced">Zrównoważony</sys:String>
+  <sys:String x:Key="L.Video.NvencLowOverhead">Niskie obciążenie (domyślne)</sys:String>
   <sys:String x:Key="L.Video.AdaptiveQuantization">Kwantyzacja adaptacyjna</sys:String>
   <sys:String x:Key="L.Video.EstimatedRamBuffer">Szacowany bufor RAM</sys:String>
   <sys:String x:Key="L.Video.NvencUnavailable">Ustawienia NVENC są niedostępne dla wybranego kodera.</sys:String>

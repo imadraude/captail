@@ -19,7 +19,7 @@ public sealed class Config
     /// <summary>0 = adaptive bitrate based on codec and load.</summary>
     public int BitrateMbps { get; set; }
     /// <summary>See <see cref="NvencModes"/>.</summary>
-    public string NvencMode { get; set; } = NvencModes.Balanced;
+    public string NvencMode { get; set; } = NvencModes.LowOverhead;
     /// <summary>Only used by the low-overhead NVENC mode.</summary>
     public bool LowOverheadAdaptiveQuantization { get; set; }
     public string Hotkey { get; set; } = "Ctrl+Shift+F10";
@@ -96,14 +96,11 @@ public sealed class Config
         return defaultConfig;
     }
 
-    private static bool TryLoad(string path, out Config? config)
+    public static bool TryDeserialize(string json, out Config? config)
     {
         config = null;
-        if (!File.Exists(path))
-            return false;
         try
         {
-            string json = File.ReadAllText(path);
             using JsonDocument document = JsonDocument.Parse(json);
             bool hasConfiguredLanguage = document.RootElement.ValueKind ==
                                          JsonValueKind.Object &&
@@ -115,11 +112,45 @@ public sealed class Config
                                              property.Value.ValueKind == JsonValueKind.String &&
                                              !string.IsNullOrWhiteSpace(
                                                  property.Value.GetString()));
+
+            bool hasConfiguredNvencMode = document.RootElement.ValueKind ==
+                                          JsonValueKind.Object &&
+                                          document.RootElement.EnumerateObject().Any(property =>
+                                              string.Equals(
+                                                  property.Name,
+                                                  nameof(NvencMode),
+                                                  StringComparison.OrdinalIgnoreCase) &&
+                                              property.Value.ValueKind == JsonValueKind.String &&
+                                              !string.IsNullOrWhiteSpace(
+                                                  property.Value.GetString()));
+
             config = JsonSerializer.Deserialize<Config>(json);
-            if (config is not null && !hasConfiguredLanguage)
-                config.Language = Localization.ResolveInitialLanguage(null);
-            config?.Normalize();
+            if (config is not null)
+            {
+                if (!hasConfiguredLanguage)
+                    config.Language = Localization.ResolveInitialLanguage(null);
+                if (!hasConfiguredNvencMode)
+                    config.NvencMode = NvencModes.LowOverhead;
+                config.Normalize();
+            }
             return config is not null;
+        }
+        catch (Exception exception)
+        {
+            Log.Write($"Config deserialize failed: {exception.Message}");
+            return false;
+        }
+    }
+
+    private static bool TryLoad(string path, out Config? config)
+    {
+        config = null;
+        if (!File.Exists(path))
+            return false;
+        try
+        {
+            string json = File.ReadAllText(path);
+            return TryDeserialize(json, out config);
         }
         catch (Exception exception)
         {
@@ -273,7 +304,7 @@ public sealed class Config
         NvencMode = AllowedText(
             NvencMode,
             [NvencModes.Balanced, NvencModes.LowOverhead],
-            NvencModes.Balanced);
+            NvencModes.LowOverhead);
         Hotkey = NormalizeHotkey(Hotkey, "Ctrl+Shift+F10");
         ToggleReplayHotkey = NormalizeHotkey(ToggleReplayHotkey, "Ctrl+Shift+F9");
         RecordHotkey = NormalizeHotkey(RecordHotkey, "Ctrl+Shift+F11");

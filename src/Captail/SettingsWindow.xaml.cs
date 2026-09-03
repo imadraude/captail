@@ -1014,7 +1014,7 @@ public partial class SettingsWindow : Window
             : Localization.Text("L.Video.NvencUnavailable");
         LowOverheadAqBox.IsEnabled =
             nvencAvailable &&
-            GetSelectedTag(NvencModeBox, NvencModes.Balanced) ==
+            GetSelectedTag(NvencModeBox, NvencModes.LowOverhead) ==
                 NvencModes.LowOverhead;
         UpdateRamEstimate();
     }

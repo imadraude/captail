@@ -372,8 +372,8 @@
   <sys:String x:Key="L.Video.BitrateCustomHint">Авто или своё значение от 2 до 100 Мбит/с</sys:String>
   <sys:String x:Key="L.Video.NvencMode">Режим NVENC</sys:String>
   <sys:String x:Key="L.Help.NvencLowOverhead">Низкая нагрузка использует P2 и настройку малой задержки без многопроходности, lookahead и B-кадров.</sys:String>
-  <sys:String x:Key="L.Video.NvencBalanced">Сбалансированный (по умолчанию)</sys:String>
-  <sys:String x:Key="L.Video.NvencLowOverhead">Низкая нагрузка</sys:String>
+  <sys:String x:Key="L.Video.NvencBalanced">Сбалансированный</sys:String>
+  <sys:String x:Key="L.Video.NvencLowOverhead">Низкая нагрузка (по умолчанию)</sys:String>
   <sys:String x:Key="L.Video.AdaptiveQuantization">Адаптивное квантование</sys:String>
   <sys:String x:Key="L.Video.EstimatedRamBuffer">Расчётный буфер в ОЗУ</sys:String>
   <sys:String x:Key="L.Video.NvencUnavailable">Настройки NVENC недоступны для выбранного кодировщика.</sys:String>

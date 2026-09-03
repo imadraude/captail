@@ -343,8 +343,8 @@
   <sys:String x:Key="L.Video.BitrateCustomHint">Automatisch oder eigener Wert von 2 bis 100 Mbit/s</sys:String>
   <sys:String x:Key="L.Video.NvencMode">NVENC-Modus</sys:String>
   <sys:String x:Key="L.Help.NvencLowOverhead">Geringe Last verwendet P2 und niedrige Latenz ohne Multipass, Lookahead oder B-Frames.</sys:String>
-  <sys:String x:Key="L.Video.NvencBalanced">Ausgewogen (Standard)</sys:String>
-  <sys:String x:Key="L.Video.NvencLowOverhead">Geringe Last</sys:String>
+  <sys:String x:Key="L.Video.NvencBalanced">Ausgewogen</sys:String>
+  <sys:String x:Key="L.Video.NvencLowOverhead">Geringe Last (Standard)</sys:String>
   <sys:String x:Key="L.Video.AdaptiveQuantization">Adaptive Quantisierung</sys:String>
   <sys:String x:Key="L.Video.EstimatedRamBuffer">Geschätzter RAM-Puffer</sys:String>
   <sys:String x:Key="L.Video.NvencUnavailable">NVENC-Einstellungen sind für den gewählten Encoder nicht verfügbar.</sys:String>

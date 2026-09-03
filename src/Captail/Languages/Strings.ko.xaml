@@ -343,8 +343,8 @@
   <sys:String x:Key="L.Video.BitrateCustomHint">자동 또는 2~100 Mbps 사용자 지정 값</sys:String>
   <sys:String x:Key="L.Video.NvencMode">NVENC 모드</sys:String>
   <sys:String x:Key="L.Help.NvencLowOverhead">낮은 부하 모드는 P2와 저지연 조정을 사용하며 멀티패스, 미리 보기 또는 B 프레임을 사용하지 않습니다.</sys:String>
-  <sys:String x:Key="L.Video.NvencBalanced">균형 조정(기본값)</sys:String>
-  <sys:String x:Key="L.Video.NvencLowOverhead">낮은 부하</sys:String>
+  <sys:String x:Key="L.Video.NvencBalanced">균형 조정</sys:String>
+  <sys:String x:Key="L.Video.NvencLowOverhead">낮은 부하(기본값)</sys:String>
   <sys:String x:Key="L.Video.AdaptiveQuantization">적응형 양자화</sys:String>
   <sys:String x:Key="L.Video.EstimatedRamBuffer">예상 RAM 버퍼</sys:String>
   <sys:String x:Key="L.Video.NvencUnavailable">선택한 인코더에서는 NVENC 설정을 사용할 수 없습니다.</sys:String>

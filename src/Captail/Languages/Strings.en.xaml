@@ -372,8 +372,8 @@
   <sys:String x:Key="L.Video.BitrateCustomHint">Auto or a custom value from 2 to 100 Mbps</sys:String>
   <sys:String x:Key="L.Video.NvencMode">NVENC mode</sys:String>
   <sys:String x:Key="L.Help.NvencLowOverhead">Low overhead uses P2, low-latency tuning, no multipass/lookahead or B-frames.</sys:String>
-  <sys:String x:Key="L.Video.NvencBalanced">Balanced (default)</sys:String>
-  <sys:String x:Key="L.Video.NvencLowOverhead">Low overhead</sys:String>
+  <sys:String x:Key="L.Video.NvencBalanced">Balanced</sys:String>
+  <sys:String x:Key="L.Video.NvencLowOverhead">Low overhead (default)</sys:String>
   <sys:String x:Key="L.Video.AdaptiveQuantization">Adaptive quantization</sys:String>
   <sys:String x:Key="L.Video.EstimatedRamBuffer">Estimated RAM buffer</sys:String>
   <sys:String x:Key="L.Video.NvencUnavailable">NVENC settings are unavailable for the selected encoder.</sys:String>

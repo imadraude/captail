@@ -343,8 +343,8 @@
   <sys:String x:Key="L.Video.BitrateCustomHint">Automático o un valor personalizado de 2 a 100 Mbps</sys:String>
   <sys:String x:Key="L.Video.NvencMode">Modo NVENC</sys:String>
   <sys:String x:Key="L.Help.NvencLowOverhead">La carga baja usa P2 y baja latencia sin multipaso, lookahead ni fotogramas B.</sys:String>
-  <sys:String x:Key="L.Video.NvencBalanced">Equilibrado (predeterminado)</sys:String>
-  <sys:String x:Key="L.Video.NvencLowOverhead">Carga baja</sys:String>
+  <sys:String x:Key="L.Video.NvencBalanced">Equilibrado</sys:String>
+  <sys:String x:Key="L.Video.NvencLowOverhead">Carga baja (predeterminado)</sys:String>
   <sys:String x:Key="L.Video.AdaptiveQuantization">Cuantización adaptativa</sys:String>
   <sys:String x:Key="L.Video.EstimatedRamBuffer">Búfer RAM estimado</sys:String>
   <sys:String x:Key="L.Video.NvencUnavailable">Los ajustes de NVENC no están disponibles para el codificador seleccionado.</sys:String>

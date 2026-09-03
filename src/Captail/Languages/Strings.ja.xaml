@@ -343,8 +343,8 @@
   <sys:String x:Key="L.Video.BitrateCustomHint">自動または 2～100 Mbps のカスタム値</sys:String>
   <sys:String x:Key="L.Video.NvencMode">NVENC モード</sys:String>
   <sys:String x:Key="L.Help.NvencLowOverhead">低負荷モードは P2 と低遅延設定を使用し、マルチパス、先読み、B フレームを無効にします。</sys:String>
-  <sys:String x:Key="L.Video.NvencBalanced">バランス（既定）</sys:String>
-  <sys:String x:Key="L.Video.NvencLowOverhead">低負荷</sys:String>
+  <sys:String x:Key="L.Video.NvencBalanced">バランス</sys:String>
+  <sys:String x:Key="L.Video.NvencLowOverhead">低負荷（既定）</sys:String>
   <sys:String x:Key="L.Video.AdaptiveQuantization">適応量子化</sys:String>
   <sys:String x:Key="L.Video.EstimatedRamBuffer">推定 RAM バッファー</sys:String>
   <sys:String x:Key="L.Video.NvencUnavailable">選択したエンコーダーでは NVENC 設定を使用できません。</sys:String>

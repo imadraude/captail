@@ -163,4 +163,77 @@ public sealed class ConfigTests
             config.OpenAppHotkey));
         Assert.Equal("Ctrl+Shift+F8", config.OpenAppHotkey);
     }
+
+    [Fact]
+    public void NewConfig_UsesLowOverheadByDefault()
+    {
+        var config = new Config();
+        Assert.Equal(NvencModes.LowOverhead, config.NvencMode);
+    }
+
+    [Fact]
+    public void Deserialize_MissingNvencMode_MigratesToLowOverhead()
+    {
+        string json = """
+        {
+            "BufferSeconds": 120,
+            "FrameRate": 60
+        }
+        """;
+
+        bool success = Config.TryDeserialize(json, out Config? config);
+
+        Assert.True(success);
+        Assert.NotNull(config);
+        Assert.Equal(NvencModes.LowOverhead, config.NvencMode);
+    }
+
+    [Fact]
+    public void Deserialize_ExplicitBalanced_PreservesBalanced()
+    {
+        string json = """
+        {
+            "NvencMode": "balanced",
+            "FrameRate": 60
+        }
+        """;
+
+        bool success = Config.TryDeserialize(json, out Config? config);
+
+        Assert.True(success);
+        Assert.NotNull(config);
+        Assert.Equal(NvencModes.Balanced, config.NvencMode);
+    }
+
+    [Fact]
+    public void Normalize_InvalidNvencMode_NormalizesToLowOverhead()
+    {
+        var config = new Config
+        {
+            NvencMode = "invalid_ultra_fast",
+        };
+
+        config.Normalize();
+
+        Assert.Equal(NvencModes.LowOverhead, config.NvencMode);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void RecommendedNvencSettings_LowOverhead_AppliesExpectedParameters(bool adaptiveQuantization)
+    {
+        ObsReplayEngine.NvencSettings settings = ObsReplayEngine.RecommendedNvencSettings(
+            codec: "h264",
+            mode: NvencModes.LowOverhead,
+            lowOverheadAdaptiveQuantization: adaptiveQuantization,
+            loadProfile: ObsReplayEngine.EncoderLoadProfile.Standard);
+
+        Assert.Equal("p2", settings.Preset);
+        Assert.Equal("ll", settings.Tune);
+        Assert.Equal("disabled", settings.Multipass);
+        Assert.False(settings.Lookahead);
+        Assert.Equal(0, settings.BFrames);
+        Assert.Equal(adaptiveQuantization, settings.AdaptiveQuantization);
+    }
 }
