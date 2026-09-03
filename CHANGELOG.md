@@ -4,6 +4,29 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.12] - 2026-09-03
+
+### Added
+
+- **Performance telemetry:** Built-in capture performance snapshots track rendered frames, lagged frames, encoded frames, output bytes, CPU time, and working set. A structured `PERF` log line is emitted per completed measurement sample without impacting the capture hot path.
+- **Recording performance QA tool:** New `tools/ReplayPerformanceQa` console harness runs repeatable benchmark scenarios (baseline, replay, record, replay+record, save-replay, advanced-audio) with configurable warm-up, sample duration, and iteration count.
+- **Suspend Instant Replay during manual recording:** New option pauses the replay buffer while a manual recording is active, reducing GPU encoder and disk I/O load. Replay resumes automatically with a fresh window after recording stops. The setting is enabled by default and clearly labeled in the UI.
+- **Warm recording pipeline:** New option keeps the OBS pipeline initialized when Instant Replay is off, so pressing Record starts capturing without cold-start delay. Disabled by default until idle overhead is measured on target hardware.
+- **Performance budgets:** Documented target thresholds for p99 frame time, lagged frames, CPU overhead, Record-to-first-byte latency, and stop/finalization time in `docs/PERFORMANCE_BUDGETS.md`.
+
+### Improved
+
+- **NVENC Low Overhead is now the default** for new configurations. Existing users who chose Balanced keep their setting. Invalid or missing modes normalize to Low Overhead. All 11 localizations updated.
+- **Graceful recording output shutdown:** Dispose now attempts a clean `obs_output_stop` with a brief wait before falling back to `force_stop`, reducing the chance of truncated final MP4 fragments.
+- **Earlier replay-suspension guard:** Saving a replay while the buffer is suspended now fails immediately with a clear message instead of waiting for a lock.
+- **Recording output readiness check:** Manual recording waits for the first encoded packet before suspending the replay buffer, preventing a race where the replay stops before the recording encoder produces data.
+- **Resilient OBS log bridge:** Native log handler install/remove is wrapped in exception handlers so a missing bridge DLL degrades gracefully instead of crashing.
+
+### Known limitations
+
+- Performance budgets are initial targets. Actual thresholds depend on GPU generation, driver version, capture resolution, and disk speed. Run the QA harness on your hardware to establish a local baseline.
+- The warm recording pipeline keeps OBS sources and encoders allocated in memory. Idle GPU and CPU cost has not been measured across all supported hardware.
+
 ## [0.5.11] - 2026-09-03
 
 ### Improved
