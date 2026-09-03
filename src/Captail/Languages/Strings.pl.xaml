@@ -35,7 +35,7 @@
   <sys:String x:Key="L.Status.Disabled">Powtórka jest wyłączona</sys:String>
   <sys:String x:Key="L.Status.Idle">Bufor nie nagrywa</sys:String>
   <sys:String x:Key="L.Status.Recovering">Przywracanie powtórki</sys:String>
-  <sys:String x:Key="L.Status.Detail">Ostatnie {0} · {1} · {2}</sys:String>
+  <sys:String x:Key="L.Status.Detail">Ostatnie {0} · {1}</sys:String>
   <sys:String x:Key="L.Status.BufferLast">Bufor: ostatni {0}</sys:String>
 
   <sys:String x:Key="L.Audio.System">Systemu</sys:String>

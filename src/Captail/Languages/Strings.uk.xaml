@@ -35,7 +35,7 @@
   <sys:String x:Key="L.Status.Disabled">Миттєвий повтор вимкнено</sys:String>
   <sys:String x:Key="L.Status.Idle">Буфер не записує</sys:String>
   <sys:String x:Key="L.Status.Recovering">Відновлення миттєвого повтору</sys:String>
-  <sys:String x:Key="L.Status.Detail">Останні {0} · {1} · {2}</sys:String>
+  <sys:String x:Key="L.Status.Detail">Останні {0} · {1}</sys:String>
   <sys:String x:Key="L.Status.BufferLast">Буфер: останні {0}</sys:String>
 
   <sys:String x:Key="L.Audio.System">Система</sys:String>

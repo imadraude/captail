@@ -35,7 +35,7 @@
   <sys:String x:Key="L.Status.Disabled">인스턴트 리플레이가 꺼져 있습니다.</sys:String>
   <sys:String x:Key="L.Status.Idle">버퍼가 녹화 중이 아닙니다</sys:String>
   <sys:String x:Key="L.Status.Recovering">인스턴트 리플레이 복구 중</sys:String>
-  <sys:String x:Key="L.Status.Detail">지난 {0} · {1} · {2}</sys:String>
+  <sys:String x:Key="L.Status.Detail">지난 {0} · {1}</sys:String>
   <sys:String x:Key="L.Status.BufferLast">버퍼: 마지막 {0}</sys:String>
 
   <sys:String x:Key="L.Audio.System">시스템</sys:String>

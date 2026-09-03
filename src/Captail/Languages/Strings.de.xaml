@@ -35,7 +35,7 @@
   <sys:String x:Key="L.Status.Disabled">Instant Replay ist deaktiviert</sys:String>
   <sys:String x:Key="L.Status.Idle">Der Puffer zeichnet nicht auf</sys:String>
   <sys:String x:Key="L.Status.Recovering">Wiederherstellung läuft</sys:String>
-  <sys:String x:Key="L.Status.Detail">Letzte {0} · {1} · {2}</sys:String>
+  <sys:String x:Key="L.Status.Detail">Letzte {0} · {1}</sys:String>
   <sys:String x:Key="L.Status.BufferLast">Puffer: letzte {0}</sys:String>
 
   <sys:String x:Key="L.Audio.System">System</sys:String>

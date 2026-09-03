@@ -4,6 +4,14 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.9] - 2026-09-03
+
+### Improved
+
+- **Quieter Recording Indicators**: Replaced continuously rotating and pulsing status indicators with compact static states, moved the screen overlay closer to the selected edge, and arranged simultaneous Instant Replay and manual recording indicators without overlap.
+- **Clearer Capture Summary**: The dashboard status now prioritizes the replay duration and the executable name of the game actually being captured, omitting redundant audio details so the summary remains visible.
+- **Smaller Replay Card Actions**: Reduced the hover action tray, controls, spacing, and shadow again so it covers less of each replay title while keeping all four actions and their tooltips available.
+
 ## [0.5.8] - 2026-09-03
 
 ### Improved

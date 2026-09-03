@@ -35,7 +35,7 @@
   <sys:String x:Key="L.Status.Disabled">Replay instantâneo desativado</sys:String>
   <sys:String x:Key="L.Status.Idle">Buffer não está gravando</sys:String>
   <sys:String x:Key="L.Status.Recovering">Recuperando Replay Instantâneo</sys:String>
-  <sys:String x:Key="L.Status.Detail">Último {0} · {1} · {2}</sys:String>
+  <sys:String x:Key="L.Status.Detail">Último {0} · {1}</sys:String>
   <sys:String x:Key="L.Status.BufferLast">Buffer: último {0}</sys:String>
 
   <sys:String x:Key="L.Audio.System">Sistema</sys:String>

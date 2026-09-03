@@ -45,7 +45,6 @@ public partial class SettingsWindow : Window
     private bool _updatingUi;
     private bool _runtimeActive;
     private int _availableReplaySeconds;
-    private bool? _animatedRecordingState;
     private bool _isRecording;
     private bool _isRecordingPaused;
     private TimeSpan _recordingDuration;
@@ -482,25 +481,9 @@ public partial class SettingsWindow : Window
             _config.AudioRoutingMode,
             "advanced",
             StringComparison.OrdinalIgnoreCase);
-        string primaryAudio = Localization.Text(
-            advancedAudio
-                ? "L.Audio.ApplicationAudio"
-                : _config.CaptureSource == "game"
-                    ? "L.Audio.GameSound"
-                    : "L.Audio.SystemSound");
         bool hasPrimaryAudio = advancedAudio
             ? _config.ProcessAudioRoutes.Any(route => route.Enabled)
             : _config.CaptureSystemAudio;
-        string audio = (hasPrimaryAudio, _config.CaptureMicrophone) switch
-        {
-            (true, true) when advancedAudio || _config.SeparateAudioTracks =>
-                Localization.Format("L.Audio.SeparateSuffix", primaryAudio),
-            (true, true) =>
-                Localization.Format("L.Audio.MixedWithMic", primaryAudio),
-            (true, false) => primaryAudio,
-            (false, true) => Localization.Text("L.Audio.MicrophoneLower"),
-            _ => Localization.Text("L.Audio.VideoOnly"),
-        };
 
         StatusTitleText.Text = Localization.Text(
             active ? "L.Status.Enabled" : "L.Status.Disabled");
@@ -508,13 +491,11 @@ public partial class SettingsWindow : Window
             ? Localization.Format(
                 "L.Status.Detail",
                 FormatDuration(_config.BufferSeconds),
-                LocalizedCaptureSource(activeCaptureSource),
-                audio)
+                LocalizedCaptureSource(activeCaptureSource))
             : Localization.Text("L.Status.Idle");
         StatusRing.Stroke = FindBrush(active ? "AccentBrush" : "RingIdleBrush");
         StatusDot.Fill = FindBrush(active ? "AccentBrush" : "RingIdleBrush");
         SaveReplayButton.IsEnabled = active && _availableReplaySeconds > 0;
-        AnimateRecordingState(active);
 
         SystemSourceChip.IsChecked = hasPrimaryAudio;
         MicSourceChip.IsChecked = _config.CaptureMicrophone;
@@ -885,7 +866,6 @@ public partial class SettingsWindow : Window
         StatusRing.Stroke = FindBrush("ErrorBrush");
         StatusDot.Fill = FindBrush("ErrorBrush");
         SaveReplayButton.IsEnabled = false;
-        AnimateRecordingState(false);
     }
 
     private void Settings_Click(object sender, RoutedEventArgs e)
@@ -2743,33 +2723,6 @@ public partial class SettingsWindow : Window
             NoticeBanner.Opacity = 0;
         };
         NoticeBanner.BeginAnimation(OpacityProperty, fade);
-    }
-
-    private void AnimateRecordingState(bool active)
-    {
-        if (_animatedRecordingState == active)
-            return;
-
-        _animatedRecordingState = active;
-        StatusRingRotation.BeginAnimation(RotateTransform.AngleProperty, null);
-        StatusDot.BeginAnimation(OpacityProperty, null);
-        StatusRingRotation.Angle = 0;
-        StatusDot.Opacity = 1;
-        if (!active)
-            return;
-
-        StatusRingRotation.BeginAnimation(RotateTransform.AngleProperty,
-            new DoubleAnimation(0, 360, TimeSpan.FromSeconds(5))
-            {
-                RepeatBehavior = RepeatBehavior.Forever,
-            });
-        StatusDot.BeginAnimation(OpacityProperty,
-            new DoubleAnimation(1, 0.42, TimeSpan.FromSeconds(1.2))
-            {
-                AutoReverse = true,
-                RepeatBehavior = RepeatBehavior.Forever,
-                EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut },
-            });
     }
 
     private static void AnimateView(FrameworkElement view)

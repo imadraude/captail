@@ -35,7 +35,7 @@
   <sys:String x:Key="L.Status.Disabled">インスタント リプレイはオフです</sys:String>
   <sys:String x:Key="L.Status.Idle">バッファは録画していません</sys:String>
   <sys:String x:Key="L.Status.Recovering">インスタント リプレイの回復</sys:String>
-  <sys:String x:Key="L.Status.Detail">最後の {0} · {1} · {2}</sys:String>
+  <sys:String x:Key="L.Status.Detail">最後の {0} · {1}</sys:String>
   <sys:String x:Key="L.Status.BufferLast">バッファ: 最後の {0}</sys:String>
 
   <sys:String x:Key="L.Audio.System">システム</sys:String>

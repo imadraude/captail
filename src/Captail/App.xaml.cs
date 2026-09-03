@@ -49,6 +49,7 @@ public partial class App : Application
         new(StringComparer.OrdinalIgnoreCase);
     private OverlayNotificationWindow? _overlayNotification;
     private ReplayStatusIndicatorWindow? _recordingIndicator;
+    private ReplayStatusIndicatorWindow? _manualRecordingIndicator;
     private readonly UpdateService _updateService = new();
     private DispatcherTimer? _updateShutdownTimer;
     private DispatcherTimer? _autoUpdateTimer;
@@ -2951,12 +2952,15 @@ public partial class App : Application
         int availableReplaySeconds = active
             ? _obs?.AvailableReplaySeconds ?? _config!.BufferSeconds
             : 0;
+        string? capturedSource = !string.IsNullOrWhiteSpace(_obs?.ActiveGameExecutable)
+            ? Path.GetFileNameWithoutExtension(_obs.ActiveGameExecutable)
+            : _captureDescription;
         if (_capabilities is not null)
             _settingsWindow?.UpdateCapabilities(_capabilities);
         _settingsWindow?.UpdateRuntimeState(
             active,
             codec,
-            _captureDescription,
+            capturedSource,
             availableReplaySeconds);
         _settingsWindow?.UpdateRecordingState(
             isRecording,
@@ -3003,27 +3007,49 @@ public partial class App : Application
     {
         bool isRecording = _replayRuntime?.Snapshot.IsRecording ?? _obs?.IsRecording ?? false;
         if (_uiOnly || Volatile.Read(ref _exiting) != 0 ||
-            _config?.ShowRecordingIndicator != true ||
-            (!_config.ReplayEnabled && !isRecording))
+            _config?.ShowRecordingIndicator != true)
         {
             _recordingIndicator?.HideIndicator();
+            _manualRecordingIndicator?.HideIndicator();
             return;
         }
 
-        _recordingIndicator ??= new ReplayStatusIndicatorWindow();
-        _recordingIndicator.SetPlacement(
-            _config.RecordingIndicatorPosition);
-        _recordingIndicator.SetGameDetected(
-            IsReplayRunning &&
-            !string.IsNullOrWhiteSpace(_obs?.ActiveGameExecutable));
-        ReplayIndicatorState state = isRecording
-            ? ReplayIndicatorState.Recording
-            : _replayRuntime?.Snapshot.State == ReplayRuntimeState.Recovering
+        bool showReplay = _config.ReplayEnabled;
+        bool showBoth = showReplay && isRecording;
+        if (showReplay)
+        {
+            _recordingIndicator ??= new ReplayStatusIndicatorWindow();
+            _recordingIndicator.SetPlacement(_config.RecordingIndicatorPosition);
+            _recordingIndicator.SetInwardOffset(showBoth ? 29 : 0);
+            _recordingIndicator.SetGameDetected(
+                IsReplayRunning &&
+                !string.IsNullOrWhiteSpace(_obs?.ActiveGameExecutable));
+            ReplayIndicatorState replayState =
+                _replayRuntime?.Snapshot.State == ReplayRuntimeState.Recovering
                 ? ReplayIndicatorState.Recovering
                 : IsReplayRunning
                     ? ReplayIndicatorState.Active
                     : ReplayIndicatorState.Error;
-        _recordingIndicator.SetState(state);
+            _recordingIndicator.SetState(replayState);
+        }
+        else
+        {
+            _recordingIndicator?.HideIndicator();
+        }
+
+        if (isRecording)
+        {
+            _manualRecordingIndicator ??= new ReplayStatusIndicatorWindow();
+            _manualRecordingIndicator.SetPlacement(_config.RecordingIndicatorPosition);
+            _manualRecordingIndicator.SetInwardOffset(0);
+            _manualRecordingIndicator.SetGameDetected(
+                !string.IsNullOrWhiteSpace(_obs?.ActiveGameExecutable));
+            _manualRecordingIndicator.SetState(ReplayIndicatorState.Recording);
+        }
+        else
+        {
+            _manualRecordingIndicator?.HideIndicator();
+        }
     }
 
     private void ShowReplaySavedIndicator()
@@ -3037,6 +3063,10 @@ public partial class App : Application
         _recordingIndicator ??= new ReplayStatusIndicatorWindow();
         _recordingIndicator.SetPlacement(
             _config.RecordingIndicatorPosition);
+        _recordingIndicator.SetInwardOffset(
+            (_replayRuntime?.Snapshot.IsRecording ?? _obs?.IsRecording ?? false)
+                ? 29
+                : 0);
         _recordingIndicator.SetGameDetected(
             !string.IsNullOrWhiteSpace(_obs?.ActiveGameExecutable));
         _recordingIndicator.ShowTransient(
@@ -3527,6 +3557,7 @@ public partial class App : Application
         _obsTaskScheduler.Dispose();
         _overlayNotification?.ClosePermanently();
         _recordingIndicator?.ClosePermanently();
+        _manualRecordingIndicator?.ClosePermanently();
         if (_singleInstanceMutex is not null)
         {
             try

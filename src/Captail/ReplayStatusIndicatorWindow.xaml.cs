@@ -52,6 +52,7 @@ public partial class ReplayStatusIndicatorWindow : Window
     private uint _lastForegroundProcessId;
     private bool _lastForegroundIsScreenCapture;
     private bool _gameDetected;
+    private int _inwardOffset;
     private bool _firstFrameRendered;
     private int _lastLeft = int.MinValue;
     private int _lastTop = int.MinValue;
@@ -124,6 +125,17 @@ public partial class ReplayStatusIndicatorWindow : Window
             return;
 
         _gameDetected = gameDetected;
+        if (IsVisible)
+            PositionOnForegroundMonitor();
+    }
+
+    internal void SetInwardOffset(int offset)
+    {
+        int normalized = Math.Max(0, offset);
+        if (_inwardOffset == normalized)
+            return;
+
+        _inwardOffset = normalized;
         if (IsVisible)
             PositionOnForegroundMonitor();
     }
@@ -214,42 +226,17 @@ public partial class ReplayStatusIndicatorWindow : Window
         {
             case ReplayIndicatorState.Recording:
                 StateRing.StrokeDashArray = new DoubleCollection([6, 3]);
-                StartRotation(1800);
-                CenterDot.BeginAnimation(
-                    OpacityProperty,
-                    new DoubleAnimation(0.3, 1, TimeSpan.FromMilliseconds(500))
-                    {
-                        AutoReverse = true,
-                        RepeatBehavior = RepeatBehavior.Forever,
-                    });
                 break;
             case ReplayIndicatorState.Active:
                 StateRing.StrokeDashArray = new DoubleCollection([7, 3]);
-                StartRotation(2200);
                 break;
             case ReplayIndicatorState.Recovering:
                 StateRing.StrokeDashArray = new DoubleCollection([2, 2.4]);
-                StartRotation(1050);
-                StateRing.BeginAnimation(
-                    OpacityProperty,
-                    new DoubleAnimation(0.38, 1, TimeSpan.FromMilliseconds(420))
-                    {
-                        AutoReverse = true,
-                        RepeatBehavior = RepeatBehavior.Forever,
-                    });
                 break;
             case ReplayIndicatorState.Error:
                 CenterDot.Visibility = Visibility.Collapsed;
                 ErrorGlyph.Visibility = Visibility.Visible;
                 StateRing.StrokeDashArray = new DoubleCollection([1.2, 2.2]);
-                StartRotation(650);
-                IndicatorRoot.BeginAnimation(
-                    OpacityProperty,
-                    new DoubleAnimation(0.58, 1, TimeSpan.FromMilliseconds(280))
-                    {
-                        AutoReverse = true,
-                        RepeatBehavior = RepeatBehavior.Forever,
-                    });
                 break;
             case ReplayIndicatorState.Saved:
                 CenterDot.Visibility = Visibility.Collapsed;
@@ -276,22 +263,12 @@ public partial class ReplayStatusIndicatorWindow : Window
             },
         };
 
-    private void StartRotation(int durationMilliseconds)
-    {
-        RingRotation.BeginAnimation(
-            RotateTransform.AngleProperty,
-            new DoubleAnimation(0, 360, TimeSpan.FromMilliseconds(durationMilliseconds))
-            {
-                RepeatBehavior = RepeatBehavior.Forever,
-            });
-    }
-
     private void StopAnimations()
     {
-        RingRotation.BeginAnimation(RotateTransform.AngleProperty, null);
-        RingRotation.Angle = 0;
         StateRing.BeginAnimation(OpacityProperty, null);
         StateRing.Opacity = 1;
+        CenterDot.BeginAnimation(OpacityProperty, null);
+        CenterDot.Opacity = 1;
         IndicatorRoot.BeginAnimation(OpacityProperty, null);
         IndicatorRoot.Opacity = 1;
         IndicatorScale.BeginAnimation(ScaleTransform.ScaleXProperty, null);
@@ -448,8 +425,9 @@ public partial class ReplayStatusIndicatorWindow : Window
 
         uint dpi = GetDpiForWindow(hwnd);
         double scale = dpi > 0 ? dpi / 96d : 1d;
-        int size = (int)Math.Round(30 * scale);
-        int inset = (int)Math.Round(16 * scale);
+        int size = (int)Math.Round(26 * scale);
+        int inset = (int)Math.Round(6 * scale);
+        int inwardOffset = (int)Math.Round(_inwardOffset * scale);
         bool placeRight = _placement is
             ReplayIndicatorPlacement.TopRight or
             ReplayIndicatorPlacement.BottomRight;
@@ -461,8 +439,8 @@ public partial class ReplayStatusIndicatorWindow : Window
         // selected in-game corner.
         Rect bounds = _gameDetected ? info.Monitor : info.WorkArea;
         int left = placeRight
-            ? bounds.Right - size - inset
-            : bounds.Left + inset;
+            ? bounds.Right - size - inset - inwardOffset
+            : bounds.Left + inset + inwardOffset;
         int top = placeBottom
             ? bounds.Bottom - size - inset
             : bounds.Top + inset;

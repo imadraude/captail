@@ -38,7 +38,7 @@
   <sys:String x:Key="L.Status.Disabled">Instant Replay is off</sys:String>
   <sys:String x:Key="L.Status.Idle">Buffer is not recording</sys:String>
   <sys:String x:Key="L.Status.Recovering">Recovering Instant Replay</sys:String>
-  <sys:String x:Key="L.Status.Detail">Last {0} · {1} · {2}</sys:String>
+  <sys:String x:Key="L.Status.Detail">Last {0} · {1}</sys:String>
   <sys:String x:Key="L.Status.BufferLast">Buffer: last {0}</sys:String>
 
   <sys:String x:Key="L.Audio.System">System</sys:String>
