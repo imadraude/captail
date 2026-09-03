@@ -16,7 +16,8 @@ internal sealed record ReplayRuntimeSnapshot(
     bool IsRecording = false,
     bool IsRecordingPaused = false,
     DateTime? RecordingStartedUtc = null,
-    string? Error = null);
+    string? Error = null,
+    bool IsReplaySuspended = false);
 
 internal sealed record ReplayCommandResult(
     bool Succeeded,

@@ -32,6 +32,8 @@ public sealed class Config
     /// <summary>"top-left", "top-right", "bottom-left", or "bottom-right".</summary>
     public string RecordingIndicatorPosition { get; set; } = "top-right";
     public bool AutoUpdate { get; set; } = true;
+    public bool SuspendReplayDuringRecording { get; set; } = true;
+    public bool KeepRecordingPipelineWarm { get; set; }
 
     /// <summary>"av1", "hevc", or "h264". OBS selects an available encoder for the requested format.</summary>
     public string Codec { get; set; } = "h264";
@@ -237,6 +239,8 @@ public sealed class Config
         AdvancedMicrophoneTrack = source.AdvancedMicrophoneTrack;
         OutputDirectory = source.OutputDirectory;
         OrganizeReplaysByGame = source.OrganizeReplaysByGame;
+        SuspendReplayDuringRecording = source.SuspendReplayDuringRecording;
+        KeepRecordingPipelineWarm = source.KeepRecordingPipelineWarm;
         Normalize();
     }
 
@@ -265,7 +269,9 @@ public sealed class Config
         AdvancedMicrophoneTrack == other.AdvancedMicrophoneTrack &&
         ProcessAudioRoutesEqual(ProcessAudioRoutes, other.ProcessAudioRoutes) &&
         string.Equals(OutputDirectory, other.OutputDirectory, StringComparison.OrdinalIgnoreCase) &&
-        OrganizeReplaysByGame == other.OrganizeReplaysByGame;
+        OrganizeReplaysByGame == other.OrganizeReplaysByGame &&
+        SuspendReplayDuringRecording == other.SuspendReplayDuringRecording &&
+        KeepRecordingPipelineWarm == other.KeepRecordingPipelineWarm;
 
     public bool ValuesEqual(Config other)
     {
