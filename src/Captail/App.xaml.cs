@@ -399,16 +399,22 @@ public partial class App : Application
             if (!backgroundLaunch)
                 OpenSettings();
 
-            if (_config.ReplayEnabled &&
-                (await _replayRuntime!.SetEnabledAsync(true)).Succeeded)
+            if (_config.ReplayEnabled)
             {
-                ShowOverlayNotification(
-                    "●",
-                    Localization.Text("L.Notify.ReadyTitle"),
-                    Localization.Format(
-                        "L.Status.BufferLast",
-                        FormatDuration(_config.BufferSeconds)),
-                    OverlayTone.Success);
+                if ((await _replayRuntime!.SetEnabledAsync(true)).Succeeded)
+                {
+                    ShowOverlayNotification(
+                        "●",
+                        Localization.Text("L.Notify.ReadyTitle"),
+                        Localization.Format(
+                            "L.Status.BufferLast",
+                            FormatDuration(_config.BufferSeconds)),
+                        OverlayTone.Success);
+                }
+            }
+            else if (_config.KeepRecordingPipelineWarm)
+            {
+                await _replayRuntime!.ApplyConfigurationAsync(_config);
             }
         }
         catch (Exception exception)

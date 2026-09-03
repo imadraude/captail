@@ -137,9 +137,11 @@ internal sealed class ReplayRuntime : IAsyncDisposable
                     await previousPipeline.DisposeAsync();
                 }
 
-                if (candidateConfiguration.ReplayEnabled)
+                if (candidateConfiguration.ReplayEnabled || candidateConfiguration.KeepRecordingPipelineWarm)
                 {
-                    Publish(ReplayRuntimeState.Starting, replayEnabled: true);
+                    Publish(
+                        candidateConfiguration.ReplayEnabled ? ReplayRuntimeState.Starting : ReplayRuntimeState.Disabled,
+                        replayEnabled: candidateConfiguration.ReplayEnabled);
                     candidatePipeline = _pipelineFactory.Create(candidateConfiguration);
                     await candidatePipeline.StartAsync(cancellationToken);
                     _pipeline = candidatePipeline;
@@ -151,7 +153,7 @@ internal sealed class ReplayRuntime : IAsyncDisposable
             _configuration.CopyFrom(candidateConfiguration);
             _configStore.Save(_configuration.Clone());
             Publish(
-                _pipeline is null
+                _pipeline is null || !_configuration.ReplayEnabled
                     ? ReplayRuntimeState.Disabled
                     : ReplayRuntimeState.Running,
                 _configuration.ReplayEnabled);
@@ -315,7 +317,9 @@ internal sealed class ReplayRuntime : IAsyncDisposable
             else
             {
                 Publish(
-                    ReplayRuntimeState.Running,
+                    _configuration.ReplayEnabled
+                        ? ReplayRuntimeState.Running
+                        : ReplayRuntimeState.Disabled,
                     _configuration.ReplayEnabled,
                     isRecording: false,
                     isRecordingPaused: false,
@@ -472,8 +476,15 @@ internal sealed class ReplayRuntime : IAsyncDisposable
     private async Task<ReplayCommandResult> EnableCoreAsync(
         CancellationToken cancellationToken)
     {
-        if (_pipeline is not null)
+        if (_pipeline is not null && _configuration.ReplayEnabled)
             return ReplayCommandResult.Success(Snapshot);
+
+        if (_pipeline is not null)
+        {
+            IReplayPipeline warmPipeline = _pipeline;
+            _pipeline = null;
+            await warmPipeline.DisposeAsync();
+        }
 
         Publish(ReplayRuntimeState.Starting, replayEnabled: false);
         IReplayPipeline? candidate = null;
@@ -529,6 +540,23 @@ internal sealed class ReplayRuntime : IAsyncDisposable
         await pipeline.DisposeAsync();
         _configuration.ReplayEnabled = false;
         _configStore.Save(_configuration.Clone());
+
+        if (_configuration.KeepRecordingPipelineWarm)
+        {
+            try
+            {
+                Config warmConfig = _configuration.Clone();
+                warmConfig.ReplayEnabled = false;
+                IReplayPipeline warmPipeline = _pipelineFactory.Create(warmConfig);
+                await warmPipeline.StartAsync(CancellationToken.None);
+                _pipeline = warmPipeline;
+            }
+            catch (Exception ex)
+            {
+                Log.Write($"Failed to warm pipeline after disable: {ex.Message}");
+            }
+        }
+
         Publish(ReplayRuntimeState.Disabled, replayEnabled: false);
         return ReplayCommandResult.Success(Snapshot);
     }
