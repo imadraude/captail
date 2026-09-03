@@ -621,10 +621,11 @@ public partial class ClipEditorWindow : Window
     private void StartThumb_DragDelta(object sender, DragDeltaEventArgs e)
     {
         PauseForTimelineEdit();
+        double minGap = Math.Max(MinimumSelectionSeconds, PixelsToSeconds(StartThumb.Width));
         _selectionStart = Math.Clamp(
             _selectionStart + PixelsToSeconds(e.HorizontalChange),
             0,
-            _selectionEnd - MinimumSelectionSeconds);
+            _selectionEnd - minGap);
         _playbackPosition = _selectionStart;
         PreviewPlayer.Seek(_playbackPosition, exact: false);
         UpdateRangeText();
@@ -634,10 +635,11 @@ public partial class ClipEditorWindow : Window
     private void EndThumb_DragDelta(object sender, DragDeltaEventArgs e)
     {
         PauseForTimelineEdit();
+        double minGap = Math.Max(MinimumSelectionSeconds, PixelsToSeconds(EndThumb.Width));
         _selectionEnd = Math.Clamp(
             _selectionEnd + PixelsToSeconds(e.HorizontalChange),
-            _selectionStart + MinimumSelectionSeconds,
-            Math.Max(MinimumSelectionSeconds, _clip.Duration.TotalSeconds));
+            _selectionStart + minGap,
+            Math.Max(minGap, _clip.Duration.TotalSeconds));
         if (_playbackPosition > _selectionEnd)
             _playbackPosition = _selectionEnd;
         PreviewPlayer.Seek(_playbackPosition, exact: false);
@@ -886,8 +888,8 @@ public partial class ClipEditorWindow : Window
         double endEdge = _selectionEnd / duration * width;
 
         double handleLimit = Math.Max(0, width - handleWidth);
-        Canvas.SetLeft(StartThumb, Math.Clamp(startEdge - handleWidth / 2, 0, handleLimit));
-        Canvas.SetLeft(EndThumb, Math.Clamp(endEdge - handleWidth / 2, 0, handleLimit));
+        Canvas.SetLeft(StartThumb, Math.Clamp(startEdge, 0, handleLimit));
+        Canvas.SetLeft(EndThumb, Math.Clamp(endEdge - handleWidth, 0, handleLimit));
         Canvas.SetLeft(LeftShade, 0);
         LeftShade.Width = Math.Max(0, startEdge);
         Canvas.SetLeft(RightShade, endEdge);

@@ -369,6 +369,8 @@
 
   <!-- Quiet actions such as "Change..." -->
   <Style x:Key="SubtleButton" TargetType="Button">
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
     <Setter Property="Foreground" Value="#FFC4CDD2"/>
     <Setter Property="FontFamily" Value="{StaticResource FontUi}"/>
     <Setter Property="FontSize" Value="11.5"/>
@@ -382,7 +384,8 @@
           <Border x:Name="Bd" Background="{StaticResource BgControlBrush}"
                   BorderBrush="{StaticResource BorderControlBrush}" BorderThickness="1"
                   CornerRadius="8" Padding="{TemplateBinding Padding}">
-            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
           </Border>
           <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
