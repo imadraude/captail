@@ -9,7 +9,7 @@ param(
 
     [string]$ChangelogPath = "",
 
-    [string]$Repository = "FaulMit/captail",
+    [string]$Repository = "imadraude/captail",
 
     [string]$PreviousTag = ""
 )

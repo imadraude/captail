@@ -4,6 +4,12 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.5] - 2026-09-03
+
+### Fixed
+
+- **Replay Library Full Title & Metadata Visibility**: Removed an excessive static right margin (`135px`) on replay library cards that prematurely truncated clip titles and date/time metadata when resting, restored full-width text rendering across the card with hover tooltips, and elevated the floating action button tray with a refined drop shadow.
+
 ## [0.5.4] - 2026-09-03
 
 ### Added

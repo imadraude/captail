@@ -456,20 +456,25 @@
                                             </Border>
                                         </Grid>
                                     </Border>
-                                    <StackPanel x:Name="ClipText" Grid.Column="1" Margin="11,10,135,10"
+                                    <StackPanel x:Name="ClipText" Grid.Column="1" Margin="11,10,12,10"
                                                 VerticalAlignment="Center">
                                         <TextBlock Text="{Binding Title}" FontSize="13" FontWeight="SemiBold"
                                                    Foreground="{StaticResource TextPrimaryBrush}"
-                                                   TextTrimming="CharacterEllipsis"/>
+                                                   TextTrimming="CharacterEllipsis"
+                                                   ToolTip="{Binding Title}"/>
                                         <TextBlock Text="{Binding Details}" Style="{StaticResource SecondaryText}"
-                                                   Margin="0,5,0,0" FontSize="11.5" TextTrimming="CharacterEllipsis"/>
+                                                   Margin="0,5,0,0" FontSize="11.5" TextTrimming="CharacterEllipsis"
+                                                   ToolTip="{Binding Details}"/>
                                     </StackPanel>
                                     <Border x:Name="ClipActionTray" Grid.Column="1"
                                             HorizontalAlignment="Right" VerticalAlignment="Center"
                                             Margin="8" Padding="2" CornerRadius="8"
-                                            Background="#F015191C" BorderBrush="{StaticResource BorderControlBrush}"
+                                            Background="#F615191C" BorderBrush="{StaticResource BorderControlBrush}"
                                             BorderThickness="1" Opacity="0" IsHitTestVisible="False"
                                             RenderTransformOrigin="0.5,0.5">
+                                        <Border.Effect>
+                                            <DropShadowEffect BlurRadius="10" Direction="180" ShadowDepth="2" Opacity="0.45" Color="#000000"/>
+                                        </Border.Effect>
                                         <Border.RenderTransform>
                                             <TranslateTransform x:Name="ClipActionTranslate" X="8"/>
                                         </Border.RenderTransform>
