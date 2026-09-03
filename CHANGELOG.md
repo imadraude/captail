@@ -4,6 +4,18 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.3] - 2026-09-03
+
+### Added
+
+- **Ukrainian Installer Localization & Polished Wizard**: Replaced legacy installer language files with complete Ukrainian translations (`Ukrainian.isl`), streamlined the setup wizard flow, and added quiet relaunch behavior after update installations.
+- **Silent Automatic Updates**: Added a background update monitor and user toggle (`AutoUpdate`) in General Settings to seamlessly download and apply updates in the background when not recording.
+
+### Fixed
+
+- **Replay Library Title Contrast**: Fixed a bug where recent replay titles in `RecentReplaysList` inherited black text (`#000000`) on dark surfaces and dimmed on hover; explicitly bound `Foreground` to `TextPrimaryBrush` and preserved full opacity.
+- **Dashboard Action Buttons Alignment**: Unified `SaveReplayButton` and `RecordButton` layout using constrained 2-column grids, centered 16×16 icon boxes, identical 18px hotkey badge baselines, matching corner radii (`11`), and text trimming to prevent overlapping in localized interfaces.
+
 ## [0.5.2] - 2026-09-03
 
 ### Improved

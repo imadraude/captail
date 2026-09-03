@@ -32,6 +32,7 @@
   <sys:String x:Key="L.Update.InstallFailedTitle">更新失败</sys:String>
   <sys:String x:Key="L.Update.StoreManaged">v{0} · Microsoft Store</sys:String>
   <sys:String x:Key="L.Update.StoreManagedTip">更新由 Microsoft Store 提供</sys:String>
+  <sys:String x:Key="L.Update.AutoUpdate">自动更新</sys:String>
 
   <sys:String x:Key="L.Status.Enabled">即时回放已开启</sys:String>
   <sys:String x:Key="L.Status.Disabled">即时回放已关闭</sys:String>

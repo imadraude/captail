@@ -29,6 +29,7 @@
   <sys:String x:Key="L.Update.InstallFailedTitle">La actualización falló</sys:String>
   <sys:String x:Key="L.Update.StoreManaged">v{0} · Tienda Microsoft</sys:String>
   <sys:String x:Key="L.Update.StoreManagedTip">Las actualizaciones las entrega Microsoft Store</sys:String>
+  <sys:String x:Key="L.Update.AutoUpdate">Actualizaciones automáticas</sys:String>
 
   <sys:String x:Key="L.Status.Enabled">Repetición instantánea activa</sys:String>
   <sys:String x:Key="L.Status.Disabled">Repetición instantánea inactiva</sys:String>

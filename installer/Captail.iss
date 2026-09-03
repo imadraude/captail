@@ -42,6 +42,10 @@ Uninstallable=yes
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
+WizardResizable=no
+DisableReadyPage=yes
+DisableDirPage=auto
+ShowLanguageDialog=auto
 CloseApplications=yes
 RestartApplications=no
 ChangesAssociations=no
@@ -51,11 +55,24 @@ UsedUserAreasWarning=no
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
-Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
+Name: "ukrainian"; MessagesFile: "compiler:Languages\Ukrainian.isl"
+
+[CustomMessages]
+StartupDescription=Start Captail with Windows
+StartupGroupDescription=Windows integration:
+LaunchProgram=Launch Captail
+AppStillBusy=Captail is still busy. Wait for replay saving to finish, then retry.
+CouldNotStop=Captail could not stop safely. Close any active save operation and retry.
+
+ukrainian.StartupDescription=Запускати Captail разом із Windows
+ukrainian.StartupGroupDescription=Інтеграція з Windows:
+ukrainian.LaunchProgram=Запустити Captail
+ukrainian.AppStillBusy=Captail все ще зайнятий. Зачекайте на завершення збереження повтору та повторіть спробу.
+ukrainian.CouldNotStop=Не вдалося безпечно зупинити Captail. Закрийте активне збереження та повторіть спробу.
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-Name: "startup"; Description: "Start Captail with Windows"; GroupDescription: "Windows integration:"; Flags: unchecked
+Name: "startup"; Description: "{cm:StartupDescription}"; GroupDescription: "{cm:StartupGroupDescription}"; Flags: unchecked
 
 [Files]
 Source: "{#SourceDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -72,9 +89,15 @@ Type: filesandordirs; Name: "{localappdata}\Captail"
 Type: filesandordirs; Name: "{userappdata}\Captail"
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "Launch Captail"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyAppExeName}"; Flags: nowait; Check: ShouldRelaunchAfterUpdate
 
 [Code]
+function ShouldRelaunchAfterUpdate(): Boolean;
+begin
+  Result := WizardSilent and (ExpandConstant('{param:relaunch|0}') = '1');
+end;
+
 function StopCaptail(): Boolean;
 var
   ResultCode: Integer;
@@ -96,15 +119,15 @@ function PrepareToInstall(var NeedsRestart: Boolean): String;
 begin
   Result := '';
   if not StopCaptail() then
-    Result := 'Captail is still busy. Wait for replay saving to finish, then retry.';
+    Result := ExpandConstant('{cm:AppStillBusy}');
 end;
 
 function InitializeUninstall(): Boolean;
 begin
   Result := StopCaptail();
-  if not Result then
+  if not Result and not WizardSilent then
     MsgBox(
-      'Captail could not stop safely. Close any active save operation and retry.',
+      ExpandConstant('{cm:CouldNotStop}'),
       mbError,
       MB_OK);
 end;

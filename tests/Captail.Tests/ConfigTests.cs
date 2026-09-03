@@ -50,6 +50,12 @@ public sealed class ConfigTests
 
         Assert.False(original.ValuesEqual(modified));
         Assert.True(original.PipelineEquals(modified));
+
+        modified = original.Clone();
+        modified.AutoUpdate = false;
+
+        Assert.False(original.ValuesEqual(modified));
+        Assert.True(original.PipelineEquals(modified));
     }
 
     [Fact]

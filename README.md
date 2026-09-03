@@ -30,15 +30,14 @@
 Captail is a focused alternative to NVIDIA ShadowPlay Instant Replay. It keeps the latest seconds or minutes in a rolling buffer, then saves them when you press a hotkey. No scenes, streaming setup, account, cloud upload, analytics, or telemetry.
 
 > [!WARNING]
-> Captail `v0.5.2` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA RTX 40 and RTX 50 series are tested; other GPUs need broader public testing.
+> Captail `v0.5.3` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA RTX 40 and RTX 50 series are tested; other GPUs need broader public testing.
 
-## What's new in Captail 0.5.2?
+## What's new in Captail 0.5.3?
 
-- **Replay Library Performance & Pagination:** Incremental page loading (64 items) with native WPF UI virtualization recycling and display-sized thumbnail decoding, reducing library memory usage by up to 95%.
-- **Non-Blocking Background Scanning:** Offloaded clip scanning to a background task with priority-queue selection to keep the Settings window fast and smooth.
-- **Bounded Thumbnail Storage:** Capped thumbnail cache at 512 MB with automatic background pruning of entries older than 30 days.
-- **Timeline Trimming Alignment:** Moved range trim handles outside the active selection track so sliders no longer obscure the video frames being trimmed.
-- **Dashboard Button Symmetry:** Fixed alignment in the manual recording button so text and hotkey pill badges stretch symmetrically.
+- **Replay Library Title Contrast & Legibility:** Fixed an issue where replay card titles rendered in pure black on dark surfaces and dimmed on hover; titles are now crisp, high-contrast, and always readable.
+- **Dashboard Action Buttons Alignment:** Balanced the Save Replay and Record buttons with unified 2-column layouts, centered icon slots, matching 18px hotkey badges, and identical corner radii.
+- **Ukrainian Installer Localization & Streamlined Setup:** Added complete Ukrainian setup wizard translations, removed obsolete locale files, and implemented quiet background updates with relaunch support.
+- **Silent Background Updates:** Added an optional automatic update service with toggle support in General Settings.
 
 ## Is Captail for me?
 

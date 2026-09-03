@@ -32,6 +32,7 @@
   <sys:String x:Key="L.Update.InstallFailedTitle">Update failed</sys:String>
   <sys:String x:Key="L.Update.StoreManaged">v{0} · Microsoft Store</sys:String>
   <sys:String x:Key="L.Update.StoreManagedTip">Updates are delivered by Microsoft Store</sys:String>
+  <sys:String x:Key="L.Update.AutoUpdate">Automatic updates</sys:String>
 
   <sys:String x:Key="L.Status.Enabled">Instant Replay is on</sys:String>
   <sys:String x:Key="L.Status.Disabled">Instant Replay is off</sys:String>

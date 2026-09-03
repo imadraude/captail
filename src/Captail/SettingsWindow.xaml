@@ -283,16 +283,24 @@
                             HorizontalContentAlignment="Stretch"
                             Click="SaveReplay_Click">
                         <Grid>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
-                                <Path Data="{StaticResource IconDownload}"
-                                      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                      StrokeThickness="2"
-                                      Width="15" Height="15" Stretch="Uniform" Margin="0,0,7,0"/>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,6,0">
+                                <Grid Width="16" Height="16" Margin="0,0,8,0" VerticalAlignment="Center">
+                                    <Path Data="{StaticResource IconDownload}"
+                                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                          StrokeThickness="2"
+                                          Width="14" Height="14" Stretch="Uniform"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
                                 <TextBlock x:Name="SaveButtonText" Text="Save 5 min"
-                                           FontSize="13" FontWeight="ExtraBold" VerticalAlignment="Center"/>
+                                           FontSize="13" FontWeight="ExtraBold" VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"/>
                             </StackPanel>
-                            <Border Background="#24000000" CornerRadius="6"
-                                    Padding="6,3" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <Border Grid.Column="1" Background="#24000000" CornerRadius="5"
+                                    Padding="6,2.5" HorizontalAlignment="Right" VerticalAlignment="Center">
                                 <TextBlock x:Name="HotkeySummaryText" Text="Ctrl+Shift+F10"
                                            FontFamily="{StaticResource FontMono}" FontSize="9.5"
                                            VerticalAlignment="Center"/>
@@ -301,20 +309,27 @@
                     </Button>
 
                     <Button x:Name="RecordButton" Grid.Column="2"
-                            Style="{StaticResource SubtleButton}"
+                            Style="{StaticResource RecordActionButton}"
                             Height="44" Padding="12,0"
                             HorizontalContentAlignment="Stretch"
                             Click="RecordButton_Click">
                         <Grid>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
-                                <Ellipse x:Name="RecordDot" Width="9" Height="9"
-                                         Fill="#FF5F63" Margin="0,0,7,0" VerticalAlignment="Center"/>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,6,0">
+                                <Grid Width="16" Height="16" Margin="0,0,8,0" VerticalAlignment="Center">
+                                    <Ellipse x:Name="RecordDot" Width="9" Height="9"
+                                             Fill="#FF5F63" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
                                 <TextBlock x:Name="RecordButtonText" Text="{DynamicResource L.Record.Start}"
-                                           FontSize="13" FontWeight="ExtraBold" VerticalAlignment="Center"/>
+                                           FontSize="13" FontWeight="ExtraBold" VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"/>
                             </StackPanel>
-                            <Border Background="#14FFFFFF" BorderBrush="{StaticResource BorderControlBrush}"
-                                    BorderThickness="1" CornerRadius="6"
-                                    Padding="5,2" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <Border Grid.Column="1" Background="#14FFFFFF" BorderBrush="{StaticResource BorderControlBrush}"
+                                    BorderThickness="1" CornerRadius="5"
+                                    Padding="5,1.5" HorizontalAlignment="Right" VerticalAlignment="Center">
                                 <TextBlock x:Name="RecordHotkeySummaryText" Text="Ctrl+Shift+F11"
                                            FontFamily="{StaticResource FontMono}" FontSize="9.5"
                                            Foreground="{StaticResource TextSecondaryBrush}"
@@ -379,6 +394,7 @@
                                Visibility="Collapsed"/>
                 <ListBox x:Name="RecentReplaysList" Grid.Row="1"
                          Background="Transparent" BorderThickness="0"
+                         Foreground="{StaticResource TextPrimaryBrush}"
                          Padding="0,0,6,0" Visibility="Collapsed"
                          ScrollViewer.VerticalScrollBarVisibility="Auto"
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -397,6 +413,7 @@
                             <Setter Property="Margin" Value="0"/>
                             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                             <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
                             <Setter Property="Focusable" Value="False"/>
                             <Setter Property="Template">
                                 <Setter.Value>
@@ -441,9 +458,10 @@
                                             </Border>
                                         </Grid>
                                     </Border>
-                                    <StackPanel x:Name="ClipText" Grid.Column="1" Margin="11,10"
+                                    <StackPanel x:Name="ClipText" Grid.Column="1" Margin="11,10,135,10"
                                                 VerticalAlignment="Center">
                                         <TextBlock Text="{Binding Title}" FontSize="13" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextPrimaryBrush}"
                                                    TextTrimming="CharacterEllipsis"/>
                                         <TextBlock Text="{Binding Details}" Style="{StaticResource SecondaryText}"
                                                    Margin="0,5,0,0" FontSize="11.5" TextTrimming="CharacterEllipsis"/>
@@ -504,9 +522,6 @@
                                                     <CubicEase EasingMode="EaseOut"/>
                                                 </DoubleAnimation.EasingFunction>
                                             </DoubleAnimation>
-                                            <DoubleAnimation Storyboard.TargetName="ClipText"
-                                                             Storyboard.TargetProperty="Opacity"
-                                                             To="0.24" Duration="0:0:0.1"/>
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </EventTrigger>
@@ -519,9 +534,6 @@
                                             <DoubleAnimation Storyboard.TargetName="ClipActionTranslate"
                                                              Storyboard.TargetProperty="X"
                                                              To="8" Duration="0:0:0.1"/>
-                                            <DoubleAnimation Storyboard.TargetName="ClipText"
-                                                             Storyboard.TargetProperty="Opacity"
-                                                             To="1" Duration="0:0:0.1"/>
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </EventTrigger>
@@ -747,6 +759,12 @@
                                 <Grid Margin="13,11">
                                     <TextBlock Text="{DynamicResource L.Replay.StartWindows}" Style="{StaticResource RowLabelText}"/>
                                     <ToggleButton x:Name="AutostartBox" HorizontalAlignment="Right"
+                                                  Style="{StaticResource ToggleSwitch}"/>
+                                </Grid>
+                                <Border Style="{StaticResource RowDivider}"/>
+                                <Grid Margin="13,11">
+                                    <TextBlock Text="{DynamicResource L.Update.AutoUpdate}" Style="{StaticResource RowLabelText}"/>
+                                    <ToggleButton x:Name="AutoUpdateBox" HorizontalAlignment="Right"
                                                   Style="{StaticResource ToggleSwitch}"/>
                                 </Grid>
                             </StackPanel>

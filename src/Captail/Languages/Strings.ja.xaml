@@ -29,6 +29,7 @@
   <sys:String x:Key="L.Update.InstallFailedTitle">アップデートに失敗しました</sys:String>
   <sys:String x:Key="L.Update.StoreManaged">v{0} · Microsoft ストア</sys:String>
   <sys:String x:Key="L.Update.StoreManagedTip">アップデートは Microsoft Store から配信されます</sys:String>
+  <sys:String x:Key="L.Update.AutoUpdate">自動更新</sys:String>
 
   <sys:String x:Key="L.Status.Enabled">インスタント リプレイがオンになっています</sys:String>
   <sys:String x:Key="L.Status.Disabled">インスタント リプレイはオフです</sys:String>

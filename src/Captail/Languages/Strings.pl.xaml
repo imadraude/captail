@@ -29,6 +29,7 @@
   <sys:String x:Key="L.Update.InstallFailedTitle">Aktualizacja nie powiodła się</sys:String>
   <sys:String x:Key="L.Update.StoreManaged">v{0} · Sklep Microsoft</sys:String>
   <sys:String x:Key="L.Update.StoreManagedTip">Aktualizacje są dostarczane przez Microsoft Store</sys:String>
+  <sys:String x:Key="L.Update.AutoUpdate">Automatyczne aktualizacje</sys:String>
 
   <sys:String x:Key="L.Status.Enabled">Powtórka jest włączona</sys:String>
   <sys:String x:Key="L.Status.Disabled">Powtórka jest wyłączona</sys:String>

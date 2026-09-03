@@ -29,6 +29,7 @@
   <sys:String x:Key="L.Update.InstallFailedTitle">Помилка оновлення</sys:String>
   <sys:String x:Key="L.Update.StoreManaged">v{0} · Microsoft Store</sys:String>
   <sys:String x:Key="L.Update.StoreManagedTip">Оновлення доставляються через Microsoft Store</sys:String>
+  <sys:String x:Key="L.Update.AutoUpdate">Автоматичне оновлення</sys:String>
 
   <sys:String x:Key="L.Status.Enabled">Миттєвий повтор увімкнено</sys:String>
   <sys:String x:Key="L.Status.Disabled">Миттєвий повтор вимкнено</sys:String>

@@ -50,6 +50,9 @@ public partial class App : Application
     private ReplayStatusIndicatorWindow? _recordingIndicator;
     private readonly UpdateService _updateService = new();
     private DispatcherTimer? _updateShutdownTimer;
+    private DispatcherTimer? _autoUpdateTimer;
+    private CancellationTokenSource? _autoUpdateCts;
+    private int _autoUpdateInProgress;
     private int _saving;
     private EncoderCapabilities? _capabilities;
     private readonly SemaphoreSlim _pipelineGate = new(1, 1);
@@ -389,6 +392,7 @@ public partial class App : Application
             StartCaptureStateMonitor();
             StartActivationServer();
             InitializeReplayRuntime();
+            StartAutoUpdateMonitor();
             if (!backgroundLaunch)
                 OpenSettings();
 
@@ -2455,6 +2459,69 @@ public partial class App : Application
         _updateShutdownTimer.Start();
     }
 
+    private void StartAutoUpdateMonitor()
+    {
+        if (AppDistribution.IsMicrosoftStore)
+            return;
+
+        _autoUpdateCts = new CancellationTokenSource();
+        _autoUpdateTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(45),
+        };
+        _autoUpdateTimer.Tick += async (_, _) =>
+        {
+            if (_autoUpdateTimer is not null)
+                _autoUpdateTimer.Interval = TimeSpan.FromHours(4);
+            await CheckAndApplyAutoUpdateAsync();
+        };
+        _autoUpdateTimer.Start();
+    }
+
+    private async Task CheckAndApplyAutoUpdateAsync()
+    {
+        if (AppDistribution.IsMicrosoftStore || _config?.AutoUpdate != true)
+            return;
+
+        if (Volatile.Read(ref _exiting) != 0)
+            return;
+
+        if (Interlocked.CompareExchange(ref _autoUpdateInProgress, 1, 0) != 0)
+            return;
+
+        try
+        {
+            CancellationToken token = _autoUpdateCts?.Token ?? CancellationToken.None;
+            UpdateRelease? release = await _updateService.CheckAsync(force: false, token);
+            if (release is null || release.Version <= UpdateService.CurrentVersion)
+                return;
+
+            if (token.IsCancellationRequested || Volatile.Read(ref _exiting) != 0)
+                return;
+
+            PreparedUpdate update = await _updateService.PrepareAsync(release, progress: null, token);
+
+            if (token.IsCancellationRequested || Volatile.Read(ref _exiting) != 0)
+                return;
+
+            bool isRecording = _replayRuntime?.Snapshot.IsRecording == true;
+            if (_saving == 0 && !isRecording && _settingsWindow is null)
+            {
+                Log.Write($"Applying automatic update {release.Tag} silently...");
+                UpdateService.Launch(update);
+                await RequestShutdownAsync();
+            }
+        }
+        catch (Exception exception)
+        {
+            Log.Write($"Auto-update check failed: {exception.Message}");
+        }
+        finally
+        {
+            Interlocked.Exchange(ref _autoUpdateInProgress, 0);
+        }
+    }
+
     private async Task EnsureCapabilitiesAsync()
     {
         if (_capabilities is not null &&
@@ -3330,6 +3397,11 @@ public partial class App : Application
 
         _healthTimer?.Stop();
         _captureStateTimer?.Stop();
+        _autoUpdateTimer?.Stop();
+        _autoUpdateTimer = null;
+        _autoUpdateCts?.Cancel();
+        _autoUpdateCts?.Dispose();
+        _autoUpdateCts = null;
         try
         {
             if (_replayRuntime is not null)

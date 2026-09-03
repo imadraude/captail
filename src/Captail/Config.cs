@@ -30,6 +30,7 @@ public sealed class Config
     public bool ShowRecordingIndicator { get; set; } = true;
     /// <summary>"top-left", "top-right", "bottom-left", or "bottom-right".</summary>
     public string RecordingIndicatorPosition { get; set; } = "top-right";
+    public bool AutoUpdate { get; set; } = true;
 
     /// <summary>"av1", "hevc", or "h264". OBS selects an available encoder for the requested format.</summary>
     public string Codec { get; set; } = "h264";
@@ -175,6 +176,7 @@ public sealed class Config
         WarnWhenGameStartsWithReplayOff = source.WarnWhenGameStartsWithReplayOff;
         ShowRecordingIndicator = source.ShowRecordingIndicator;
         RecordingIndicatorPosition = source.RecordingIndicatorPosition;
+        AutoUpdate = source.AutoUpdate;
         Codec = source.Codec;
         MonitorIndex = source.MonitorIndex;
         RecordingResolution = source.RecordingResolution;
@@ -238,6 +240,7 @@ public sealed class Config
         return ReplayEnabled == other.ReplayEnabled &&
                WarnWhenGameStartsWithReplayOff == other.WarnWhenGameStartsWithReplayOff &&
                ShowRecordingIndicator == other.ShowRecordingIndicator &&
+               AutoUpdate == other.AutoUpdate &&
                string.Equals(
                    RecordingIndicatorPosition,
                    other.RecordingIndicatorPosition,

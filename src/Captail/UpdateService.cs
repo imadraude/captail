@@ -214,11 +214,13 @@ internal sealed class UpdateService
 
         if (update.Kind == UpdatePackageKind.Installer)
         {
-            if (Process.Start(new ProcessStartInfo
+            var startInfo = new ProcessStartInfo
             {
                 FileName = update.PackagePath,
                 UseShellExecute = true,
-            }) is null)
+                Arguments = "/SILENT /SUPPRESSMSGBOXES /NORESTART /relaunch=1",
+            };
+            if (Process.Start(startInfo) is null)
             {
                 throw new InvalidOperationException(
                     "Windows did not start the Captail installer.");
