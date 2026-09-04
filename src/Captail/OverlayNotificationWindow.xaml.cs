@@ -23,6 +23,7 @@ public partial class OverlayNotificationWindow : Window
     private static readonly Geometry InfoGeometry = Geometry.Parse("M 7 3.2 L 7 3.4 M 7 5.8 L 7 10.8");
     private static readonly Geometry DotGeometry = Geometry.Parse("M 7 3.4 A 3.6 3.6 0 1 0 7.01 3.4 Z");
     private static readonly Geometry SquareGeometry = Geometry.Parse("M 5 3.6 H 9 C 9.8 3.6 10.4 4.2 10.4 5 V 9 C 10.4 9.8 9.8 10.4 9 10.4 H 5 C 4.2 10.4 3.6 9.8 3.6 9 V 5 C 3.6 4.2 4.2 3.6 5 3.6 Z");
+    private static readonly Geometry ReloadGeometry = Geometry.Parse("M 10.5 4.5 A 4.3 4.3 0 1 0 11.3 7 M 10.5 2.2 L 10.5 4.5 L 8.2 4.5");
 
     static OverlayNotificationWindow()
     {
@@ -32,6 +33,7 @@ public partial class OverlayNotificationWindow : Window
         InfoGeometry.Freeze();
         DotGeometry.Freeze();
         SquareGeometry.Freeze();
+        ReloadGeometry.Freeze();
     }
 
     private const int GwlExStyle = -20;
@@ -192,6 +194,12 @@ public partial class OverlayNotificationWindow : Window
         if (normalized is "■" or "stop" or "square")
         {
             SetVectorIcon(SquareGeometry, stroke: Brushes.Transparent, fill: accent, strokeThickness: 0);
+            return;
+        }
+
+        if (normalized is "⟳" or "↻" or "reload" or "sync" or "saving" or "recovering")
+        {
+            SetVectorIcon(ReloadGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.5);
             return;
         }
 

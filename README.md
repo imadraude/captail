@@ -30,15 +30,16 @@
 Captail is a focused alternative to NVIDIA ShadowPlay Instant Replay. It keeps the latest seconds or minutes in a rolling buffer, then saves them when you press a hotkey. No scenes, streaming setup, account, cloud upload, analytics, or telemetry.
 
 > [!WARNING]
-> Captail `v0.5.14` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA GeForce GTX 1650 and RTX 40/50 series are tested; other GPUs need broader public testing.
+> Captail `v0.5.15` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA GeForce GTX 1650 and RTX 40/50 series are tested; other GPUs need broader public testing.
 
-## What's new in Captail 0.5.14?
+## What's new in Captail 0.5.15?
 
-This release refines overlay notifications with clean vector iconography, eliminating font-metric misalignment and ensuring crisp rendering across all Windows display DPI scales.
+This release overhauls recording indicators and status glyphs with clean vector iconography, eliminating dash asymmetry and ensuring crisp rendering across all display scales.
 
-- Dedicated vector path geometries replace font-based unicode symbols in status notifications.
-- Mathematically centered checkmark, warning, error, info, active buffer, and stop icons.
-- Improved rendering consistency and visual hierarchy matching Captail dark theme design language.
+- Dedicated vector path geometries and rounded caps (`StrokeDashCap="Round"`) for all HUD indicator states.
+- Optically centered checkmark (`Saved`) and cross (`Error`) geometries with zero border clipping.
+- Refined settings window status ring arc and dynamic record stop action button.
+- Native vector saving/recovery reload notification glyphs.
 
 ## Is Captail for me?
 

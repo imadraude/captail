@@ -4,6 +4,15 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.15] - 2026-09-04
+
+### Improved
+
+- **Precision vector recording indicators:** Overhauled the in-game HUD recording indicator across all states (`Active`, `Recording`, `Saved`, `Error`, `Suspended`, `Recovering`). Applied `StrokeDashCap="Round"` with mathematically exact angular intervals, eliminating distorted, asymmetrical, and flat-cut dashes.
+- **Optically centered glyphs:** Redesigned the replay-saved checkmark and encoder-error cross geometries to prevent clipping and border collision with the indicator ring. Center status dot was increased to 3×3 px for sub-pixel sharpness on standard and high-DPI displays.
+- **Dashboard status ring and stop action:** Refined the settings window status ring with smooth rounded arc termination matching Captail branding. The dashboard record button now dynamically switches to a rounded stop square (`RecordSquare`) during active recordings.
+- **Vector saving and recovery notifications:** Added dedicated reload vector geometry for replay-saving and background recovery notifications, replacing fallback system font glyphs.
+
 ## [0.5.14] - 2026-09-04
 
 ### Improved

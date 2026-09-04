@@ -272,21 +272,22 @@ public partial class ReplayStatusIndicatorWindow : Window
         switch (state)
         {
             case ReplayIndicatorState.Recording:
-                StateRing.StrokeDashArray = new DoubleCollection([5, 2.5]);
+                StateRing.StrokeDashArray = new DoubleCollection([4.77, 2.9]);
                 break;
             case ReplayIndicatorState.Active:
-                StateRing.StrokeDashArray = new DoubleCollection([5.5, 2.5]);
+                StateRing.StrokeDashArray = new DoubleCollection([5.93, 4.3]);
                 break;
             case ReplayIndicatorState.Suspended:
-                StateRing.StrokeDashArray = new DoubleCollection([2, 3]);
+                StateRing.StrokeDashArray = new DoubleCollection([9.5, 5.84]);
                 break;
             case ReplayIndicatorState.Recovering:
-                StateRing.StrokeDashArray = new DoubleCollection([1.8, 2]);
+                StateRing.StrokeDashArray = new DoubleCollection([2.5, 2.615]);
                 break;
             case ReplayIndicatorState.Error:
                 CenterDot.Visibility = Visibility.Collapsed;
                 ErrorGlyph.Visibility = Visibility.Visible;
-                StateRing.StrokeDashArray = new DoubleCollection([1, 1.8]);
+                ErrorGlyph.Stroke = brush;
+                StateRing.StrokeDashArray = null;
                 break;
             case ReplayIndicatorState.Saved:
                 CenterDot.Visibility = Visibility.Collapsed;

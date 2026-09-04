@@ -154,7 +154,8 @@
                         <Grid Width="38" Height="38" Margin="0,0,12,0">
                             <Ellipse Stroke="{StaticResource DividerBrush}" StrokeThickness="2"/>
                             <Ellipse x:Name="StatusRing" Stroke="{StaticResource AccentBrush}" StrokeThickness="2"
-                                     StrokeDashArray="32,8" StrokeStartLineCap="Round"
+                                     StrokeDashCap="Round"
+                                     StrokeDashArray="45, 11.55"
                                      RenderTransformOrigin="0.5,0.5"/>
                             <Ellipse x:Name="StatusDot" Width="6" Height="6" Fill="{StaticResource AccentBrush}"/>
                         </Grid>
@@ -314,9 +315,12 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <Grid Width="15" Height="15" Margin="0,0,6,0" VerticalAlignment="Center">
+                            <Grid Width="16" Height="16" Margin="0,0,6,0" VerticalAlignment="Center">
                                 <Ellipse x:Name="RecordDot" Width="8" Height="8"
                                          Fill="#FF5F63" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <Rectangle x:Name="RecordSquare" Width="8" Height="8" RadiusX="1.5" RadiusY="1.5"
+                                           Fill="#FF5F63" Visibility="Collapsed"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Grid.Column="1" x:Name="RecordButtonText" Text="{DynamicResource L.Record.Start}"
                                        FontSize="12" FontWeight="Bold" VerticalAlignment="Center"

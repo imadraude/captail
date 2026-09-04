@@ -539,6 +539,8 @@ public partial class SettingsWindow : Window
         _isRecording = isRecording;
         _isRecordingPaused = isPaused;
         _recordingDuration = duration;
+        RecordDot.Visibility = isRecording ? Visibility.Collapsed : Visibility.Visible;
+        RecordSquare.Visibility = isRecording ? Visibility.Visible : Visibility.Collapsed;
 
         if (isRecording)
         {
