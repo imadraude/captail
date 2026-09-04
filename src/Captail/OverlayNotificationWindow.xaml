@@ -30,13 +30,28 @@
                 </Grid.ColumnDefinitions>
 
                 <Grid x:Name="NotificationIcon" Width="26" Height="26"
-                      VerticalAlignment="Center">
+                      VerticalAlignment="Center"
+                      SnapsToDevicePixels="True">
                     <Ellipse x:Name="IconSurface" Fill="#2063E0BD"/>
                     <Ellipse x:Name="IconRing" Stroke="#7063E0BD" StrokeThickness="1"/>
-                    <TextBlock x:Name="IconText" Text="✓"
+                    <Viewbox Width="14" Height="14"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center">
+                        <Canvas Width="14" Height="14">
+                            <Path x:Name="IconPath"
+                                  Stroke="#FF63E0BD"
+                                  StrokeThickness="1.7"
+                                  StrokeStartLineCap="Round"
+                                  StrokeEndLineCap="Round"
+                                  StrokeLineJoin="Round"
+                                  SnapsToDevicePixels="True"/>
+                        </Canvas>
+                    </Viewbox>
+                    <TextBlock x:Name="IconText"
+                               Visibility="Collapsed"
                                Foreground="#FF63E0BD"
-                               FontFamily="Segoe UI Variable Display"
-                               FontSize="12" FontWeight="SemiBold"
+                               FontFamily="Segoe UI Variable Text"
+                               FontSize="11" FontWeight="SemiBold"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"/>
                 </Grid>

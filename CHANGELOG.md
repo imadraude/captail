@@ -4,6 +4,12 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.14] - 2026-09-04
+
+### Improved
+
+- **Precision vector notification icons:** Replaced font-based unicode characters in overlay notifications with dedicated, frozen vector path geometries (`Path`) and optical centering. Status icons for replay saved, warning, error, info, active buffer, and stopped states now render razor-sharp and balanced across all Windows display DPI scales without font metric offset or clipping.
+
 ## [0.5.13] - 2026-09-03
 
 ### Fixed
