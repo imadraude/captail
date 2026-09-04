@@ -30,16 +30,15 @@
 Captail is a focused alternative to NVIDIA ShadowPlay Instant Replay. It keeps the latest seconds or minutes in a rolling buffer, then saves them when you press a hotkey. No scenes, streaming setup, account, cloud upload, analytics, or telemetry.
 
 > [!WARNING]
-> Captail `v0.5.15` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA GeForce GTX 1650 and RTX 40/50 series are tested; other GPUs need broader public testing.
+> Captail `v0.5.16` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA GeForce GTX 1650 and RTX 40/50 series are tested; other GPUs need broader public testing.
 
-## What's new in Captail 0.5.15?
+## What's new in Captail 0.5.16?
 
-This release overhauls recording indicators and status glyphs with clean vector iconography, eliminating dash asymmetry and ensuring crisp rendering across all display scales.
+This release introduces an in-place rename option for saved replays and recordings directly in the dashboard, complete with instant validation and seamless thumbnail cache migration.
 
-- Dedicated vector path geometries and rounded caps (`StrokeDashCap="Round"`) for all HUD indicator states.
-- Optically centered checkmark (`Saved`) and cross (`Error`) geometries with zero border clipping.
-- Refined settings window status ring arc and dynamic record stop action button.
-- Native vector saving/recovery reload notification glyphs.
+- Rename clips from the dashboard library action tray without leaving the app.
+- Modal overlay with automatic focus, inline collision errors, and Enter/Escape keyboard shortcuts.
+- Automatic SHA-256 cache migration keeping thumbnail and duration previews intact without FFmpeg re-runs.
 
 ## Is Captail for me?
 

@@ -62,6 +62,7 @@ public partial class SettingsWindow : Window
     private readonly ObservableCollection<ReplayClipItem> _replayItems = [];
     private bool _hasMoreReplays;
     private ReplayClip? _pendingDeleteClip;
+    private ReplayClip? _pendingRenameClip;
     private IReadOnlyList<CaptureInterop.MonitorInfo> _monitors = [];
     private readonly List<DisplayIdentifierWindow> _displayIdentifierWindows = [];
     private bool _settingsDirty;
@@ -2095,6 +2096,12 @@ public partial class SettingsWindow : Window
                 e.Handled = true;
                 return;
             }
+            if (e.Key == Key.Escape && RenameOverlay.Visibility == Visibility.Visible)
+            {
+                CancelRename();
+                e.Handled = true;
+                return;
+            }
             if (e.Key == Key.Escape && DeleteConfirmOverlay.Visibility == Visibility.Visible)
             {
                 CancelDeleteReplay();
@@ -2610,6 +2617,120 @@ public partial class SettingsWindow : Window
             Owner = this,
         };
         player.ShowDialog();
+    }
+
+    private void RequestRenameReplay_Click(object sender, RoutedEventArgs e)
+    {
+        if (((FrameworkElement)sender).DataContext is not ReplayClipItem item)
+            return;
+        _pendingRenameClip = item.Clip;
+        RenameOriginalFileText.Text = item.Clip.Name;
+        RenameTextBox.Text = Path.GetFileNameWithoutExtension(item.Clip.Name);
+        RenameErrorText.Visibility = Visibility.Collapsed;
+        RenameErrorText.Text = string.Empty;
+        RenameOverlay.Visibility = Visibility.Visible;
+        AnimateView(RenameOverlay);
+        RenameTextBox.Focus();
+        RenameTextBox.SelectAll();
+    }
+
+    private void CancelRename_Click(object sender, RoutedEventArgs e) =>
+        CancelRename();
+
+    private void CancelRename()
+    {
+        _pendingRenameClip = null;
+        RenameOverlay.Visibility = Visibility.Collapsed;
+    }
+
+    private void RenameTextBox_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            e.Handled = true;
+            ConfirmRename();
+        }
+        else if (e.Key == Key.Escape)
+        {
+            e.Handled = true;
+            CancelRename();
+        }
+    }
+
+    private void RenameTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (RenameErrorText.Visibility == Visibility.Visible)
+        {
+            RenameErrorText.Visibility = Visibility.Collapsed;
+            RenameErrorText.Text = string.Empty;
+        }
+    }
+
+    private void ConfirmRename_Click(object sender, RoutedEventArgs e) =>
+        ConfirmRename();
+
+    private async void ConfirmRename()
+    {
+        ReplayClip? clip = _pendingRenameClip;
+        if (clip is null)
+            return;
+
+        string newName = RenameTextBox.Text.Trim();
+        if (string.IsNullOrWhiteSpace(newName))
+        {
+            ShowRenameError(Localization.Text("L.Library.RenameEmptyError"));
+            return;
+        }
+
+        char[] invalidChars = Path.GetInvalidFileNameChars();
+        if (newName.IndexOfAny(invalidChars) >= 0 ||
+            newName.Contains('/') ||
+            newName.Contains('\\') ||
+            newName == "." ||
+            newName == "..")
+        {
+            ShowRenameError(Localization.Text("L.Library.RenameInvalidError"));
+            return;
+        }
+
+        string currentBaseName = Path.GetFileNameWithoutExtension(clip.Name);
+        if (string.Equals(newName, currentBaseName, StringComparison.OrdinalIgnoreCase))
+        {
+            CancelRename();
+            return;
+        }
+
+        try
+        {
+            await Task.Run(
+                () => _replayLibrary.Rename(_outputDirectory, clip, newName),
+                _lifetimeCts.Token);
+            CancelRename();
+            await RefreshReplayLibraryAsync();
+        }
+        catch (OperationCanceledException) when (_lifetimeCts.IsCancellationRequested)
+        {
+            // Window is closing.
+        }
+        catch (IOException)
+        {
+            ShowRenameError(Localization.Text("L.Library.RenameExistsError"));
+        }
+        catch (ArgumentException exception)
+        {
+            ShowRenameError(exception.Message);
+        }
+        catch (Exception exception)
+        {
+            ShowRenameError(exception.Message);
+        }
+    }
+
+    private void ShowRenameError(string message)
+    {
+        RenameErrorText.Text = message;
+        RenameErrorText.Visibility = Visibility.Visible;
+        RenameTextBox.Focus();
     }
 
     private void RequestDeleteReplay_Click(object sender, RoutedEventArgs e)

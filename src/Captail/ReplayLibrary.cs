@@ -170,6 +170,99 @@ public sealed class ReplayLibrary
         _durationCache.TryRemove(CacheKey(clip), out _);
     }
 
+    public ReplayClip Rename(string rootDirectory, ReplayClip clip, string newNameWithoutExtension)
+    {
+        string sourcePath = ValidateClipPath(rootDirectory, clip.Path);
+        if (!File.Exists(sourcePath))
+            throw new FileNotFoundException("Replay no longer exists.", sourcePath);
+
+        if (string.IsNullOrWhiteSpace(newNameWithoutExtension))
+            throw new ArgumentException("New name cannot be empty.", nameof(newNameWithoutExtension));
+
+        string trimmedName = newNameWithoutExtension.Trim();
+        char[] invalidChars = Path.GetInvalidFileNameChars();
+        if (trimmedName.IndexOfAny(invalidChars) >= 0 ||
+            trimmedName.Contains('/') ||
+            trimmedName.Contains('\\') ||
+            trimmedName == "." ||
+            trimmedName == "..")
+        {
+            throw new ArgumentException("New name contains invalid characters.", nameof(newNameWithoutExtension));
+        }
+
+        string directory = Path.GetDirectoryName(sourcePath)!;
+        string extension = Path.GetExtension(sourcePath);
+        string newFileName = trimmedName.EndsWith(extension, StringComparison.OrdinalIgnoreCase)
+            ? trimmedName
+            : trimmedName + extension;
+
+        if (IsInternalWorkingFile(newFileName))
+            throw new ArgumentException("Name conflicts with internal working file pattern.", nameof(newNameWithoutExtension));
+
+        string destinationPath = Path.Combine(directory, newFileName);
+        if (string.Equals(sourcePath, destinationPath, StringComparison.OrdinalIgnoreCase))
+            return clip;
+
+        if (File.Exists(destinationPath))
+            throw new IOException($"A file with the name '{newFileName}' already exists.");
+
+        File.Move(sourcePath, destinationPath);
+
+        string oldCacheKey = CacheKey(clip);
+        string oldMetaPath = MetadataPathFromClip(clip);
+        string oldThumbPath = clip.ThumbnailPath ?? (CachePathPrefix(oldCacheKey) + ".jpg");
+
+        var newFileInfo = new FileInfo(destinationPath);
+        string newCacheKey = CacheKey(newFileInfo);
+        string newPrefix = CachePathPrefix(newCacheKey);
+        string newMetaPath = newPrefix + ".meta";
+        string newThumbPath = newPrefix + ".jpg";
+
+        string? finalThumbnailPath = null;
+        if (File.Exists(oldThumbPath))
+        {
+            try
+            {
+                File.Move(oldThumbPath, newThumbPath, overwrite: true);
+                finalThumbnailPath = newThumbPath;
+            }
+            catch (IOException)
+            {
+                // Thumbnail cache migration is best effort.
+            }
+        }
+
+        if (File.Exists(oldMetaPath))
+        {
+            try
+            {
+                File.Move(oldMetaPath, newMetaPath, overwrite: true);
+            }
+            catch (IOException)
+            {
+                // Metadata cache migration is best effort.
+            }
+        }
+
+        if (_durationCache.TryRemove(oldCacheKey, out TimeSpan cachedDuration) && cachedDuration > TimeSpan.Zero)
+        {
+            _durationCache[newCacheKey] = cachedDuration;
+        }
+        else if (clip.Duration > TimeSpan.Zero)
+        {
+            _durationCache[newCacheKey] = clip.Duration;
+        }
+
+        return new ReplayClip(
+            destinationPath,
+            newFileName,
+            clip.Collection,
+            newFileInfo.LastWriteTime,
+            newFileInfo.Length,
+            clip.Duration,
+            finalThumbnailPath);
+    }
+
     public async Task<string> TrimAsync(
         string rootDirectory,
         ReplayClip clip,

@@ -4,6 +4,13 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.16] - 2026-09-04
+
+### Added
+
+- **Rename replays and recordings:** Added an in-place rename option to the recent replays library. Users can rename clips directly from the dashboard action tray using an overlay modal with instant validation, keyboard navigation (Enter to confirm, Escape to cancel), and error feedback for name collisions.
+- **Seamless cache migration:** Renaming a replay safely migrates the corresponding thumbnail and duration cache files without losing previews or re-encoding media with FFmpeg.
+
 ## [0.5.15] - 2026-09-04
 
 ### Improved

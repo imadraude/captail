@@ -169,6 +169,12 @@
   <sys:String x:Key="L.Library.Delete">Видалити</sys:String>
   <sys:String x:Key="L.Library.DeleteTitle">Видалити цей повтор?</sys:String>
   <sys:String x:Key="L.Library.DeleteMessage">Файл буде переміщено до кошика.</sys:String>
+  <sys:String x:Key="L.Library.Rename">Перейменувати</sys:String>
+  <sys:String x:Key="L.Library.RenameTitle">Перейменувати повтор</sys:String>
+  <sys:String x:Key="L.Library.RenameAction">Перейменувати</sys:String>
+  <sys:String x:Key="L.Library.RenameEmptyError">Назва файлу не може бути порожньою.</sys:String>
+  <sys:String x:Key="L.Library.RenameInvalidError">Назва файлу містить неприпустимі символи.</sys:String>
+  <sys:String x:Key="L.Library.RenameExistsError">Файл із такою назвою вже існує.</sys:String>
   <sys:String x:Key="L.Library.Cancel">Скасувати</sys:String>
   <sys:String x:Key="L.Library.Metadata">{0} · {1}</sys:String>
   <sys:String x:Key="L.Library.TrimTitle">Обрізати повтор</sys:String>

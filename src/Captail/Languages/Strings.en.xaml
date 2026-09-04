@@ -172,6 +172,12 @@
   <sys:String x:Key="L.Library.Delete">Delete</sys:String>
   <sys:String x:Key="L.Library.DeleteTitle">Delete this replay?</sys:String>
   <sys:String x:Key="L.Library.DeleteMessage">File will be moved to Recycle Bin.</sys:String>
+  <sys:String x:Key="L.Library.Rename">Rename</sys:String>
+  <sys:String x:Key="L.Library.RenameTitle">Rename replay</sys:String>
+  <sys:String x:Key="L.Library.RenameAction">Rename</sys:String>
+  <sys:String x:Key="L.Library.RenameEmptyError">File name cannot be empty.</sys:String>
+  <sys:String x:Key="L.Library.RenameInvalidError">File name contains invalid characters.</sys:String>
+  <sys:String x:Key="L.Library.RenameExistsError">A file with this name already exists.</sys:String>
   <sys:String x:Key="L.Library.Cancel">Cancel</sys:String>
   <sys:String x:Key="L.Library.Metadata">{0} · {1}</sys:String>
   <sys:String x:Key="L.Library.TrimTitle">Trim replay</sys:String>

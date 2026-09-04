@@ -1,4 +1,4 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=System.Runtime">
 
   <sys:String x:Key="L.Brand">Captail</sys:String>
   <sys:String x:Key="L.LanguageCode">PT</sys:String>
@@ -169,6 +169,12 @@
   <sys:String x:Key="L.Library.Delete">Excluir</sys:String>
   <sys:String x:Key="L.Library.DeleteTitle">Excluir este replay?</sys:String>
   <sys:String x:Key="L.Library.DeleteMessage">O arquivo será movido para a Lixeira.</sys:String>
+  <sys:String x:Key="L.Library.Rename">Renomear</sys:String>
+  <sys:String x:Key="L.Library.RenameTitle">Renombrar replay</sys:String>
+  <sys:String x:Key="L.Library.RenameAction">Renomear</sys:String>
+  <sys:String x:Key="L.Library.RenameEmptyError">O nome do arquivo não pode ficar em branco.</sys:String>
+  <sys:String x:Key="L.Library.RenameInvalidError">O nome do arquivo contém caracteres inválidos.</sys:String>
+  <sys:String x:Key="L.Library.RenameExistsError">Já existe um arquivo com esse nome.</sys:String>
   <sys:String x:Key="L.Library.Cancel">Cancelar</sys:String>
   <sys:String x:Key="L.Library.Metadata">{0} · {1}</sys:String>
   <sys:String x:Key="L.Library.TrimTitle">Cortar replay</sys:String>

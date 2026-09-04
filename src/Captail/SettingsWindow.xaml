@@ -502,6 +502,11 @@
                                                       StrokeThickness="1.8" Stretch="Uniform"/>
                                             </Button>
                                             <Button Style="{StaticResource ReplayCardActionButton}"
+                                                    Click="RequestRenameReplay_Click" ToolTip="{DynamicResource L.Library.Rename}">
+                                                <Path Data="{StaticResource IconEdit}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                      StrokeThickness="1.8" Stretch="Uniform"/>
+                                            </Button>
+                                            <Button Style="{StaticResource ReplayCardActionButton}"
                                                     Click="TrimReplay_Click" ToolTip="{DynamicResource L.Library.Trim}"
                                                     IsEnabled="{Binding CanTrim}">
                                                 <Path Data="{StaticResource IconScissors}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
@@ -1468,6 +1473,35 @@
                               StrokeThickness="1.8" Width="11" Height="11" Stretch="Uniform"/>
                     </Button>
                 </Grid>
+            </Border>
+
+            <Border x:Name="RenameOverlay" Grid.RowSpan="3" Panel.ZIndex="30"
+                    Visibility="Collapsed" Background="#B80A0D0F" CornerRadius="15">
+                <Border Width="340" Padding="18" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Style="{StaticResource SettingsGroup}">
+                    <StackPanel>
+                        <TextBlock Text="{DynamicResource L.Library.RenameTitle}"
+                                   FontSize="15" FontWeight="Bold"/>
+                        <TextBlock x:Name="RenameOriginalFileText" Margin="0,7,0,10"
+                                   Style="{StaticResource MonoText}" TextTrimming="CharacterEllipsis"/>
+                        <TextBox x:Name="RenameTextBox"
+                                 Style="{StaticResource DarkTextBox}"
+                                 Margin="0,0,0,4"
+                                 KeyDown="RenameTextBox_KeyDown"
+                                 TextChanged="RenameTextBox_TextChanged"/>
+                        <TextBlock x:Name="RenameErrorText"
+                                   Foreground="#FFDC3545" FontSize="11"
+                                   Margin="0,2,0,8" Visibility="Collapsed"
+                                   TextWrapping="Wrap"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+                            <Button Content="{DynamicResource L.Library.Cancel}" Style="{StaticResource SubtleButton}"
+                                    Margin="0,0,8,0" Click="CancelRename_Click"/>
+                            <Button x:Name="ConfirmRenameButton" Content="{DynamicResource L.Library.RenameAction}"
+                                    Style="{StaticResource AccentButton}"
+                                    Padding="14,8" Click="ConfirmRename_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
             </Border>
 
             <Border x:Name="DeleteConfirmOverlay" Grid.RowSpan="3" Panel.ZIndex="30"

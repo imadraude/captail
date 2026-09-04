@@ -259,6 +259,142 @@ public sealed class ReplayLibraryTests : IDisposable
         Assert.False(File.Exists(metaPath));
     }
 
+    [Fact]
+    public void Rename_ValidNewName_RenamesFileAndMigratesThumbnails()
+    {
+        Directory.CreateDirectory(_directory);
+        string thumbCache = Path.Combine(_directory, "thumb_cache");
+        Directory.CreateDirectory(thumbCache);
+
+        FileInfo file = CreateFile(10);
+        string oldKey = $"{file.FullName}|{file.Length}|{file.LastWriteTimeUtc.Ticks}";
+        string oldHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(oldKey)));
+
+        string oldThumbPath = Path.Combine(thumbCache, $"{oldHash}.jpg");
+        string oldMetaPath = Path.Combine(thumbCache, $"{oldHash}.meta");
+        File.WriteAllText(oldThumbPath, "dummy-thumb");
+        File.WriteAllText(oldMetaPath, "dummy-meta");
+
+        var library = new ReplayLibrary(
+            new FfmpegAdapter(_directory),
+            thumbCache);
+
+        var clip = new ReplayClip(
+            file.FullName,
+            file.Name,
+            null,
+            file.LastWriteTime,
+            file.Length,
+            TimeSpan.FromSeconds(15),
+            oldThumbPath);
+
+        ReplayClip renamed = library.Rename(_directory, clip, "great_highlight");
+
+        string expectedNewPath = Path.Combine(_directory, "great_highlight.mp4");
+        Assert.False(File.Exists(file.FullName));
+        Assert.True(File.Exists(expectedNewPath));
+        Assert.Equal(expectedNewPath, renamed.Path);
+        Assert.Equal("great_highlight.mp4", renamed.Name);
+        Assert.Equal(clip.Duration, renamed.Duration);
+
+        string newKey = $"{expectedNewPath}|{renamed.SizeBytes}|{renamed.SavedAt.ToUniversalTime().Ticks}";
+        string newHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(newKey)));
+        string expectedThumbPath = Path.Combine(thumbCache, $"{newHash}.jpg");
+        string expectedMetaPath = Path.Combine(thumbCache, $"{newHash}.meta");
+
+        Assert.True(File.Exists(expectedThumbPath));
+        Assert.True(File.Exists(expectedMetaPath));
+        Assert.False(File.Exists(oldThumbPath));
+        Assert.False(File.Exists(oldMetaPath));
+        Assert.Equal(expectedThumbPath, renamed.ThumbnailPath);
+    }
+
+    [Fact]
+    public void Rename_SameName_ReturnsOriginalClip()
+    {
+        Directory.CreateDirectory(_directory);
+        FileInfo file = CreateFile(11);
+        var library = new ReplayLibrary(new FfmpegAdapter(_directory), _directory);
+        var clip = new ReplayClip(
+            file.FullName,
+            file.Name,
+            null,
+            file.LastWriteTime,
+            file.Length,
+            TimeSpan.FromSeconds(5),
+            null);
+
+        ReplayClip result = library.Rename(_directory, clip, Path.GetFileNameWithoutExtension(file.Name));
+        Assert.Equal(clip.Path, result.Path);
+        Assert.True(File.Exists(file.FullName));
+    }
+
+    [Fact]
+    public void Rename_TargetAlreadyExists_ThrowsIOException()
+    {
+        Directory.CreateDirectory(_directory);
+        FileInfo fileA = CreateFile(12);
+        FileInfo fileB = CreateFile(13);
+
+        var library = new ReplayLibrary(new FfmpegAdapter(_directory), _directory);
+        var clipA = new ReplayClip(
+            fileA.FullName,
+            fileA.Name,
+            null,
+            fileA.LastWriteTime,
+            fileA.Length,
+            TimeSpan.FromSeconds(5),
+            null);
+
+        Assert.Throws<IOException>(() =>
+            library.Rename(_directory, clipA, Path.GetFileNameWithoutExtension(fileB.Name)));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData("clip/name")]
+    [InlineData("clip\\name")]
+    [InlineData("..")]
+    [InlineData("clip:name")]
+    [InlineData("clip*name")]
+    public void Rename_InvalidName_ThrowsArgumentException(string invalidName)
+    {
+        Directory.CreateDirectory(_directory);
+        FileInfo file = CreateFile(14);
+        var library = new ReplayLibrary(new FfmpegAdapter(_directory), _directory);
+        var clip = new ReplayClip(
+            file.FullName,
+            file.Name,
+            null,
+            file.LastWriteTime,
+            file.Length,
+            TimeSpan.FromSeconds(5),
+            null);
+
+        Assert.Throws<ArgumentException>(() =>
+            library.Rename(_directory, clip, invalidName));
+    }
+
+    [Fact]
+    public void Rename_InternalWorkingFileName_ThrowsArgumentException()
+    {
+        Directory.CreateDirectory(_directory);
+        FileInfo file = CreateFile(15);
+        var library = new ReplayLibrary(new FfmpegAdapter(_directory), _directory);
+        var clip = new ReplayClip(
+            file.FullName,
+            file.Name,
+            null,
+            file.LastWriteTime,
+            file.Length,
+            TimeSpan.FromSeconds(5),
+            null);
+
+        Assert.Throws<ArgumentException>(() =>
+            library.Rename(_directory, clip, "recording.tmp"));
+    }
+
     private FileInfo CreateFile(int index)
     {
         string path = Path.Combine(_directory, $"{index:000}.mp4");
