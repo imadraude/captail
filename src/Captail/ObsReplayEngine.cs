@@ -102,6 +102,9 @@ public sealed class ObsReplayEngine : IDisposable
     private nint _videoSource;
     private nint _desktopVideoSource;
     private nint _gameVideoSource;
+    private nint _videoScene;
+    private nint _gameSceneItem;
+    private nint _desktopSceneItem;
     private nint _videoEncoder;
     private nint _output;
     private nint _outputSignals;
@@ -114,6 +117,7 @@ public sealed class ObsReplayEngine : IDisposable
     private bool _resettingReplayWindow;
     private uint _previousFrameCount;
     private DateTime _previousFrameCheckUtc;
+    private int _stalledFrameChecks;
     private DateTime _replayWindowStartedUtc;
     private uint _outputWidth;
     private uint _outputHeight;
@@ -303,6 +307,8 @@ public sealed class ObsReplayEngine : IDisposable
         {
             if (_started && IsGameCapture && !IsGameHooked)
                 return true;
+            if (_replaySuspendedForManualRecording)
+                return true;
             if (!IsActive)
                 return false;
 
@@ -318,7 +324,14 @@ public sealed class ObsReplayEngine : IDisposable
                                    frames != _previousFrameCount;
                 _previousFrameCount = frames;
                 _previousFrameCheckUtc = now;
-                return progressing;
+                if (!progressing)
+                {
+                    _stalledFrameChecks++;
+                    return _stalledFrameChecks < 3;
+                }
+
+                _stalledFrameChecks = 0;
+                return true;
             }
 
             return true;
@@ -546,9 +559,16 @@ public sealed class ObsReplayEngine : IDisposable
         if (useGame == _automaticGameActive)
             return false;
 
-        nint target = useGame ? _gameVideoSource : _desktopVideoSource;
-        ObsNative.obs_set_output_source(0, target);
-        _videoSource = target;
+        if (_gameSceneItem != 0)
+            ObsNative.obs_sceneitem_set_visible(_gameSceneItem, useGame);
+        if (_desktopSceneItem != 0)
+            ObsNative.obs_sceneitem_set_visible(_desktopSceneItem, !useGame);
+        if (_videoScene == 0)
+        {
+            nint target = useGame ? _gameVideoSource : _desktopVideoSource;
+            ObsNative.obs_set_output_source(0, target);
+            _videoSource = target;
+        }
         _automaticGameActive = useGame;
         _activeGameExecutable = useGame
             ? executable
@@ -982,6 +1002,7 @@ public sealed class ObsReplayEngine : IDisposable
                             _replayWindowStartedUtc = DateTime.UtcNow;
                             _gameOutputPaused = false;
                             _previousFrameCheckUtc = default;
+                            _stalledFrameChecks = 0;
                             Log.Write("Instant Replay buffer resumed after manual recording (game capture).");
                         }
                         else
@@ -997,6 +1018,7 @@ public sealed class ObsReplayEngine : IDisposable
                     {
                         _replayWindowStartedUtc = DateTime.UtcNow;
                         _previousFrameCheckUtc = default;
+                        _stalledFrameChecks = 0;
                         Log.Write("Instant Replay buffer resumed after manual recording.");
                     }
                     else
@@ -1398,9 +1420,57 @@ public sealed class ObsReplayEngine : IDisposable
             throw new InvalidOperationException(
                 Localization.Text("L.Engine.VideoSourceFailed"));
 
-        // Captail always has one video source. Connecting it directly avoids an
-        // extra scene-composition pass, which matters at 144/240 FPS.
-        ObsNative.obs_set_output_source(0, _videoSource);
+        _videoScene = ObsNative.obs_scene_create("Captail Video Canvas");
+        if (_videoScene == 0)
+            throw new InvalidOperationException("Could not create the video composition scene.");
+
+        ObsNative.Vec2 bounds = new() { X = _baseWidth, Y = _baseHeight };
+
+        if (_gameVideoSource != 0)
+        {
+            _gameSceneItem = ObsNative.obs_scene_add(_videoScene, _gameVideoSource);
+            if (_gameSceneItem != 0)
+            {
+                ObsNative.obs_sceneitem_set_bounds_type(
+                    _gameSceneItem,
+                    ObsNative.BoundsType.ScaleInner);
+                ObsNative.obs_sceneitem_set_bounds_alignment(
+                    _gameSceneItem,
+                    0);
+                ObsNative.obs_sceneitem_set_bounds(_gameSceneItem, ref bounds);
+                ObsNative.obs_sceneitem_set_scale_filter(
+                    _gameSceneItem,
+                    ObsNative.ScaleType.Bicubic);
+                ObsNative.obs_sceneitem_set_visible(
+                    _gameSceneItem,
+                    !IsAutomaticCapture);
+            }
+        }
+
+        if (_desktopVideoSource != 0)
+        {
+            _desktopSceneItem = ObsNative.obs_scene_add(_videoScene, _desktopVideoSource);
+            if (_desktopSceneItem != 0)
+            {
+                ObsNative.obs_sceneitem_set_bounds_type(
+                    _desktopSceneItem,
+                    ObsNative.BoundsType.ScaleInner);
+                ObsNative.obs_sceneitem_set_bounds_alignment(
+                    _desktopSceneItem,
+                    0);
+                ObsNative.obs_sceneitem_set_bounds(_desktopSceneItem, ref bounds);
+                ObsNative.obs_sceneitem_set_scale_filter(
+                    _desktopSceneItem,
+                    ObsNative.ScaleType.Bicubic);
+                ObsNative.obs_sceneitem_set_visible(
+                    _desktopSceneItem,
+                    true);
+            }
+        }
+
+        nint videoOutputSource = ObsNative.obs_scene_get_source(_videoScene);
+        _videoSource = videoOutputSource;
+        ObsNative.obs_set_output_source(0, videoOutputSource);
 
         if (IsAdvancedAudioRouting)
         {
@@ -2007,6 +2077,7 @@ public sealed class ObsReplayEngine : IDisposable
                         Localization.Text("L.Engine.BufferStartFailed"));
                 _gameOutputPaused = false;
                 _previousFrameCheckUtc = default;
+                _stalledFrameChecks = 0;
                 Log.Write("Game Capture found; Replay Buffer resumed.");
             }
             return;
@@ -2025,6 +2096,7 @@ public sealed class ObsReplayEngine : IDisposable
         _gameOutputPaused = false;
         _replayWindowStartedUtc = DateTime.UtcNow;
         _previousFrameCheckUtc = default;
+        _stalledFrameChecks = 0;
         Log.Write("Game Capture found; Replay Buffer started.");
     }
 
@@ -2593,6 +2665,13 @@ public sealed class ObsReplayEngine : IDisposable
         foreach (nint source in _audioSources)
             ObsNative.obs_source_release(source);
         _audioSources.Clear();
+        if (_videoScene != 0)
+        {
+            ObsNative.obs_scene_release(_videoScene);
+            _videoScene = 0;
+            _gameSceneItem = 0;
+            _desktopSceneItem = 0;
+        }
         if (_processAudioScene != 0)
         {
             ObsNative.obs_scene_release(_processAudioScene);

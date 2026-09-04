@@ -2088,11 +2088,13 @@ public partial class App : Application
         if (config is null ||
             !config.WarnWhenGameStartsWithReplayOff ||
             config.ReplayEnabled ||
-            IsReplayRunning)
+            IsReplayRunning ||
+            _obs?.IsRecording == true ||
+            _replayRuntime?.Snapshot.IsRecording == true)
         {
             _pendingReplayOffGame = "";
             _pendingReplayOffGameSamples = 0;
-            if (IsReplayRunning)
+            if (IsReplayRunning || _obs?.IsRecording == true || _replayRuntime?.Snapshot.IsRecording == true)
                 _warnedReplayOffGames.Clear();
             return;
         }

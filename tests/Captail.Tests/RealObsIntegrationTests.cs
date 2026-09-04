@@ -79,6 +79,7 @@ public sealed class RealObsIntegrationTests
                 recordPath1 = await RunOnObs(() => engine.StartRecordingAsync()).Unwrap();
                 Assert.True(engine.IsRecording, "Recording output should be active");
                 Assert.True(engine.IsReplaySuspendedForManualRecording, "Replay should be marked suspended");
+                Assert.True(engine.IsHealthy, "Engine should report healthy even when replay is suspended during manual recording");
                 Assert.Equal(0, engine.AvailableReplaySeconds);
 
                 // Saving replay must throw when suspended
@@ -230,5 +231,70 @@ public sealed class RealObsIntegrationTests
         Assert.True(packets.GetArrayLength() > 0, "No video packets found");
         string flags = packets[0].GetProperty("flags").GetString()!;
         Assert.StartsWith("K", flags); // Keyframe flag
+    }
+
+    [Fact]
+    public async Task RealObs_GameCapture_VideoSceneWithScalingBounds_InitializesAndCleansUpCleanly()
+    {
+        string testDir = Path.Combine(Path.GetTempPath(), "Captail_Obs_GameTest_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(testDir);
+
+        try
+        {
+            var config = new Config
+            {
+                CaptureSource = "game",
+                OutputDirectory = testDir,
+                BufferSeconds = 15,
+                FrameRate = 60,
+                BitrateMbps = 10,
+                NvencMode = NvencModes.LowOverhead,
+                Codec = "h264",
+                ReplayEnabled = true,
+            };
+
+            using var scheduler = new SingleThreadTaskScheduler("ObsGameTestThread");
+
+            Task<T> RunOnObs<T>(Func<T> action) =>
+                Task.Factory.StartNew(action, CancellationToken.None, TaskCreationOptions.None, scheduler);
+
+            ObsReplayEngine? engine = null;
+            try
+            {
+                try
+                {
+                    engine = await RunOnObs(() =>
+                    {
+                        var eng = new ObsReplayEngine(config);
+                        eng.Start();
+                        return eng;
+                    });
+                }
+                catch (InvalidOperationException ex) when (
+                    ex.Message.Contains(Localization.Text("L.Engine.NoEncoder")) ||
+                    ex.Message.Contains("L.Engine.NoEncoder") ||
+                    ex.Message.Contains("H.264") ||
+                    ex.Message.Contains("encoder"))
+                {
+                    return;
+                }
+
+                Assert.NotNull(engine);
+                Assert.True(engine.IsGameCapture);
+                Assert.False(engine.IsAutomaticCapture);
+                Assert.True(engine.IsHealthy, "Game capture should report healthy while waiting for game");
+            }
+            finally
+            {
+                if (engine is not null)
+                {
+                    await Task.Factory.StartNew(() => engine.Dispose(), CancellationToken.None, TaskCreationOptions.None, scheduler);
+                }
+            }
+        }
+        finally
+        {
+            try { Directory.Delete(testDir, true); } catch { }
+        }
     }
 }

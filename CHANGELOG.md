@@ -4,6 +4,14 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.17] - 2026-09-04
+
+### Fixed
+
+- **Game capture canvas scaling and black bars:** Resolved an issue where games running at scaled resolutions (including Windows display DPI scaling such as 125% or non-native game resolutions) rendered unscaled in the top-left corner of the video canvas, producing large black bars on the bottom and right in saved clips. Captail now composites capture sources into a dedicated video canvas scene with inner-rectangle bounds scaling (`ScaleInner`), optical centering, and bicubic filtering, cleanly filling the target video frame while preserving aspect ratio.
+- **Watchdog false alarms and replay buffer wipes:** Fixed an issue where transient frame stalls during game launch, shader compilation, level loading, or fullscreen display mode switches immediately triggered pipeline recovery, wiping the rolling replay buffer in memory. The watchdog now requires sustained frame stalls across consecutive monitoring checks before restarting.
+- **Suppressed warnings during manual recording:** Fixed false "replays not recording" notifications appearing while a manual recording is actively in progress. In addition, the watchdog now explicitly recognizes suspended replay states during manual recording as healthy.
+
 ## [0.5.16] - 2026-09-04
 
 ### Added

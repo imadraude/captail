@@ -14,7 +14,15 @@ internal static class ObsNative
     internal enum VideoColorSpace { Default, Cs601, Cs709, Srgb }
     internal enum VideoRange { Default, Partial, Full }
     internal enum ScaleType { Disable, Point, Bicubic, Bilinear, Lanczos, Area }
+    internal enum BoundsType { None, Stretch, ScaleInner, ScaleOuter, ScaleToWidth, ScaleToHeight, MaxOnly }
     internal enum SpeakerLayout { Unknown, Mono, Stereo }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct Vec2
+    {
+        internal float X;
+        internal float Y;
+    }
 
     [StructLayout(LayoutKind.Sequential)]
     internal struct VideoInfo
@@ -163,6 +171,28 @@ internal static class ObsNative
 
     [DllImport(Library, CallingConvention = CallingConvention.Cdecl)]
     internal static extern void obs_sceneitem_remove(nint sceneItem);
+
+    [DllImport(Library, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void obs_sceneitem_set_bounds_type(nint item, BoundsType type);
+
+    [DllImport(Library, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void obs_sceneitem_set_bounds_alignment(nint item, uint alignment);
+
+    [DllImport(Library, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void obs_sceneitem_set_bounds(nint item, ref Vec2 bounds);
+
+    [DllImport(Library, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void obs_sceneitem_set_scale_filter(nint item, ScaleType filter);
+
+    [DllImport(Library, CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.I1)]
+    internal static extern bool obs_sceneitem_set_visible(
+        nint item,
+        [MarshalAs(UnmanagedType.I1)] bool visible);
+
+    [DllImport(Library, CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.I1)]
+    internal static extern bool obs_sceneitem_visible(nint item);
 
     [DllImport(Library, CallingConvention = CallingConvention.Cdecl)]
     internal static extern void obs_scene_release(nint scene);
