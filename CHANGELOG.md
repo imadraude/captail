@@ -4,6 +4,12 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.18] - 2026-09-05
+
+### Fixed
+
+- **Clip editor timeline trim handles and layout precision:** Fixed timeline trim handle alignment and selection box positioning in the clip editor window. Timeline geometry and layout calculations now use dedicated, mathematically verified coordinate logic, ensuring trim handles remain strictly contained within timeline boundaries without visual clipping or overflow.
+
 ## [0.5.17] - 2026-09-04
 
 ### Fixed
