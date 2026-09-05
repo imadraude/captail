@@ -311,6 +311,11 @@ public partial class ProcessAudioRoutingWindow : Window
 
     private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
+        if (e.Key == Key.Tab)
+        {
+            e.Handled = true;
+            return;
+        }
         if (e.Key == Key.Escape)
         {
             e.Handled = true;

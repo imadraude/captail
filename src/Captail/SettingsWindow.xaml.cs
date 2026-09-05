@@ -2082,6 +2082,11 @@ public partial class SettingsWindow : Window
     {
         if (_capturingHotkeyButton is null)
         {
+            if (e.Key == Key.Tab && RenameOverlay.Visibility != Visibility.Visible)
+            {
+                e.Handled = true;
+                return;
+            }
             if (e.Key == Key.Escape && AboutPopup.IsOpen)
             {
                 AboutPopup.IsOpen = false;
@@ -2619,6 +2624,15 @@ public partial class SettingsWindow : Window
         player.ShowDialog();
     }
 
+    private void Thumbnail_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ClickCount == 1)
+        {
+            PlayReplay_Click(sender, e);
+            e.Handled = true;
+        }
+    }
+
     private void RequestRenameReplay_Click(object sender, RoutedEventArgs e)
     {
         if (((FrameworkElement)sender).DataContext is not ReplayClipItem item)
@@ -2654,6 +2668,10 @@ public partial class SettingsWindow : Window
         {
             e.Handled = true;
             CancelRename();
+        }
+        else if (e.Key == Key.Tab)
+        {
+            e.Handled = true;
         }
     }
 

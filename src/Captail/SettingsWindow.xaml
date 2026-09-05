@@ -11,6 +11,9 @@
         Background="Transparent"
         Foreground="{StaticResource TextPrimaryBrush}"
         FontFamily="{StaticResource FontUi}"
+        KeyboardNavigation.TabNavigation="None"
+        KeyboardNavigation.ControlTabNavigation="None"
+        KeyboardNavigation.DirectionalNavigation="None"
         Closing="Window_Closing"
         Deactivated="Window_Deactivated"
         PreviewMouseDown="Window_PreviewMouseDown"
@@ -425,137 +428,191 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <DataTemplate.Resources>
-                                <Style x:Key="ReplayCardActionButton"
-                                       TargetType="Button"
-                                       BasedOn="{StaticResource ClipActionButton}">
-                                    <Setter Property="Width" Value="24"/>
-                                    <Setter Property="Height" Value="24"/>
-                                    <Setter Property="Padding" Value="6"/>
-                                    <Setter Property="Margin" Value="1,0,0,0"/>
-                                </Style>
-                            </DataTemplate.Resources>
-                            <Border x:Name="ClipCard" Height="74" Margin="0,0,0,8"
-                                    Background="{StaticResource BgSurfaceBrush}"
-                                    BorderBrush="{StaticResource DividerBrush}"
-                                    BorderThickness="1" CornerRadius="10" ClipToBounds="True">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="112"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <Border Background="{StaticResource BgControlBrush}"
-                                            CornerRadius="9,0,0,9">
-                                        <Grid>
-                                            <Border CornerRadius="9,0,0,9">
-                                                <Border.Background>
-                                                    <ImageBrush ImageSource="{Binding Thumbnail}"
-                                                                Stretch="UniformToFill"/>
-                                                </Border.Background>
-                                            </Border>
-                                            <Border HorizontalAlignment="Left" VerticalAlignment="Top"
-                                                    Margin="5" Padding="4,1.5" CornerRadius="3"
-                                                    Background="{Binding BadgeBackground}">
-                                                <TextBlock Text="{Binding KindBadge}" FontFamily="{StaticResource FontMono}"
-                                                           FontSize="9" FontWeight="Bold" Foreground="White"/>
-                                            </Border>
-                                            <Border HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                                                    Margin="5" Padding="5,2" CornerRadius="4"
-                                                    Background="#BB0B0F11">
-                                                <TextBlock Text="{Binding Duration}" FontFamily="{StaticResource FontMono}"
-                                                           FontSize="10.5" Foreground="White"/>
-                                            </Border>
-                                        </Grid>
-                                    </Border>
-                                    <StackPanel x:Name="ClipText" Grid.Column="1" Margin="11,10,12,10"
-                                                VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding Title}" FontSize="13" FontWeight="SemiBold"
-                                                   Foreground="{StaticResource TextPrimaryBrush}"
-                                                   TextTrimming="CharacterEllipsis"
-                                                   ToolTip="{Binding Title}"/>
-                                        <TextBlock Text="{Binding Details}" Style="{StaticResource SecondaryText}"
-                                                   Margin="0,5,0,0" FontSize="11.5" TextTrimming="CharacterEllipsis"
-                                                   ToolTip="{Binding Details}"/>
-                                    </StackPanel>
-                                    <Border x:Name="ClipActionTray" Grid.Column="1"
-                                            HorizontalAlignment="Right" VerticalAlignment="Center"
-                                            Margin="6" Padding="1" CornerRadius="6"
-                                            Background="#F615191C" BorderBrush="{StaticResource BorderControlBrush}"
-                                            BorderThickness="1" Opacity="0" IsHitTestVisible="False"
-                                            RenderTransformOrigin="0.5,0.5">
-                                        <Border.Effect>
-                                            <DropShadowEffect BlurRadius="8" Direction="180" ShadowDepth="1" Opacity="0.38" Color="#000000"/>
-                                        </Border.Effect>
-                                        <Border.RenderTransform>
-                                            <TranslateTransform x:Name="ClipActionTranslate" X="8"/>
-                                        </Border.RenderTransform>
-                                        <StackPanel Orientation="Horizontal">
-                                            <Button Style="{StaticResource ReplayCardActionButton}"
-                                                    Click="PlayReplay_Click" ToolTip="{DynamicResource L.Library.Preview}"
-                                                    IsEnabled="{Binding CanTrim}">
-                                                <Path Data="{StaticResource IconPlay}"
-                                                      Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                                      Stretch="Uniform"/>
-                                            </Button>
-                                            <Button Style="{StaticResource ReplayCardActionButton}"
-                                                    Click="RevealReplay_Click" ToolTip="{DynamicResource L.Library.Open}">
-                                                <Path Data="{StaticResource IconFolder}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                                      StrokeThickness="1.8" Stretch="Uniform"/>
-                                            </Button>
-                                            <Button Style="{StaticResource ReplayCardActionButton}"
-                                                    Click="RequestRenameReplay_Click" ToolTip="{DynamicResource L.Library.Rename}">
-                                                <Path Data="{StaticResource IconEdit}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                                      StrokeThickness="1.8" Stretch="Uniform"/>
-                                            </Button>
-                                            <Button Style="{StaticResource ReplayCardActionButton}"
-                                                    Click="TrimReplay_Click" ToolTip="{DynamicResource L.Library.Trim}"
-                                                    IsEnabled="{Binding CanTrim}">
-                                                <Path Data="{StaticResource IconScissors}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                                      StrokeThickness="1.8" Stretch="Uniform"/>
-                                            </Button>
-                                            <Button Style="{StaticResource ReplayCardActionButton}"
-                                                    Click="RequestDeleteReplay_Click" ToolTip="{DynamicResource L.Library.Delete}">
-                                                <Path Data="{StaticResource IconTrash}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                                      StrokeThickness="1.8" Stretch="Uniform"/>
-                                            </Button>
-                                        </StackPanel>
-                                    </Border>
-                                </Grid>
-                            </Border>
-                            <DataTemplate.Triggers>
-                                <Trigger SourceName="ClipCard" Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="ClipActionTray" Property="IsHitTestVisible" Value="True"/>
-                                    <Setter TargetName="ClipCard" Property="Background" Value="{StaticResource BgHoverBrush}"/>
-                                    <Setter TargetName="ClipCard" Property="BorderBrush" Value="#FF34423E"/>
-                                </Trigger>
-                                <EventTrigger SourceName="ClipCard" RoutedEvent="MouseEnter">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="ClipActionTray"
-                                                             Storyboard.TargetProperty="Opacity"
-                                                             To="1" Duration="0:0:0.14"/>
-                                            <DoubleAnimation Storyboard.TargetName="ClipActionTranslate"
-                                                             Storyboard.TargetProperty="X"
-                                                             To="0" Duration="0:0:0.14">
-                                                <DoubleAnimation.EasingFunction>
-                                                    <CubicEase EasingMode="EaseOut"/>
-                                                </DoubleAnimation.EasingFunction>
-                                            </DoubleAnimation>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                                <EventTrigger SourceName="ClipCard" RoutedEvent="MouseLeave">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="ClipActionTray"
-                                                             Storyboard.TargetProperty="Opacity"
-                                                             To="0" Duration="0:0:0.1"/>
-                                            <DoubleAnimation Storyboard.TargetName="ClipActionTranslate"
-                                                             Storyboard.TargetProperty="X"
-                                                             To="8" Duration="0:0:0.1"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                            </DataTemplate.Triggers>
+                                 <Style x:Key="ReplayCardActionButton"
+                                        TargetType="Button"
+                                        BasedOn="{StaticResource ClipActionButton}">
+                                     <Setter Property="Width" Value="24"/>
+                                     <Setter Property="Height" Value="24"/>
+                                     <Setter Property="Padding" Value="6"/>
+                                     <Setter Property="Margin" Value="1,0,0,0"/>
+                                     <Setter Property="Focusable" Value="False"/>
+                                     <Setter Property="IsTabStop" Value="False"/>
+                                 </Style>
+                             </DataTemplate.Resources>
+                             <Border x:Name="ClipCard" Height="74" Margin="0,0,0,8"
+                                     Background="{StaticResource BgSurfaceBrush}"
+                                     BorderBrush="{StaticResource DividerBrush}"
+                                     BorderThickness="1" CornerRadius="10" ClipToBounds="True">
+                                 <Grid>
+                                     <Grid.ColumnDefinitions>
+                                         <ColumnDefinition Width="112"/>
+                                         <ColumnDefinition Width="*"/>
+                                     </Grid.ColumnDefinitions>
+                                     <Border x:Name="ThumbnailContainer"
+                                             Background="{StaticResource BgControlBrush}"
+                                             CornerRadius="9,0,0,9" Cursor="Hand"
+                                             ToolTip="{DynamicResource L.Library.Preview}"
+                                             MouseLeftButtonDown="Thumbnail_MouseLeftButtonDown">
+                                         <Grid>
+                                             <Border CornerRadius="9,0,0,9">
+                                                 <Border.Background>
+                                                     <ImageBrush ImageSource="{Binding Thumbnail}"
+                                                                 Stretch="UniformToFill"/>
+                                                 </Border.Background>
+                                             </Border>
+                                             <Border x:Name="ThumbnailHoverShade" CornerRadius="9,0,0,9"
+                                                     Background="#40000000" Opacity="0" IsHitTestVisible="False"/>
+                                             <Border HorizontalAlignment="Left" VerticalAlignment="Top"
+                                                     Margin="5" Padding="4,1.5" CornerRadius="3"
+                                                     Background="{Binding BadgeBackground}">
+                                                 <TextBlock Text="{Binding KindBadge}" FontFamily="{StaticResource FontMono}"
+                                                            FontSize="9" FontWeight="Bold" Foreground="White"/>
+                                             </Border>
+                                             <Border HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                     Margin="5" Padding="5,2" CornerRadius="4"
+                                                     Background="#BB0B0F11">
+                                                 <TextBlock Text="{Binding Duration}" FontFamily="{StaticResource FontMono}"
+                                                            FontSize="10.5" Foreground="White"/>
+                                             </Border>
+                                             <Border x:Name="ThumbnailPlayBadge"
+                                                     HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                     Width="32" Height="32" CornerRadius="16"
+                                                     Background="#CC0B0F11" BorderBrush="{StaticResource AccentBrush}"
+                                                     BorderThickness="1.5" Opacity="0" IsHitTestVisible="False"
+                                                     RenderTransformOrigin="0.5,0.5">
+                                                 <Border.RenderTransform>
+                                                     <ScaleTransform x:Name="ThumbnailPlayScale" ScaleX="0.88" ScaleY="0.88"/>
+                                                 </Border.RenderTransform>
+                                                 <Path x:Name="ThumbnailPlayIcon" Data="{StaticResource IconPlay}"
+                                                       Fill="{StaticResource AccentBrush}"
+                                                       Width="11" Height="11" Stretch="Uniform" Margin="2,0,0,0"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                             </Border>
+                                         </Grid>
+                                     </Border>
+                                     <Grid Grid.Column="1">
+                                         <Grid.ColumnDefinitions>
+                                             <ColumnDefinition Width="*"/>
+                                             <ColumnDefinition Width="Auto"/>
+                                         </Grid.ColumnDefinitions>
+                                         <StackPanel x:Name="ClipText" Grid.Column="0" Margin="11,10,6,10"
+                                                     VerticalAlignment="Center">
+                                             <TextBlock Text="{Binding Title}" FontSize="13" FontWeight="SemiBold"
+                                                        Foreground="{StaticResource TextPrimaryBrush}"
+                                                        TextTrimming="CharacterEllipsis"
+                                                        ToolTip="{Binding Title}"/>
+                                             <TextBlock Text="{Binding Details}" Style="{StaticResource SecondaryText}"
+                                                        Margin="0,5,0,0" FontSize="11.5" TextTrimming="CharacterEllipsis"
+                                                        ToolTip="{Binding Details}"/>
+                                         </StackPanel>
+                                         <Border x:Name="ClipActionTray" Grid.Column="1"
+                                                 VerticalAlignment="Center"
+                                                 Margin="0,0,6,0" Padding="1" CornerRadius="6"
+                                                 Background="#E615191C" BorderBrush="{StaticResource BorderControlBrush}"
+                                                 BorderThickness="1" Opacity="0" IsHitTestVisible="False"
+                                                 RenderTransformOrigin="0.5,0.5">
+                                             <Border.RenderTransform>
+                                                 <TranslateTransform x:Name="ClipActionTranslate" X="4"/>
+                                             </Border.RenderTransform>
+                                             <StackPanel Orientation="Horizontal">
+                                                 <Button Style="{StaticResource ReplayCardActionButton}"
+                                                         Click="TrimReplay_Click" ToolTip="{DynamicResource L.Library.Trim}"
+                                                         IsEnabled="{Binding CanTrim}">
+                                                     <Path Data="{StaticResource IconScissors}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                           StrokeThickness="1.8" Stretch="Uniform"/>
+                                                 </Button>
+                                                 <Button Style="{StaticResource ReplayCardActionButton}"
+                                                         Click="RevealReplay_Click" ToolTip="{DynamicResource L.Library.Open}">
+                                                     <Path Data="{StaticResource IconFolder}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                           StrokeThickness="1.8" Stretch="Uniform"/>
+                                                 </Button>
+                                                 <Button Style="{StaticResource ReplayCardActionButton}"
+                                                         Click="RequestRenameReplay_Click" ToolTip="{DynamicResource L.Library.Rename}">
+                                                     <Path Data="{StaticResource IconEdit}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                           StrokeThickness="1.8" Stretch="Uniform"/>
+                                                 </Button>
+                                                 <Button Style="{StaticResource ReplayCardActionButton}"
+                                                         Click="RequestDeleteReplay_Click" ToolTip="{DynamicResource L.Library.Delete}">
+                                                     <Path Data="{StaticResource IconTrash}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                           StrokeThickness="1.8" Stretch="Uniform"/>
+                                                 </Button>
+                                             </StackPanel>
+                                         </Border>
+                                     </Grid>
+                                 </Grid>
+                             </Border>
+                             <DataTemplate.Triggers>
+                                 <Trigger SourceName="ClipCard" Property="IsMouseOver" Value="True">
+                                     <Setter TargetName="ClipActionTray" Property="IsHitTestVisible" Value="True"/>
+                                     <Setter TargetName="ClipCard" Property="Background" Value="{StaticResource BgHoverBrush}"/>
+                                     <Setter TargetName="ClipCard" Property="BorderBrush" Value="#FF34423E"/>
+                                 </Trigger>
+                                 <Trigger SourceName="ThumbnailContainer" Property="IsMouseOver" Value="True">
+                                     <Setter TargetName="ThumbnailPlayBadge" Property="Background" Value="{StaticResource AccentBrush}"/>
+                                     <Setter TargetName="ThumbnailPlayBadge" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                     <Setter TargetName="ThumbnailPlayIcon" Property="Fill" Value="#FF0B0F11"/>
+                                 </Trigger>
+                                 <EventTrigger SourceName="ClipCard" RoutedEvent="MouseEnter">
+                                     <BeginStoryboard>
+                                         <Storyboard>
+                                             <DoubleAnimation Storyboard.TargetName="ClipActionTray"
+                                                              Storyboard.TargetProperty="Opacity"
+                                                              To="1" Duration="0:0:0.14"/>
+                                             <DoubleAnimation Storyboard.TargetName="ClipActionTranslate"
+                                                              Storyboard.TargetProperty="X"
+                                                              To="0" Duration="0:0:0.14">
+                                                 <DoubleAnimation.EasingFunction>
+                                                     <CubicEase EasingMode="EaseOut"/>
+                                                 </DoubleAnimation.EasingFunction>
+                                             </DoubleAnimation>
+                                             <DoubleAnimation Storyboard.TargetName="ThumbnailHoverShade"
+                                                              Storyboard.TargetProperty="Opacity"
+                                                              To="1" Duration="0:0:0.14"/>
+                                             <DoubleAnimation Storyboard.TargetName="ThumbnailPlayBadge"
+                                                              Storyboard.TargetProperty="Opacity"
+                                                              To="1" Duration="0:0:0.14"/>
+                                             <DoubleAnimation Storyboard.TargetName="ThumbnailPlayScale"
+                                                              Storyboard.TargetProperty="ScaleX"
+                                                              To="1" Duration="0:0:0.14">
+                                                 <DoubleAnimation.EasingFunction>
+                                                     <CubicEase EasingMode="EaseOut"/>
+                                                 </DoubleAnimation.EasingFunction>
+                                             </DoubleAnimation>
+                                             <DoubleAnimation Storyboard.TargetName="ThumbnailPlayScale"
+                                                              Storyboard.TargetProperty="ScaleY"
+                                                              To="1" Duration="0:0:0.14">
+                                                 <DoubleAnimation.EasingFunction>
+                                                     <CubicEase EasingMode="EaseOut"/>
+                                                 </DoubleAnimation.EasingFunction>
+                                             </DoubleAnimation>
+                                         </Storyboard>
+                                     </BeginStoryboard>
+                                 </EventTrigger>
+                                 <EventTrigger SourceName="ClipCard" RoutedEvent="MouseLeave">
+                                     <BeginStoryboard>
+                                         <Storyboard>
+                                             <DoubleAnimation Storyboard.TargetName="ClipActionTray"
+                                                              Storyboard.TargetProperty="Opacity"
+                                                              To="0" Duration="0:0:0.1"/>
+                                             <DoubleAnimation Storyboard.TargetName="ClipActionTranslate"
+                                                              Storyboard.TargetProperty="X"
+                                                              To="4" Duration="0:0:0.1"/>
+                                             <DoubleAnimation Storyboard.TargetName="ThumbnailHoverShade"
+                                                              Storyboard.TargetProperty="Opacity"
+                                                              To="0" Duration="0:0:0.1"/>
+                                             <DoubleAnimation Storyboard.TargetName="ThumbnailPlayBadge"
+                                                              Storyboard.TargetProperty="Opacity"
+                                                              To="0" Duration="0:0:0.1"/>
+                                             <DoubleAnimation Storyboard.TargetName="ThumbnailPlayScale"
+                                                              Storyboard.TargetProperty="ScaleX"
+                                                              To="0.88" Duration="0:0:0.1"/>
+                                             <DoubleAnimation Storyboard.TargetName="ThumbnailPlayScale"
+                                                              Storyboard.TargetProperty="ScaleY"
+                                                              To="0.88" Duration="0:0:0.1"/>
+                                         </Storyboard>
+                                     </BeginStoryboard>
+                                 </EventTrigger>
+                             </DataTemplate.Triggers>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>

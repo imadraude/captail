@@ -4,6 +4,13 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.19] - 2026-09-05
+
+### Improved
+
+- **Replay card quick actions and layout:** Redesigned recent replay cards in the dashboard. Replay preview is now triggered directly from an elegant centered Play badge on the thumbnail, while the remaining quick actions (Trim, Folder, Rename, Delete) sit in a dedicated right column. Replay titles and metadata never overlap with action buttons and truncate cleanly.
+- **Tab key focus suppression:** Disabled Tab key navigation across the application windows and removed keyboard focus retention from buttons and controls, preventing Tab and mouse clicks from accidentally stealing focus or interfering with player controls and hotkeys.
+
 ## [0.5.18] - 2026-09-05
 
 ### Fixed
