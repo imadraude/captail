@@ -881,24 +881,25 @@ public partial class ClipEditorWindow : Window
             return;
         double duration = Math.Max(MinimumSelectionSeconds, _clip.Duration.TotalSeconds);
         double width = Math.Max(1, RangeTimeline.ActualWidth);
-        double handleWidth = StartThumb.Width;
-        double startEdge = _selectionStart / duration * width;
-        double endEdge = _selectionEnd / duration * width;
 
-        Canvas.SetLeft(StartThumb, Math.Clamp(startEdge - handleWidth, -handleWidth, width - handleWidth));
-        Canvas.SetLeft(EndThumb, Math.Clamp(endEdge, 0, width));
-        Canvas.SetLeft(LeftShade, 0);
-        LeftShade.Width = Math.Max(0, startEdge);
-        Canvas.SetLeft(RightShade, endEdge);
-        RightShade.Width = Math.Max(0, width - endEdge);
-        Canvas.SetLeft(SelectionBorder, startEdge);
-        SelectionBorder.Width = Math.Max(0, endEdge - startEdge);
+        TimelineVisualState state = TimelineLayout.Calculate(
+            _selectionStart,
+            _selectionEnd,
+            CurrentPlaybackPosition(),
+            duration,
+            width,
+            StartThumb.Width,
+            PlayheadThumb.Width);
 
-        double playhead = CurrentPlaybackPosition() / duration * width;
-        double playheadLimit = Math.Max(0, width - PlayheadThumb.Width);
-        Canvas.SetLeft(
-            PlayheadThumb,
-            Math.Clamp(playhead - PlayheadThumb.Width / 2, 0, playheadLimit));
+        Canvas.SetLeft(StartThumb, state.StartThumbLeft);
+        Canvas.SetLeft(EndThumb, state.EndThumbLeft);
+        Canvas.SetLeft(LeftShade, state.LeftShadeLeft);
+        LeftShade.Width = state.LeftShadeWidth;
+        Canvas.SetLeft(RightShade, state.RightShadeLeft);
+        RightShade.Width = state.RightShadeWidth;
+        Canvas.SetLeft(SelectionBorder, state.SelectionBorderLeft);
+        SelectionBorder.Width = state.SelectionBorderWidth;
+        Canvas.SetLeft(PlayheadThumb, state.PlayheadThumbLeft);
     }
 
     private void UpdateRangeText()

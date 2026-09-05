@@ -826,8 +826,16 @@ public partial class App : Application
             file.DirectoryName!,
             clip,
             saved => Log.Write($"CLIP_EDITOR_QA saved={saved}"),
-            mode);
+            mode)
+        {
+            WindowStartupLocation = WindowStartupLocation.CenterScreen
+        };
         MainWindow = window;
+        window.Loaded += (_, _) =>
+        {
+            window.Activate();
+            window.Focus();
+        };
         window.ShowDialog();
         Shutdown(0);
     }

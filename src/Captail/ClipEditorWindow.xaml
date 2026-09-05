@@ -301,8 +301,10 @@
                             </ItemsControl>
                         </Border>
                         <Canvas x:Name="RangeOverlay" Background="Transparent">
-                            <Rectangle x:Name="LeftShade" Height="76" Fill="#C4070A0C"/>
-                            <Rectangle x:Name="RightShade" Height="76" Fill="#C4070A0C"/>
+                            <Border x:Name="LeftShade" Height="76" Background="#C4070A0C"
+                                    CornerRadius="8,0,0,8" IsHitTestVisible="False"/>
+                            <Border x:Name="RightShade" Height="76" Background="#C4070A0C"
+                                    CornerRadius="0,8,8,0" IsHitTestVisible="False"/>
                             <Border x:Name="SelectionBorder" Height="76"
                                     BorderBrush="{StaticResource AccentBrush}" BorderThickness="3"
                                     CornerRadius="8" IsHitTestVisible="False"/>
