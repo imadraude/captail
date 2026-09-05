@@ -32,9 +32,11 @@ public sealed class TimelineLayoutTests
         Assert.Equal(0.0, state.LeftShadeWidth);
         Assert.Equal(0.0, state.RightShadeWidth);
 
-        // SelectionBorder spans the entire timeline
+        // SelectionBorder spans the entire timeline with rounded outer corners
         Assert.Equal(0.0, state.SelectionBorderLeft);
         Assert.Equal(858.0, state.SelectionBorderWidth);
+        Assert.True(state.SelectionHasLeftOuterRound);
+        Assert.True(state.SelectionHasRightOuterRound);
 
         // Playhead at position 0: center of 13px thumb is at -6.5 + 6.5 = 0.0
         Assert.Equal(-6.5, state.PlayheadThumbLeft);
@@ -57,11 +59,11 @@ public sealed class TimelineLayoutTests
             handleWidth: handleWidth,
             playheadWidth: playheadWidth);
 
-        // 20s of 100s on 1000px = 200px
-        Assert.Equal(200.0, state.StartThumbLeft);
+        // 20s of 100s on 1000px = 200px; handle sits in left shade [184, 200]
+        Assert.Equal(184.0, state.StartThumbLeft);
 
-        // 50s of 100s on 1000px = 500px; handle ends at 500px -> 500 - 16 = 484px
-        Assert.Equal(484.0, state.EndThumbLeft);
+        // 50s of 100s on 1000px = 500px; handle sits in right shade [500, 516]
+        Assert.Equal(500.0, state.EndThumbLeft);
 
         // Left shade covers [0, 200]
         Assert.Equal(0.0, state.LeftShadeLeft);
@@ -71,12 +73,53 @@ public sealed class TimelineLayoutTests
         Assert.Equal(500.0, state.RightShadeLeft);
         Assert.Equal(500.0, state.RightShadeWidth);
 
-        // SelectionBorder covers [200, 500]
+        // SelectionBorder covers [200, 500] with clean straight seams (no rounded corners inside)
         Assert.Equal(200.0, state.SelectionBorderLeft);
         Assert.Equal(300.0, state.SelectionBorderWidth);
+        Assert.False(state.SelectionHasLeftOuterRound);
+        Assert.False(state.SelectionHasRightOuterRound);
 
         // Playhead at selection start (20s -> 200px)
         Assert.Equal(200.0 - 6.5, state.PlayheadThumbLeft);
+    }
+
+    [Fact]
+    public void OneSidedTrim_SetsAdaptiveCornerRoundingCorrectly()
+    {
+        const double duration = 100.0;
+        const double timelineWidth = 1000.0;
+        const double handleWidth = 16.0;
+        const double playheadWidth = 13.0;
+
+        // Trimmed only from right: left stays at 0
+        TimelineVisualState rightTrimmed = TimelineLayout.Calculate(
+            selectionStart: 0,
+            selectionEnd: 70.0,
+            playbackPosition: 0,
+            duration: duration,
+            timelineWidth: timelineWidth,
+            handleWidth: handleWidth,
+            playheadWidth: playheadWidth);
+
+        Assert.Equal(0.0, rightTrimmed.StartThumbLeft);
+        Assert.Equal(700.0, rightTrimmed.EndThumbLeft);
+        Assert.True(rightTrimmed.SelectionHasLeftOuterRound);
+        Assert.False(rightTrimmed.SelectionHasRightOuterRound);
+
+        // Trimmed only from left: right stays at end
+        TimelineVisualState leftTrimmed = TimelineLayout.Calculate(
+            selectionStart: 30.0,
+            selectionEnd: 100.0,
+            playbackPosition: 30.0,
+            duration: duration,
+            timelineWidth: timelineWidth,
+            handleWidth: handleWidth,
+            playheadWidth: playheadWidth);
+
+        Assert.Equal(300.0 - 16.0, leftTrimmed.StartThumbLeft);
+        Assert.Equal(1000.0 - 16.0, leftTrimmed.EndThumbLeft);
+        Assert.False(leftTrimmed.SelectionHasLeftOuterRound);
+        Assert.True(leftTrimmed.SelectionHasRightOuterRound);
     }
 
     [Fact]

@@ -313,7 +313,7 @@
                                    DragCompleted="RangeThumb_DragCompleted">
                                 <Thumb.Template>
                                     <ControlTemplate TargetType="Thumb">
-                                        <Border Background="{StaticResource AccentBrush}" CornerRadius="8,2,2,8">
+                                        <Border Background="{StaticResource AccentBrush}" CornerRadius="8,0,0,8">
                                             <Rectangle Width="2" Height="22" RadiusX="1" RadiusY="1"
                                                        Fill="{StaticResource OnAccentBrush}"/>
                                         </Border>
@@ -325,7 +325,7 @@
                                    DragCompleted="RangeThumb_DragCompleted">
                                 <Thumb.Template>
                                     <ControlTemplate TargetType="Thumb">
-                                        <Border Background="{StaticResource AccentBrush}" CornerRadius="2,8,8,2">
+                                        <Border Background="{StaticResource AccentBrush}" CornerRadius="0,8,8,0">
                                             <Rectangle Width="2" Height="22" RadiusX="1" RadiusY="1"
                                                        Fill="{StaticResource OnAccentBrush}"/>
                                         </Border>
