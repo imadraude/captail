@@ -30,15 +30,15 @@
 Captail is a focused alternative to NVIDIA ShadowPlay Instant Replay. It keeps the latest seconds or minutes in a rolling buffer, then saves them when you press a hotkey. No scenes, streaming setup, account, cloud upload, analytics, or telemetry.
 
 > [!WARNING]
-> Captail `v0.5.21` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA GeForce GTX 1650 and RTX 40/50 series are tested; other GPUs need broader public testing.
+> Captail `v0.5.22` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA GeForce GTX 1650 and RTX 40/50 series are tested; other GPUs need broader public testing.
 
-## What's new in Captail 0.5.21?
+## What's new in Captail 0.5.22?
 
-This release restores full-width titles to recent replay cards with floating quick actions and cleans up the clip editor timeline geometry.
+This release makes recording finalization resilient to repeated stop commands and slow OBS shutdown callbacks.
 
-- Full-width recent replay cards with floating action tray on hover, preventing title truncation.
-- Frame-accurate trim handles aligned flush with selection cut seams, resolving playhead positioning at the start of clips.
-- Crisp rectangular video timeline track with straight vertical cut seams and zero corner rounding.
+- Concurrent stop commands now share one finalization result instead of showing a false save error.
+- Recording controls stay disabled while start or stop is still in progress.
+- Instant Replay duration resets only after its output has actually stopped.
 
 ## Is Captail for me?
 
