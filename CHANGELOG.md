@@ -4,6 +4,16 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.21] - 2026-09-06
+
+### Improved
+
+- **Replay card full-width titles and floating quick actions:** Restored full width to recent replay cards by removing the fixed action column reservation. Replay titles and metadata now utilize the entire card width without premature truncation, while quick actions (Trim, Folder, Rename, Delete) float cleanly on hover with a smooth fade-in tray, drop shadow, and dark backdrop.
+
+### Fixed
+
+- **Clip editor timeline trim handles and rectangular track geometry:** Fixed progress playhead alignment at the start of trimmed clips, ensuring the playhead begins strictly flush at the trim seam and never renders in front of or passes through the start handle. Removed all corner rounding from the video frames track, selection border, shades, and handles, providing a clean, rectangular timeline track with straight vertical cut seams.
+
 ## [0.5.20] - 2026-09-06
 
 ### Added

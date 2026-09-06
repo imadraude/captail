@@ -5,7 +5,7 @@ using Xunit;
 public sealed class TimelineLayoutTests
 {
     [Fact]
-    public void FullClipSelection_PositionsHandlesInsideTimelineAndFlushWithEdges()
+    public void FullClipSelection_PositionsHandlesFlushWithSelectionSeams()
     {
         // 5-minute video (300s) on 858px wide timeline
         const double duration = 300.0;
@@ -22,23 +22,21 @@ public sealed class TimelineLayoutTests
             handleWidth: handleWidth,
             playheadWidth: playheadWidth);
 
-        // StartThumb must start at x=0 (inside timeline, not -16)
-        Assert.Equal(0.0, state.StartThumbLeft);
+        // StartThumb sits immediately to the left of the start seam ([-16, 0])
+        Assert.Equal(-16.0, state.StartThumbLeft);
 
-        // EndThumb must end at timelineWidth, so its left edge is timelineWidth - handleWidth (842)
-        Assert.Equal(842.0, state.EndThumbLeft);
+        // EndThumb sits immediately to the right of the end seam ([858, 874])
+        Assert.Equal(858.0, state.EndThumbLeft);
 
         // Unselected shades should have 0 width
         Assert.Equal(0.0, state.LeftShadeWidth);
         Assert.Equal(0.0, state.RightShadeWidth);
 
-        // SelectionBorder spans the entire timeline with rounded outer corners
+        // SelectionBorder spans the entire active timeline
         Assert.Equal(0.0, state.SelectionBorderLeft);
         Assert.Equal(858.0, state.SelectionBorderWidth);
-        Assert.True(state.SelectionHasLeftOuterRound);
-        Assert.True(state.SelectionHasRightOuterRound);
 
-        // Playhead at position 0: center of 13px thumb is at -6.5 + 6.5 = 0.0
+        // Playhead at position 0: center of 13px thumb is at 0.0 (flush with StartThumb seam)
         Assert.Equal(-6.5, state.PlayheadThumbLeft);
     }
 
@@ -73,25 +71,23 @@ public sealed class TimelineLayoutTests
         Assert.Equal(500.0, state.RightShadeLeft);
         Assert.Equal(500.0, state.RightShadeWidth);
 
-        // SelectionBorder covers [200, 500] with clean straight seams (no rounded corners inside)
+        // SelectionBorder covers [200, 500] with clean straight seams
         Assert.Equal(200.0, state.SelectionBorderLeft);
         Assert.Equal(300.0, state.SelectionBorderWidth);
-        Assert.False(state.SelectionHasLeftOuterRound);
-        Assert.False(state.SelectionHasRightOuterRound);
 
         // Playhead at selection start (20s -> 200px)
         Assert.Equal(200.0 - 6.5, state.PlayheadThumbLeft);
     }
 
     [Fact]
-    public void OneSidedTrim_SetsAdaptiveCornerRoundingCorrectly()
+    public void OneSidedTrim_SetsHandlesAndStraightSeamsCorrectly()
     {
         const double duration = 100.0;
         const double timelineWidth = 1000.0;
         const double handleWidth = 16.0;
         const double playheadWidth = 13.0;
 
-        // Trimmed only from right: left stays at 0
+        // Trimmed only from right: left stays at 0 (handle at -16)
         TimelineVisualState rightTrimmed = TimelineLayout.Calculate(
             selectionStart: 0,
             selectionEnd: 70.0,
@@ -101,12 +97,12 @@ public sealed class TimelineLayoutTests
             handleWidth: handleWidth,
             playheadWidth: playheadWidth);
 
-        Assert.Equal(0.0, rightTrimmed.StartThumbLeft);
+        Assert.Equal(-16.0, rightTrimmed.StartThumbLeft);
         Assert.Equal(700.0, rightTrimmed.EndThumbLeft);
-        Assert.True(rightTrimmed.SelectionHasLeftOuterRound);
-        Assert.False(rightTrimmed.SelectionHasRightOuterRound);
+        Assert.Equal(0.0, rightTrimmed.SelectionBorderLeft);
+        Assert.Equal(700.0, rightTrimmed.SelectionBorderWidth);
 
-        // Trimmed only from left: right stays at end
+        // Trimmed only from left: right stays at end (handle at 1000)
         TimelineVisualState leftTrimmed = TimelineLayout.Calculate(
             selectionStart: 30.0,
             selectionEnd: 100.0,
@@ -117,9 +113,9 @@ public sealed class TimelineLayoutTests
             playheadWidth: playheadWidth);
 
         Assert.Equal(300.0 - 16.0, leftTrimmed.StartThumbLeft);
-        Assert.Equal(1000.0 - 16.0, leftTrimmed.EndThumbLeft);
-        Assert.False(leftTrimmed.SelectionHasLeftOuterRound);
-        Assert.True(leftTrimmed.SelectionHasRightOuterRound);
+        Assert.Equal(1000.0, leftTrimmed.EndThumbLeft);
+        Assert.Equal(300.0, leftTrimmed.SelectionBorderLeft);
+        Assert.Equal(700.0, leftTrimmed.SelectionBorderWidth);
     }
 
     [Fact]
@@ -160,9 +156,7 @@ public sealed class TimelineLayoutTests
             handleWidth: handleWidth,
             playheadWidth: playheadWidth);
 
-        Assert.True(state.EndThumbLeft >= state.StartThumbLeft);
-        Assert.True(state.StartThumbLeft >= 0);
-        Assert.True(state.EndThumbLeft <= timelineWidth - handleWidth);
+        Assert.True(state.EndThumbLeft >= state.StartThumbLeft + handleWidth);
     }
 
     [Fact]

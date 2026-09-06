@@ -899,9 +899,7 @@ public partial class ClipEditorWindow : Window
         RightShade.Width = state.RightShadeWidth;
         Canvas.SetLeft(SelectionBorder, state.SelectionBorderLeft);
         SelectionBorder.Width = state.SelectionBorderWidth;
-        double leftRadius = state.SelectionHasLeftOuterRound ? 8 : 0;
-        double rightRadius = state.SelectionHasRightOuterRound ? 8 : 0;
-        SelectionBorder.CornerRadius = new CornerRadius(leftRadius, rightRadius, rightRadius, leftRadius);
+        SelectionBorder.CornerRadius = new CornerRadius(0);
         Canvas.SetLeft(PlayheadThumb, state.PlayheadThumbLeft);
     }
 

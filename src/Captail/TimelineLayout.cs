@@ -9,9 +9,7 @@ internal readonly record struct TimelineVisualState(
     double RightShadeWidth,
     double SelectionBorderLeft,
     double SelectionBorderWidth,
-    double PlayheadThumbLeft,
-    bool SelectionHasLeftOuterRound,
-    bool SelectionHasRightOuterRound);
+    double PlayheadThumbLeft);
 
 internal static class TimelineLayout
 {
@@ -31,38 +29,20 @@ internal static class TimelineLayout
         if (endEdge < startEdge)
             endEdge = startEdge;
 
-        double maxHandleLeft = Math.Max(0, safeWidth - handleWidth);
+        // Handles flank the active selection outside the kept video region
+        // with clean, straight cut seams exactly at startEdge and endEdge.
+        double startThumbLeft = startEdge - handleWidth;
+        double endThumbLeft = endEdge;
 
-        // Handles sit in the unselected/shaded region outside the active selection
-        // without covering video, but stay clamped within [0, maxHandleLeft]
-        double startThumbLeft = Math.Clamp(startEdge - handleWidth, 0, maxHandleLeft);
-        double endThumbLeft = Math.Clamp(endEdge, 0, maxHandleLeft);
-
-        // Prevent thumbs from crossing or overlapping each other
-        if (safeWidth >= handleWidth * 2)
+        // Prevent thumbs from crossing each other on extremely short timelines
+        if (endThumbLeft < startThumbLeft + handleWidth)
         {
-            if (endThumbLeft < startThumbLeft + handleWidth)
-            {
-                if (startThumbLeft <= 0)
-                    endThumbLeft = startThumbLeft + handleWidth;
-                else
-                    startThumbLeft = Math.Max(0, endThumbLeft - handleWidth);
-            }
-        }
-        else if (endThumbLeft < startThumbLeft)
-        {
-            endThumbLeft = startThumbLeft;
+            endThumbLeft = startThumbLeft + handleWidth;
         }
 
         double playhead = Math.Clamp(playbackPosition / safeDuration * safeWidth, 0, safeWidth);
         double playheadHalf = playheadWidth / 2;
-        double playheadThumbLeft = Math.Clamp(
-            playhead - playheadHalf,
-            -playheadHalf,
-            safeWidth - playheadHalf);
-
-        bool selectionHasLeftOuterRound = startEdge <= 0.5;
-        bool selectionHasRightOuterRound = endEdge >= safeWidth - 0.5;
+        double playheadThumbLeft = playhead - playheadHalf;
 
         return new TimelineVisualState(
             StartThumbLeft: startThumbLeft,
@@ -73,8 +53,6 @@ internal static class TimelineLayout
             RightShadeWidth: Math.Max(0, safeWidth - endEdge),
             SelectionBorderLeft: startEdge,
             SelectionBorderWidth: Math.Max(0, endEdge - startEdge),
-            PlayheadThumbLeft: playheadThumbLeft,
-            SelectionHasLeftOuterRound: selectionHasLeftOuterRound,
-            SelectionHasRightOuterRound: selectionHasRightOuterRound);
+            PlayheadThumbLeft: playheadThumbLeft);
     }
 }

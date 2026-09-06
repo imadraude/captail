@@ -287,10 +287,10 @@
                     <TextBlock Text="{DynamicResource L.Library.VideoTrack}"
                                FontSize="11" FontWeight="Bold"
                                Foreground="{StaticResource TextMutedBrush}" Margin="2,0,0,6"/>
-                    <Grid x:Name="RangeTimeline" Height="76" ClipToBounds="False"
+                    <Grid x:Name="RangeTimeline" Height="76" Margin="16,0,16,0" ClipToBounds="False"
                           SizeChanged="RangeTimeline_SizeChanged"
                           MouseLeftButtonDown="RangeTimeline_MouseLeftButtonDown">
-                        <Border Background="{StaticResource BgControlBrush}" CornerRadius="8"
+                        <Border Background="{StaticResource BgControlBrush}" CornerRadius="0"
                                 ClipToBounds="True">
                             <ItemsControl x:Name="TimelineFrames" IsHitTestVisible="False">
                                 <ItemsControl.ItemsPanel>
@@ -307,18 +307,18 @@
                         </Border>
                         <Canvas x:Name="RangeOverlay" Background="Transparent">
                             <Border x:Name="LeftShade" Height="76" Background="#C4070A0C"
-                                    CornerRadius="8,0,0,8" IsHitTestVisible="False"/>
+                                    CornerRadius="0" IsHitTestVisible="False"/>
                             <Border x:Name="RightShade" Height="76" Background="#C4070A0C"
-                                    CornerRadius="0,8,8,0" IsHitTestVisible="False"/>
+                                    CornerRadius="0" IsHitTestVisible="False"/>
                             <Border x:Name="SelectionBorder" Height="76"
                                     BorderBrush="{StaticResource AccentBrush}" BorderThickness="3"
-                                    CornerRadius="8" IsHitTestVisible="False"/>
+                                    CornerRadius="0" IsHitTestVisible="False"/>
                             <Thumb x:Name="StartThumb" Width="16" Height="76" Cursor="SizeWE"
                                    Panel.ZIndex="4" DragDelta="StartThumb_DragDelta"
                                    DragCompleted="RangeThumb_DragCompleted">
                                 <Thumb.Template>
                                     <ControlTemplate TargetType="Thumb">
-                                        <Border Background="{StaticResource AccentBrush}" CornerRadius="8,0,0,8">
+                                        <Border Background="{StaticResource AccentBrush}" CornerRadius="0">
                                             <Rectangle Width="2" Height="22" RadiusX="1" RadiusY="1"
                                                        Fill="{StaticResource OnAccentBrush}"/>
                                         </Border>
@@ -330,7 +330,7 @@
                                    DragCompleted="RangeThumb_DragCompleted">
                                 <Thumb.Template>
                                     <ControlTemplate TargetType="Thumb">
-                                        <Border Background="{StaticResource AccentBrush}" CornerRadius="0,8,8,0">
+                                        <Border Background="{StaticResource AccentBrush}" CornerRadius="0">
                                             <Rectangle Width="2" Height="22" RadiusX="1" RadiusY="1"
                                                        Fill="{StaticResource OnAccentBrush}"/>
                                         </Border>
@@ -355,7 +355,7 @@
                         </Canvas>
                     </Grid>
 
-                    <Grid Margin="1,7,1,3">
+                    <Grid Margin="16,7,16,3">
                         <TextBlock x:Name="StartTimeText" Text="00:00.000"
                                    FontFamily="{StaticResource FontMono}" FontSize="11.5"/>
                         <TextBlock x:Name="EndTimeText" Text="00:00.000"
