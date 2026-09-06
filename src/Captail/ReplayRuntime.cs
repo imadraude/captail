@@ -63,12 +63,14 @@ internal sealed class ReplayRuntime : IAsyncDisposable
     private readonly IReplayConfigStore _configStore;
     private readonly Config _configuration;
     private readonly object _recoverySync = new();
+    private readonly object _recordingSync = new();
     private readonly TaskCompletionSource _shutdownCompleted =
         new(TaskCreationOptions.RunContinuationsAsynchronously);
     private IReplayPipeline? _pipeline;
     private bool _disposed;
     private int _shutdownRequested;
     private Task<ReplayCommandResult>? _activeRecovery;
+    private Task<string>? _activeRecordingStop;
 
     internal ReplayRuntimeSnapshot Snapshot { get; private set; }
 
@@ -281,8 +283,21 @@ internal sealed class ReplayRuntime : IAsyncDisposable
         }
     }
 
-    internal async Task<string> StopRecordingAsync(
+    internal Task<string> StopRecordingAsync(
         CancellationToken cancellationToken = default)
+    {
+        lock (_recordingSync)
+        {
+            if (_activeRecordingStop is { IsCompleted: false })
+                return _activeRecordingStop;
+
+            _activeRecordingStop = StopRecordingCoreAsync(cancellationToken);
+            return _activeRecordingStop;
+        }
+    }
+
+    private async Task<string> StopRecordingCoreAsync(
+        CancellationToken cancellationToken)
     {
         ThrowIfUnavailable();
         await _commandGate.WaitAsync(cancellationToken);

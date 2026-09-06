@@ -895,9 +895,36 @@ public sealed class ObsReplayEngine : IDisposable
                 }
 
                 _replaySuspendedForManualRecording = true;
-                _replayWindowStartedUtc = default;
                 ObsNative.obs_output_stop(_output);
-                Log.Write("Instant Replay buffer suspended during manual recording.");
+                for (int attempt = 0;
+                     attempt < 80 && ObsNative.obs_output_active(_output);
+                     attempt++)
+                {
+                    Thread.Sleep(25);
+                }
+                if (ObsNative.obs_output_active(_output))
+                {
+                    ObsNative.obs_output_force_stop(_output);
+                    for (int attempt = 0;
+                         attempt < 40 && ObsNative.obs_output_active(_output);
+                         attempt++)
+                    {
+                        Thread.Sleep(25);
+                    }
+                }
+
+                if (ObsNative.obs_output_active(_output))
+                {
+                    _replaySuspendedForManualRecording = false;
+                    Log.Write(
+                        "Instant Replay buffer did not stop for manual recording; " +
+                        "keeping its duration estimate unchanged.");
+                }
+                else
+                {
+                    _replayWindowStartedUtc = default;
+                    Log.Write("Instant Replay buffer suspended during manual recording.");
+                }
             }
 
             return Task.FromResult(fullPath);
@@ -907,7 +934,7 @@ public sealed class ObsReplayEngine : IDisposable
     public async Task<string> StopRecordingAsync(CancellationToken cancellationToken = default)
     {
         var stopStopwatch = Stopwatch.StartNew();
-        Task<string> completionTask;
+        TaskCompletionSource<string> completion;
         lock (_recordingGate)
         {
             if (!_isRecording || _recordingOutput == 0)
@@ -915,13 +942,13 @@ public sealed class ObsReplayEngine : IDisposable
 
             if (_pendingRecordingStop is not null)
             {
-                completionTask = _pendingRecordingStop.Task;
+                completion = _pendingRecordingStop;
             }
             else
             {
                 _pendingRecordingStop = new TaskCompletionSource<string>(
                     TaskCreationOptions.RunContinuationsAsynchronously);
-                completionTask = _pendingRecordingStop.Task;
+                completion = _pendingRecordingStop;
                 ObsNative.obs_output_stop(_recordingOutput);
             }
         }
@@ -931,17 +958,30 @@ public sealed class ObsReplayEngine : IDisposable
         timeout.CancelAfter(TimeSpan.FromSeconds(30));
         try
         {
-            rawPath = await completionTask.WaitAsync(timeout.Token);
+            rawPath = await completion.Task.WaitAsync(timeout.Token);
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
+            nint recordingOutput;
             lock (_recordingGate)
+                recordingOutput = _recordingOutput;
+
+            if (recordingOutput != 0 && ObsNative.obs_output_active(recordingOutput))
+                ObsNative.obs_output_force_stop(recordingOutput);
+
+            try
             {
-                if (_recordingOutput != 0 && ObsNative.obs_output_active(_recordingOutput))
-                    ObsNative.obs_output_force_stop(_recordingOutput);
-                _pendingRecordingStop = null;
+                rawPath = await completion.Task.WaitAsync(TimeSpan.FromSeconds(5));
             }
-            throw new TimeoutException("Recording stop timed out.");
+            catch (TimeoutException)
+            {
+                lock (_recordingGate)
+                {
+                    if (ReferenceEquals(_pendingRecordingStop, completion))
+                        _pendingRecordingStop = null;
+                }
+                throw new TimeoutException("Recording stop timed out.");
+            }
         }
         finally
         {

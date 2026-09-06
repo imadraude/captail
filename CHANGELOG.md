@@ -13,6 +13,7 @@ All notable user-facing changes are documented here.
 ### Fixed
 
 - **Clip editor timeline trim handles and rectangular track geometry:** Fixed progress playhead alignment at the start of trimmed clips, ensuring the playhead begins strictly flush at the trim seam and never renders in front of or passes through the start handle. Removed all corner rounding from the video frames track, selection border, shades, and handles, providing a clean, rectangular timeline track with straight vertical cut seams.
+- **Reliable recording finalization and replay duration:** Coalesced concurrent stop requests, disabled recording actions while a transition is active, and allowed OBS finalization callbacks to complete after a forced stop. Instant Replay now resets its duration estimate only after its output has actually stopped, preventing false save errors and short duration estimates for full replay files.
 
 ## [0.5.20] - 2026-09-06
 

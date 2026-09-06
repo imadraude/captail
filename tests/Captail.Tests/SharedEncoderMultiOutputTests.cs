@@ -126,6 +126,30 @@ public sealed class SharedEncoderMultiOutputTests
     }
 
     [Fact]
+    public async Task ConcurrentStopsShareTheSameFinalization()
+    {
+        var events = new List<string>();
+        var pipeline = new BlockingStopPipeline(events);
+        var config = new Config { ReplayEnabled = true };
+        await using var runtime = new ReplayRuntime(
+            config,
+            new TrackingPipelineFactory(pipeline, events),
+            new TrackingConfigStore(events));
+
+        await runtime.SetEnabledAsync(true);
+        await runtime.StartRecordingAsync();
+
+        Task<string> firstStop = runtime.StopRecordingAsync();
+        await pipeline.StopEntered.Task.WaitAsync(TimeSpan.FromSeconds(2));
+        Task<string> secondStop = runtime.StopRecordingAsync();
+        pipeline.AllowStop.TrySetResult();
+
+        Assert.Equal("recording.mp4", await firstStop);
+        Assert.Equal("recording.mp4", await secondStop);
+        Assert.Equal(1, events.Count(item => item == "stop-recording"));
+    }
+
+    [Fact]
     public async Task SharedEncoder_ShutdownDuringRecording_DisposesCleanly()
     {
         var events = new List<string>();
@@ -230,6 +254,30 @@ public sealed class SharedEncoderMultiOutputTests
             events.Add("dispose");
             return ValueTask.CompletedTask;
         }
+    }
+
+    private sealed class BlockingStopPipeline(List<string> events) : IReplayPipeline
+    {
+        public TaskCompletionSource StopEntered { get; } = new(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+        public TaskCompletionSource AllowStop { get; } = new(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task<string> SaveAsync(CancellationToken cancellationToken) =>
+            Task.FromResult("replay.mp4");
+        public Task<string> StartRecordingAsync(CancellationToken cancellationToken) =>
+            Task.FromResult("recording.mp4");
+
+        public async Task<string> StopRecordingAsync(CancellationToken cancellationToken)
+        {
+            events.Add("stop-recording");
+            StopEntered.TrySetResult();
+            await AllowStop.Task.WaitAsync(cancellationToken);
+            return "recording.mp4";
+        }
+
+        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
     }
 
     private sealed class TrackingPipelineFactory(

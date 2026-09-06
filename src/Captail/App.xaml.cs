@@ -56,6 +56,7 @@ public partial class App : Application
     private CancellationTokenSource? _autoUpdateCts;
     private int _autoUpdateInProgress;
     private int _saving;
+    private int _recordingTransitionInProgress;
     private EncoderCapabilities? _capabilities;
     private readonly SemaphoreSlim _pipelineGate = new(1, 1);
     private readonly SingleThreadTaskScheduler _obsTaskScheduler =
@@ -1613,10 +1614,21 @@ public partial class App : Application
 
     internal async Task<string?> ToggleRecordingAsync()
     {
-        if (_replayRuntime?.Snapshot.IsRecording == true)
-            return await StopRecordingAsync();
-        else
+        if (Interlocked.Exchange(ref _recordingTransitionInProgress, 1) != 0)
+            return null;
+
+        UpdateUiState();
+        try
+        {
+            if (_replayRuntime?.Snapshot.IsRecording == true)
+                return await StopRecordingAsync();
             return await StartRecordingAsync();
+        }
+        finally
+        {
+            Interlocked.Exchange(ref _recordingTransitionInProgress, 0);
+            UpdateUiState();
+        }
     }
 
     private async Task<string?> StartRecordingAsync()
@@ -2983,7 +2995,8 @@ public partial class App : Application
         _settingsWindow?.UpdateRecordingState(
             isRecording,
             isPaused,
-            duration);
+            duration,
+            Volatile.Read(ref _recordingTransitionInProgress) == 0);
         if (_tray is not null)
         {
             if (_trayActiveState != (active || isRecording))
@@ -3007,6 +3020,8 @@ public partial class App : Application
         }
         if (_recordMenuItem is not null)
         {
+            _recordMenuItem.IsEnabled =
+                Volatile.Read(ref _recordingTransitionInProgress) == 0;
             _recordMenuItem.Header = isRecording
                 ? Localization.Text("L.Record.Stop")
                 : Localization.Text("L.Record.Start");

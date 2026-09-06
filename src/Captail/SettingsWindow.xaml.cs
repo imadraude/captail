@@ -536,13 +536,18 @@ public partial class SettingsWindow : Window
         OutputFolderSummaryText.Text = _config.OutputDirectory;
     }
 
-    internal void UpdateRecordingState(bool isRecording, bool isPaused, TimeSpan duration)
+    internal void UpdateRecordingState(
+        bool isRecording,
+        bool isPaused,
+        TimeSpan duration,
+        bool actionEnabled)
     {
         _isRecording = isRecording;
         _isRecordingPaused = isPaused;
         _recordingDuration = duration;
         RecordDot.Visibility = isRecording ? Visibility.Collapsed : Visibility.Visible;
         RecordSquare.Visibility = isRecording ? Visibility.Visible : Visibility.Collapsed;
+        RecordButton.IsEnabled = actionEnabled;
 
         if (isRecording)
         {
