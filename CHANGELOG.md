@@ -4,6 +4,17 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.20] - 2026-09-06
+
+### Added
+
+- **Start minimized to tray toggle:** Added an option to start Captail minimized to the system notification area without showing the settings window on launch. Enabled by default with a dedicated toggle switch under general settings and localized across all 11 supported languages.
+
+### Improved
+
+- **Settings layout and overflow prevention:** Overhauled settings row layouts from rigid horizontal stack panels to adaptive two-column grids with automatic text wrapping. Toggles, buttons, and hotkey selectors no longer clip or get pushed beyond the window boundaries regardless of translation text length.
+- **Path and hint trimming:** Added character ellipsis truncation for long replay output folder paths and tightened localized label wording across multiple languages.
+
 ## [0.5.19] - 2026-09-05
 
 ### Improved

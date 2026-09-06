@@ -440,6 +440,7 @@ public partial class SettingsWindow : Window
             MicBoostSlider.Value = Math.Clamp(_config.MicrophoneBoostDb, 0, 20);
             OrganizeByGameBox.IsChecked = _config.OrganizeReplaysByGame;
             AutoUpdateBox.IsChecked = _config.AutoUpdate;
+            StartInTrayBox.IsChecked = _config.StartInTray;
 
             _pendingSaveHotkey = _config.Hotkey;
             _pendingToggleHotkey = _config.ToggleReplayHotkey;
@@ -1148,6 +1149,7 @@ public partial class SettingsWindow : Window
         candidate.OutputDirectory = _outputDirectory;
         candidate.OrganizeReplaysByGame = OrganizeByGameBox.IsChecked == true;
         candidate.AutoUpdate = AutoUpdateBox.IsChecked == true;
+        candidate.StartInTray = StartInTrayBox.IsChecked == true;
         candidate.Hotkey = _pendingSaveHotkey;
         candidate.ToggleReplayHotkey = _pendingToggleHotkey;
         candidate.RecordHotkey = _pendingRecordHotkey;

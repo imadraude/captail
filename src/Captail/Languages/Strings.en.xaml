@@ -103,6 +103,7 @@
   <sys:String x:Key="L.Size.5GB">5 GB</sys:String>
   <sys:String x:Key="L.Size.10GB">10 GB</sys:String>
   <sys:String x:Key="L.Replay.StartWindows">Start with Windows</sys:String>
+  <sys:String x:Key="L.App.StartInTray">Start minimized to tray</sys:String>
 
   <sys:String x:Key="L.Video.Source">Source</sys:String>
   <sys:String x:Key="L.Video.Desktop">Desktop</sys:String>

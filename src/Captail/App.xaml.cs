@@ -396,7 +396,7 @@ public partial class App : Application
             StartActivationServer();
             InitializeReplayRuntime();
             StartAutoUpdateMonitor();
-            if (!backgroundLaunch)
+            if (!backgroundLaunch && !_config.StartInTray)
                 OpenSettings();
 
             if (_config.ReplayEnabled)

@@ -32,6 +32,7 @@ public sealed class Config
     /// <summary>"top-left", "top-right", "bottom-left", or "bottom-right".</summary>
     public string RecordingIndicatorPosition { get; set; } = "top-right";
     public bool AutoUpdate { get; set; } = true;
+    public bool StartInTray { get; set; } = true;
     public bool SuspendReplayDuringRecording { get; set; } = true;
     public bool KeepRecordingPipelineWarm { get; set; }
 
@@ -212,6 +213,7 @@ public sealed class Config
         ShowRecordingIndicator = source.ShowRecordingIndicator;
         RecordingIndicatorPosition = source.RecordingIndicatorPosition;
         AutoUpdate = source.AutoUpdate;
+        StartInTray = source.StartInTray;
         Codec = source.Codec;
         MonitorIndex = source.MonitorIndex;
         RecordingResolution = source.RecordingResolution;
@@ -280,6 +282,7 @@ public sealed class Config
                WarnWhenGameStartsWithReplayOff == other.WarnWhenGameStartsWithReplayOff &&
                ShowRecordingIndicator == other.ShowRecordingIndicator &&
                AutoUpdate == other.AutoUpdate &&
+               StartInTray == other.StartInTray &&
                string.Equals(
                    RecordingIndicatorPosition,
                    other.RecordingIndicatorPosition,

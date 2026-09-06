@@ -56,6 +56,35 @@ public sealed class ConfigTests
 
         Assert.False(original.ValuesEqual(modified));
         Assert.True(original.PipelineEquals(modified));
+
+        modified = original.Clone();
+        modified.StartInTray = false;
+
+        Assert.False(original.ValuesEqual(modified));
+        Assert.True(original.PipelineEquals(modified));
+    }
+
+    [Fact]
+    public void NewConfig_HasStartInTrayEnabledByDefault()
+    {
+        var config = new Config();
+        Assert.True(config.StartInTray);
+    }
+
+    [Fact]
+    public void Deserialize_StartInTray_PreservesValue()
+    {
+        string json = """
+        {
+            "StartInTray": false
+        }
+        """;
+
+        bool success = Config.TryDeserialize(json, out Config? config);
+
+        Assert.True(success);
+        Assert.NotNull(config);
+        Assert.False(config.StartInTray);
     }
 
     [Fact]

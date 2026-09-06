@@ -653,8 +653,13 @@
                         <Border Style="{StaticResource SettingsGroup}">
                             <StackPanel>
                                 <Grid Margin="13,11">
-                                    <TextBlock Text="{DynamicResource L.Replay.Instant}" Style="{StaticResource RowLabelText}"/>
-                                    <ToggleButton x:Name="SettingsReplayToggle" HorizontalAlignment="Right"
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{DynamicResource L.Replay.Instant}" Style="{StaticResource RowLabelText}"
+                                               TextWrapping="Wrap" Margin="0,0,12,0"/>
+                                    <ToggleButton x:Name="SettingsReplayToggle" Grid.Column="1"
                                                   Style="{StaticResource ToggleSwitch}"/>
                                 </Grid>
                                 <Border Style="{StaticResource RowDivider}"/>
@@ -664,10 +669,15 @@
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Margin="0,0,12,0">
-                                        <StackPanel Orientation="Horizontal">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
                                             <TextBlock Text="{DynamicResource L.Replay.WarnGameOff}"
-                                                       Style="{StaticResource RowLabelText}"/>
-                                            <Button Style="{StaticResource HelpIconButton}">
+                                                       Style="{StaticResource RowLabelText}"
+                                                       TextWrapping="Wrap"/>
+                                            <Button Grid.Column="1" Style="{StaticResource HelpIconButton}">
                                                 <Button.ToolTip>
                                                     <ToolTip Style="{StaticResource HelpToolTip}">
                                                         <StackPanel>
@@ -679,10 +689,11 @@
                                                     </ToolTip>
                                                 </Button.ToolTip>
                                             </Button>
-                                        </StackPanel>
+                                        </Grid>
                                         <TextBlock Text="{DynamicResource L.Replay.WarnGameOffHint}"
                                                    Style="{StaticResource SecondaryText}"
-                                                   FontSize="10" Margin="0,2,0,0"/>
+                                                   FontSize="10" Margin="0,2,0,0"
+                                                   TextWrapping="Wrap"/>
                                     </StackPanel>
                                     <ToggleButton x:Name="WarnGameOffBox" Grid.Column="1"
                                                   Style="{StaticResource ToggleSwitch}"
@@ -695,10 +706,15 @@
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Margin="0,0,12,0">
-                                        <StackPanel Orientation="Horizontal">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
                                             <TextBlock Text="{DynamicResource L.Replay.RecordingIndicator}"
-                                                       Style="{StaticResource RowLabelText}"/>
-                                            <Button Style="{StaticResource HelpIconButton}">
+                                                       Style="{StaticResource RowLabelText}"
+                                                       TextWrapping="Wrap"/>
+                                            <Button Grid.Column="1" Style="{StaticResource HelpIconButton}">
                                                 <Button.ToolTip>
                                                     <ToolTip Style="{StaticResource HelpToolTip}">
                                                         <StackPanel>
@@ -710,10 +726,11 @@
                                                     </ToolTip>
                                                 </Button.ToolTip>
                                             </Button>
-                                        </StackPanel>
+                                        </Grid>
                                         <TextBlock Text="{DynamicResource L.Replay.RecordingIndicatorHint}"
                                                    Style="{StaticResource SecondaryText}"
-                                                   FontSize="10" Margin="0,2,0,0"/>
+                                                   FontSize="10" Margin="0,2,0,0"
+                                                   TextWrapping="Wrap"/>
                                     </StackPanel>
                                     <ToggleButton x:Name="RecordingIndicatorBox" Grid.Column="1"
                                                   Style="{StaticResource ToggleSwitch}"
@@ -725,10 +742,15 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="190"/>
                                     </Grid.ColumnDefinitions>
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Grid VerticalAlignment="Center" Margin="0,0,12,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
                                         <TextBlock Text="{DynamicResource L.Replay.IndicatorPosition}"
-                                                   Style="{StaticResource RowLabelText}"/>
-                                        <Button Style="{StaticResource HelpIconButton}">
+                                                   Style="{StaticResource RowLabelText}"
+                                                   TextWrapping="Wrap"/>
+                                        <Button Grid.Column="1" Style="{StaticResource HelpIconButton}">
                                             <Button.ToolTip>
                                                 <ToolTip Style="{StaticResource HelpToolTip}">
                                                     <StackPanel>
@@ -740,7 +762,7 @@
                                                 </ToolTip>
                                             </Button.ToolTip>
                                         </Button>
-                                    </StackPanel>
+                                    </Grid>
                                     <Border Grid.Column="1" Style="{StaticResource SegmentStrip}"
                                             IsEnabled="{Binding IsChecked, ElementName=RecordingIndicatorBox}">
                                         <UniformGrid x:Name="RecordingIndicatorPositionOptions" Rows="1">
@@ -832,14 +854,35 @@
                                 </Grid>
                                 <Border Style="{StaticResource RowDivider}"/>
                                 <Grid Margin="13,11">
-                                    <TextBlock Text="{DynamicResource L.Replay.StartWindows}" Style="{StaticResource RowLabelText}"/>
-                                    <ToggleButton x:Name="AutostartBox" HorizontalAlignment="Right"
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{DynamicResource L.Replay.StartWindows}" Style="{StaticResource RowLabelText}"
+                                               TextWrapping="Wrap" Margin="0,0,12,0"/>
+                                    <ToggleButton x:Name="AutostartBox" Grid.Column="1"
                                                   Style="{StaticResource ToggleSwitch}"/>
                                 </Grid>
                                 <Border Style="{StaticResource RowDivider}"/>
                                 <Grid Margin="13,11">
-                                    <TextBlock Text="{DynamicResource L.Update.AutoUpdate}" Style="{StaticResource RowLabelText}"/>
-                                    <ToggleButton x:Name="AutoUpdateBox" HorizontalAlignment="Right"
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{DynamicResource L.App.StartInTray}" Style="{StaticResource RowLabelText}"
+                                               TextWrapping="Wrap" Margin="0,0,12,0"/>
+                                    <ToggleButton x:Name="StartInTrayBox" Grid.Column="1"
+                                                  Style="{StaticResource ToggleSwitch}"/>
+                                </Grid>
+                                <Border Style="{StaticResource RowDivider}"/>
+                                <Grid Margin="13,11">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{DynamicResource L.Update.AutoUpdate}" Style="{StaticResource RowLabelText}"
+                                               TextWrapping="Wrap" Margin="0,0,12,0"/>
+                                    <ToggleButton x:Name="AutoUpdateBox" Grid.Column="1"
                                                   Style="{StaticResource ToggleSwitch}"/>
                                 </Grid>
                             </StackPanel>
@@ -988,9 +1031,11 @@
                                 <Border Style="{StaticResource RowDivider}"/>
                                 <Grid Margin="13,11">
                                     <StackPanel>
-                                        <TextBlock Text="{DynamicResource L.Video.EstimatedRamBuffer}" Style="{StaticResource RowLabelText}"/>
+                                        <TextBlock Text="{DynamicResource L.Video.EstimatedRamBuffer}" Style="{StaticResource RowLabelText}"
+                                                   TextWrapping="Wrap"/>
                                         <TextBlock x:Name="RamEstimateText" Style="{StaticResource SecondaryText}"
-                                                   FontSize="10" Margin="0,2,0,0"/>
+                                                   FontSize="10" Margin="0,2,0,0"
+                                                   TextWrapping="Wrap"/>
                                     </StackPanel>
                                 </Grid>
                                 <Border Style="{StaticResource RowDivider}"/>
@@ -999,15 +1044,22 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <TextBlock Text="{DynamicResource L.Video.SuspendReplayDuringRecording}" Style="{StaticResource RowLabelText}"/>
-                                        <Button Style="{StaticResource HelpIconButton}"
+                                    <Grid VerticalAlignment="Center" Margin="0,0,12,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{DynamicResource L.Video.SuspendReplayDuringRecording}"
+                                                   Style="{StaticResource RowLabelText}"
+                                                   TextWrapping="Wrap"/>
+                                        <Button Grid.Column="1" Style="{StaticResource HelpIconButton}"
                                                 Margin="6,0,0,0"
                                                 ToolTip="{DynamicResource L.Help.SuspendReplayDuringRecording}"
                                                 AutomationProperties.Name="{DynamicResource L.Video.SuspendReplayDuringRecording}"/>
-                                    </StackPanel>
+                                    </Grid>
                                     <CheckBox x:Name="SuspendReplayDuringRecordingBox" Grid.Column="1"
-                                              Style="{StaticResource CompactCheckBox}"/>
+                                              Style="{StaticResource CompactCheckBox}"
+                                              VerticalAlignment="Center"/>
                                 </Grid>
                                 <Border Style="{StaticResource RowDivider}"/>
                                 <Grid Margin="13,11">
@@ -1015,15 +1067,22 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <TextBlock Text="{DynamicResource L.Video.KeepRecordingPipelineWarm}" Style="{StaticResource RowLabelText}"/>
-                                        <Button Style="{StaticResource HelpIconButton}"
+                                    <Grid VerticalAlignment="Center" Margin="0,0,12,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{DynamicResource L.Video.KeepRecordingPipelineWarm}"
+                                                   Style="{StaticResource RowLabelText}"
+                                                   TextWrapping="Wrap"/>
+                                        <Button Grid.Column="1" Style="{StaticResource HelpIconButton}"
                                                 Margin="6,0,0,0"
                                                 ToolTip="{DynamicResource L.Help.KeepRecordingPipelineWarm}"
                                                 AutomationProperties.Name="{DynamicResource L.Video.KeepRecordingPipelineWarm}"/>
-                                    </StackPanel>
+                                    </Grid>
                                     <CheckBox x:Name="KeepRecordingPipelineWarmBox" Grid.Column="1"
-                                              Style="{StaticResource CompactCheckBox}"/>
+                                              Style="{StaticResource CompactCheckBox}"
+                                              VerticalAlignment="Center"/>
                                 </Grid>
                                 <Border Style="{StaticResource RowDivider}"/>
                                 <Grid Margin="13,11">
@@ -1031,7 +1090,8 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="220"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="{DynamicResource L.Video.Monitor}" Style="{StaticResource RowLabelText}"/>
+                                    <TextBlock Text="{DynamicResource L.Video.Monitor}" Style="{StaticResource RowLabelText}"
+                                               TextWrapping="Wrap" Margin="0,0,8,0" VerticalAlignment="Center"/>
                                     <Grid Grid.Column="1">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
@@ -1124,9 +1184,14 @@
                             <StackPanel>
                                 <StackPanel x:Name="SimpleSystemAudioPanel">
                                     <Grid Margin="13,11">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
                                         <TextBlock x:Name="SystemAudioLabel" Text="{DynamicResource L.Audio.SystemAudio}"
-                                                   Style="{StaticResource RowLabelText}"/>
-                                        <ToggleButton x:Name="SystemAudioBox" HorizontalAlignment="Right"
+                                                   Style="{StaticResource RowLabelText}"
+                                                   TextWrapping="Wrap" Margin="0,0,12,0"/>
+                                        <ToggleButton x:Name="SystemAudioBox" Grid.Column="1"
                                                       Style="{StaticResource ToggleSwitch}" Click="AudioToggle_Click"/>
                                     </Grid>
                                     <ComboBox x:Name="AudioDeviceBox" Style="{StaticResource DarkCombo}" Margin="13,0,13,11"/>
@@ -1137,7 +1202,7 @@
                                             <ColumnDefinition Width="42"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Text="{DynamicResource L.Audio.Volume}" Style="{StaticResource SecondaryText}"
-                                                   VerticalAlignment="Center"/>
+                                                    VerticalAlignment="Center"/>
                                         <Slider x:Name="SystemVolumeSlider" Grid.Column="1"
                                                 Style="{StaticResource VolumeSlider}"/>
                                         <TextBlock Grid.Column="2"
@@ -1148,8 +1213,13 @@
                                     <Border Style="{StaticResource RowDivider}"/>
                                 </StackPanel>
                                 <Grid Margin="13,11">
-                                    <TextBlock Text="{DynamicResource L.Audio.Microphone}" Style="{StaticResource RowLabelText}"/>
-                                    <ToggleButton x:Name="MicBox" HorizontalAlignment="Right"
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{DynamicResource L.Audio.Microphone}" Style="{StaticResource RowLabelText}"
+                                               TextWrapping="Wrap" Margin="0,0,12,0"/>
+                                    <ToggleButton x:Name="MicBox" Grid.Column="1"
                                                   Style="{StaticResource ToggleSwitch}" Click="AudioToggle_Click"/>
                                 </Grid>
                                 <ComboBox x:Name="MicDeviceBox" Style="{StaticResource DarkCombo}" Margin="13,0,13,11"/>
@@ -1218,7 +1288,7 @@
                                             </Button>
                                         </StackPanel>
                                         <TextBlock x:Name="AudioTrackHintText" Text="{DynamicResource L.Audio.SystemAndMic}"
-                                                   Style="{StaticResource SecondaryText}" Margin="0,3,0,0"/>
+                                                   Style="{StaticResource SecondaryText}" Margin="0,3,0,0" TextWrapping="Wrap"/>
                                     </StackPanel>
                                     <ComboBox x:Name="AudioTrackModeBox" Grid.Column="1"
                                               Style="{StaticResource DarkCombo}"
@@ -1236,10 +1306,14 @@
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                                        <StackPanel Orientation="Horizontal">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
                                             <TextBlock Text="{DynamicResource L.Audio.ApplicationAudio}"
-                                                       Style="{StaticResource RowLabelText}"/>
-                                            <Button Style="{StaticResource HelpIconButton}">
+                                                       Style="{StaticResource RowLabelText}" TextWrapping="Wrap"/>
+                                            <Button Grid.Column="1" Style="{StaticResource HelpIconButton}">
                                                 <Button.ToolTip>
                                                     <ToolTip Style="{StaticResource HelpToolTip}">
                                                         <StackPanel>
@@ -1249,10 +1323,10 @@
                                                     </ToolTip>
                                                 </Button.ToolTip>
                                             </Button>
-                                        </StackPanel>
+                                        </Grid>
                                         <TextBlock x:Name="AdvancedAudioRoutingSummaryText"
                                                    Style="{StaticResource SecondaryText}"
-                                                   Margin="0,3,0,0"/>
+                                                   Margin="0,3,0,0" TextWrapping="Wrap"/>
                                     </StackPanel>
                                     <Button Grid.Column="1"
                                             AutomationProperties.AutomationId="ConfigureAudioRoutingButton"
@@ -1297,8 +1371,8 @@
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Margin="0,0,10,0">
-                                        <TextBlock Text="{DynamicResource L.Storage.ReplayFolder}" Style="{StaticResource RowLabelText}"/>
-                                        <TextBlock x:Name="OutputDirText" Style="{StaticResource MonoText}" MaxWidth="250"/>
+                                        <TextBlock Text="{DynamicResource L.Storage.ReplayFolder}" Style="{StaticResource RowLabelText}" TextWrapping="Wrap"/>
+                                        <TextBlock x:Name="OutputDirText" Style="{StaticResource MonoText}" MaxWidth="250" TextTrimming="CharacterEllipsis"/>
                                     </StackPanel>
                                     <Button x:Name="BrowseOutputButton" Grid.Column="1" Content="{DynamicResource L.Storage.Change}"
                                             Style="{StaticResource SubtleButton}"
@@ -1311,7 +1385,7 @@
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Margin="0,0,12,0">
-                                        <TextBlock Text="{DynamicResource L.Storage.OrganizeByGame}" Style="{StaticResource RowLabelText}"/>
+                                        <TextBlock Text="{DynamicResource L.Storage.OrganizeByGame}" Style="{StaticResource RowLabelText}" TextWrapping="Wrap"/>
                                         <TextBlock Text="{DynamicResource L.Storage.OrganizeByGameHint}"
                                                    Style="{StaticResource SecondaryText}" TextWrapping="Wrap" MaxWidth="285"/>
                                     </StackPanel>
@@ -1338,9 +1412,9 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <StackPanel>
-                                        <TextBlock Text="{DynamicResource L.Hotkey.SaveReplay}" Style="{StaticResource RowLabelText}"/>
-                                        <TextBlock Text="{DynamicResource L.Hotkey.SaveHint}" Style="{StaticResource SecondaryText}"/>
+                                    <StackPanel Margin="0,0,10,0" VerticalAlignment="Center">
+                                        <TextBlock Text="{DynamicResource L.Hotkey.SaveReplay}" Style="{StaticResource RowLabelText}" TextWrapping="Wrap"/>
+                                        <TextBlock Text="{DynamicResource L.Hotkey.SaveHint}" Style="{StaticResource SecondaryText}" TextWrapping="Wrap"/>
                                     </StackPanel>
                                     <Button x:Name="SaveHotkeyButton" Grid.Column="1"
                                             Style="{StaticResource SubtleButton}" MinWidth="128"
@@ -1352,9 +1426,9 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <StackPanel>
-                                        <TextBlock Text="{DynamicResource L.Hotkey.Toggle}" Style="{StaticResource RowLabelText}"/>
-                                        <TextBlock Text="{DynamicResource L.Hotkey.ToggleHint}" Style="{StaticResource SecondaryText}"/>
+                                    <StackPanel Margin="0,0,10,0" VerticalAlignment="Center">
+                                        <TextBlock Text="{DynamicResource L.Hotkey.Toggle}" Style="{StaticResource RowLabelText}" TextWrapping="Wrap"/>
+                                        <TextBlock Text="{DynamicResource L.Hotkey.ToggleHint}" Style="{StaticResource SecondaryText}" TextWrapping="Wrap"/>
                                     </StackPanel>
                                     <Button x:Name="ToggleHotkeyButton" Grid.Column="1"
                                             Style="{StaticResource SubtleButton}" MinWidth="128"
@@ -1366,9 +1440,9 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <StackPanel>
-                                        <TextBlock Text="{DynamicResource L.Hotkey.Record}" Style="{StaticResource RowLabelText}"/>
-                                        <TextBlock Text="{DynamicResource L.Hotkey.RecordHint}" Style="{StaticResource SecondaryText}"/>
+                                    <StackPanel Margin="0,0,10,0" VerticalAlignment="Center">
+                                        <TextBlock Text="{DynamicResource L.Hotkey.Record}" Style="{StaticResource RowLabelText}" TextWrapping="Wrap"/>
+                                        <TextBlock Text="{DynamicResource L.Hotkey.RecordHint}" Style="{StaticResource SecondaryText}" TextWrapping="Wrap"/>
                                     </StackPanel>
                                     <Button x:Name="RecordHotkeyButton" Grid.Column="1"
                                             Style="{StaticResource SubtleButton}" MinWidth="128"
@@ -1380,9 +1454,9 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <StackPanel>
-                                        <TextBlock Text="{DynamicResource L.Hotkey.OpenApp}" Style="{StaticResource RowLabelText}"/>
-                                        <TextBlock Text="{DynamicResource L.Hotkey.OpenAppHint}" Style="{StaticResource SecondaryText}"/>
+                                    <StackPanel Margin="0,0,10,0" VerticalAlignment="Center">
+                                        <TextBlock Text="{DynamicResource L.Hotkey.OpenApp}" Style="{StaticResource RowLabelText}" TextWrapping="Wrap"/>
+                                        <TextBlock Text="{DynamicResource L.Hotkey.OpenAppHint}" Style="{StaticResource SecondaryText}" TextWrapping="Wrap"/>
                                     </StackPanel>
                                     <Button x:Name="OpenAppHotkeyButton" Grid.Column="1"
                                             Style="{StaticResource SubtleButton}" MinWidth="128"
