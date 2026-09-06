@@ -4,6 +4,12 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.5.23] - 2026-09-06
+
+### Fixed
+
+- **Replay card right border clipping at fractional DPI:** Enabled layout rounding and pixel snapping on the settings window and removed container bounds clipping on recent replay cards. The subtle 1-pixel right border on replay items no longer gets clipped or omitted on Windows display scaling such as 125%, 150%, or 175%.
+
 ## [0.5.22] - 2026-09-06
 
 ### Fixed
