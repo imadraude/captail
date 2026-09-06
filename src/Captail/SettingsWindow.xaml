@@ -11,6 +11,8 @@
         Background="Transparent"
         Foreground="{StaticResource TextPrimaryBrush}"
         FontFamily="{StaticResource FontUi}"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True"
         KeyboardNavigation.TabNavigation="None"
         KeyboardNavigation.ControlTabNavigation="None"
         KeyboardNavigation.DirectionalNavigation="None"
@@ -19,6 +21,8 @@
         PreviewMouseDown="Window_PreviewMouseDown"
         PreviewKeyDown="Window_PreviewKeyDown">
     <Border x:Name="WindowFrame"
+            SnapsToDevicePixels="True"
+            UseLayoutRounding="True"
             Background="{StaticResource BgWindowGradient}"
             BorderBrush="{StaticResource WindowBorderBrush}"
             BorderThickness="1"
@@ -442,7 +446,7 @@
                              <Border x:Name="ClipCard" Height="74" Margin="0,0,0,8"
                                      Background="{StaticResource BgSurfaceBrush}"
                                      BorderBrush="{StaticResource DividerBrush}"
-                                     BorderThickness="1" CornerRadius="10" ClipToBounds="True">
+                                     BorderThickness="1" CornerRadius="10">
                                  <Grid>
                                      <Grid.ColumnDefinitions>
                                          <ColumnDefinition Width="112"/>
