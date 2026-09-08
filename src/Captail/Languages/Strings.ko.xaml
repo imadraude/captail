@@ -392,4 +392,8 @@
   <sys:String x:Key="L.Engine.ReplaySuspendedDuringRecording">수동 녹화가 진행되는 동안 인스턴트 리플레이가 일시 중지됩니다.</sys:String>
   <sys:String x:Key="L.Video.KeepRecordingPipelineWarm">녹화 파이프라인 대기 상태 유지</sys:String>
   <sys:String x:Key="L.Help.KeepRecordingPipelineWarm">인스턴트 리플레이가 꺼져 있을 때 캡처 파이프라인을 사전 초기화하여 유휴 메모리를 약간 사용하는 대신 녹화 시작 대기 시간을 줄입니다.</sys:String>
+  <sys:String x:Key="L.Library.Volume">음량</sys:String>
+  <sys:String x:Key="L.Library.Speed">속도</sys:String>
+  <sys:String x:Key="L.Library.Mute">음소거</sys:String>
+  <sys:String x:Key="L.Library.MuteHint">음소거 전환 (M)</sys:String>
 </ResourceDictionary>

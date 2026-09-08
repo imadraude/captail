@@ -392,4 +392,8 @@
   <sys:String x:Key="L.Engine.ReplaySuspendedDuringRecording">O Instant Replay fica suspenso enquanto a gravação manual está ativa.</sys:String>
   <sys:String x:Key="L.Video.KeepRecordingPipelineWarm">Manter pipeline de gravação pré-aquecido</sys:String>
   <sys:String x:Key="L.Help.KeepRecordingPipelineWarm">Pré-inicializa o pipeline de captura quando o Instant Replay está desativado para reduzir o atraso de início da gravação com ligeiro uso de memória ociosa.</sys:String>
+  <sys:String x:Key="L.Library.Volume">Volume</sys:String>
+  <sys:String x:Key="L.Library.Speed">Velocidade</sys:String>
+  <sys:String x:Key="L.Library.Mute">Silenciar</sys:String>
+  <sys:String x:Key="L.Library.MuteHint">Silenciar / ativar som (M)</sys:String>
 </ResourceDictionary>

@@ -4,6 +4,12 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-09-09
+
+### Added
+
+- **Replay playback controls:** Adjust volume from 0–100%, mute or unmute with M, and select playback speeds from 0.25× to 2× using visible controls in the preview, trim editor, and fullscreen player. Settings stay synchronized when switching views and do not change the exported clip.
+
 ## [0.5.23] - 2026-09-06
 
 ### Fixed

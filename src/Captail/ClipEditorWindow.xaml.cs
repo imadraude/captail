@@ -25,7 +25,7 @@ public partial class ClipEditorWindow : Window
 {
     private const double MinimumSelectionSeconds = 0.25;
     private const int TimelineFrameCount = 12;
-    private const double TrimWindowBaseHeight = 790;
+    private const double TrimWindowBaseHeight = 834;
     private const double AudioTrackRowHeight = 48;
     private const int BaseVisibleAudioTracks = 1;
     private const int MaximumVisibleAudioTracks = 6;
@@ -34,7 +34,7 @@ public partial class ClipEditorWindow : Window
     private static readonly double[] PlaybackSpeeds =
         [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
     private static readonly TimeSpan FullscreenControlsTimeout = TimeSpan.FromSeconds(2.4);
-    private const double FullscreenControlsHeight = 58;
+    private const double FullscreenControlsHeight = 102;
     private readonly ReplayLibrary _library;
     private readonly string _rootDirectory;
     private readonly ReplayClip _clip;
@@ -59,6 +59,7 @@ public partial class ClipEditorWindow : Window
     private Visibility _playerVisibilityBeforeOverwrite = Visibility.Collapsed;
     private Visibility _imageVisibilityBeforeOverwrite = Visibility.Visible;
     private bool _isFullscreen;
+    private bool _playbackSpeedMenuOpen;
     private bool _restoreTopmost;
     private Rect _restoreBounds;
     private WindowState _restoreWindowState;
@@ -69,6 +70,49 @@ public partial class ClipEditorWindow : Window
     private bool _editorAssetsStarted;
     private int _playbackSpeedIndex = 3;
     private DateTime? _bufferingSinceUtc;
+
+    public static readonly DependencyProperty PlaybackVolumeProperty = DependencyProperty.Register(
+        nameof(PlaybackVolume), typeof(double), typeof(ClipEditorWindow),
+        new PropertyMetadata(100.0, OnPlaybackSettingsChanged));
+    public static readonly DependencyProperty PlaybackMutedProperty = DependencyProperty.Register(
+        nameof(PlaybackMuted), typeof(bool), typeof(ClipEditorWindow),
+        new PropertyMetadata(false, OnPlaybackSettingsChanged));
+    public static readonly DependencyProperty PlaybackSpeedIndexProperty = DependencyProperty.Register(
+        nameof(PlaybackSpeedIndex), typeof(int), typeof(ClipEditorWindow),
+        new PropertyMetadata(3, OnPlaybackSettingsChanged));
+
+    public double PlaybackVolume
+    {
+        get => (double)GetValue(PlaybackVolumeProperty);
+        set => SetValue(PlaybackVolumeProperty, value);
+    }
+
+    public bool PlaybackMuted
+    {
+        get => (bool)GetValue(PlaybackMutedProperty);
+        set => SetValue(PlaybackMutedProperty, value);
+    }
+
+    public int PlaybackSpeedIndex
+    {
+        get => (int)GetValue(PlaybackSpeedIndexProperty);
+        set => SetValue(PlaybackSpeedIndexProperty, value);
+    }
+
+    private static void OnPlaybackSettingsChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+    {
+        var window = (ClipEditorWindow)sender;
+        window._playbackSpeedIndex = Math.Clamp(window.PlaybackSpeedIndex, 0, PlaybackSpeeds.Length - 1);
+        window.ApplyPlaybackSettings();
+    }
+
+    private void ApplyPlaybackSettings()
+    {
+        if (PreviewPlayer is null || !PreviewPlayer.IsReady)
+            return;
+        PreviewPlayer.SetVolume(PlaybackVolume, PlaybackMuted);
+        PreviewPlayer.SetPlaybackSpeed(PlaybackSpeeds[_playbackSpeedIndex]);
+    }
 
     public ObservableCollection<AudioTrackRow> AudioTracks { get; } = [];
 
@@ -472,6 +516,7 @@ public partial class ClipEditorWindow : Window
                 TimeSpan.FromSeconds(_playbackPosition),
                 SelectedAudioTrackIds(),
                 _lifetimeCts.Token);
+            ApplyPlaybackSettings();
             PreviewImage.Visibility = Visibility.Collapsed;
             PreviewLoadingOverlay.Visibility = Visibility.Collapsed;
             PreviewPlayer.Visibility = Visibility.Visible;
@@ -1313,6 +1358,19 @@ public partial class ClipEditorWindow : Window
     private void FullscreenControls_MouseMove(object sender, MouseEventArgs e) =>
         ShowFullscreenControls();
 
+    private void PlaybackSpeedMenu_Opened(object sender, EventArgs e)
+    {
+        _playbackSpeedMenuOpen = true;
+        ShowFullscreenControls();
+    }
+
+    private void PlaybackSpeedMenu_Closed(object sender, EventArgs e)
+    {
+        _playbackSpeedMenuOpen = false;
+        ShowFullscreenControls();
+        Focus();
+    }
+
     private void UpdateFullscreenControls()
     {
         if (!_isFullscreen)
@@ -1324,7 +1382,7 @@ public partial class ClipEditorWindow : Window
             ShowFullscreenControls();
             return;
         }
-        if (!FullscreenControlBar.IsMouseOver &&
+        if (!FullscreenControlBar.IsMouseOver && !_playbackSpeedMenuOpen &&
             DateTime.UtcNow - _lastPointerActivityUtc >= FullscreenControlsTimeout)
         {
             HideFullscreenControls();
@@ -1353,7 +1411,7 @@ public partial class ClipEditorWindow : Window
         var animation = new DoubleAnimation(0, TimeSpan.FromMilliseconds(170));
         animation.Completed += (_, _) =>
         {
-            if (!_isFullscreen || FullscreenControlBar.IsMouseOver ||
+            if (!_isFullscreen || FullscreenControlBar.IsMouseOver || _playbackSpeedMenuOpen ||
                 DateTime.UtcNow - _lastPointerActivityUtc < FullscreenControlsTimeout)
             {
                 return;
@@ -1405,6 +1463,12 @@ public partial class ClipEditorWindow : Window
 
     private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
+        if (!_saveInProgress && e.OriginalSource is DependencyObject source &&
+            (FindAncestor<ComboBox>(source) is not null ||
+             FindAncestor<Slider>(source) is not null ||
+             FindAncestor<CheckBox>(source) is not null) &&
+            e.Key is Key.Left or Key.Right or Key.Up or Key.Down or Key.Space or Key.Enter or Key.Home or Key.End)
+            return;
         if (e.Key == Key.Tab)
         {
             e.Handled = true;
@@ -1434,6 +1498,12 @@ public partial class ClipEditorWindow : Window
                 ExitFullscreen();
             else
                 EnterFullscreen();
+            e.Handled = true;
+        }
+        else if (e.Key == Key.M && !e.IsRepeat)
+        {
+            PlaybackMuted = !PlaybackMuted;
+            ShowFullscreenControls();
             e.Handled = true;
         }
         else if (e.Key == Key.Space && !e.IsRepeat)
@@ -1480,9 +1550,8 @@ public partial class ClipEditorWindow : Window
         if (nextIndex == _playbackSpeedIndex)
             return;
 
-        _playbackSpeedIndex = nextIndex;
+        PlaybackSpeedIndex = nextIndex;
         double speed = PlaybackSpeeds[_playbackSpeedIndex];
-        PreviewPlayer.SetPlaybackSpeed(speed);
         ShowPlaybackSpeedFeedback(speed);
     }
 

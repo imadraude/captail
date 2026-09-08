@@ -394,4 +394,8 @@
   <sys:String x:Key="L.Engine.ReplaySuspendedDuringRecording">手动录制期间即时重放处于暂停状态。</sys:String>
   <sys:String x:Key="L.Video.KeepRecordingPipelineWarm">保持录制管线处于预热就绪状态</sys:String>
   <sys:String x:Key="L.Help.KeepRecordingPipelineWarm">在即时重放禁用时预初始化捕获管线，以微小的空闲内存代价缩短按下录制的启动延迟。</sys:String>
+  <sys:String x:Key="L.Library.Volume">音量</sys:String>
+  <sys:String x:Key="L.Library.Speed">速度</sys:String>
+  <sys:String x:Key="L.Library.Mute">静音</sys:String>
+  <sys:String x:Key="L.Library.MuteHint">切换静音 (M)</sys:String>
 </ResourceDictionary>

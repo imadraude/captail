@@ -396,4 +396,8 @@
   <sys:String x:Key="L.Engine.ReplaySuspendedDuringRecording">Instant Replay is paused while manual recording is active.</sys:String>
   <sys:String x:Key="L.Video.KeepRecordingPipelineWarm">Keep recording pipeline warm</sys:String>
   <sys:String x:Key="L.Help.KeepRecordingPipelineWarm">Pre-initializes the capture pipeline when Instant Replay is disabled to reduce record start latency at the cost of slight idle background memory.</sys:String>
+  <sys:String x:Key="L.Library.Volume">Volume</sys:String>
+  <sys:String x:Key="L.Library.Speed">Speed</sys:String>
+  <sys:String x:Key="L.Library.Mute">Mute</sys:String>
+  <sys:String x:Key="L.Library.MuteHint">Mute / unmute (M)</sys:String>
 </ResourceDictionary>

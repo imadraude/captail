@@ -15,6 +15,37 @@
         KeyboardNavigation.DirectionalNavigation="None"
         PreviewKeyDown="Window_PreviewKeyDown">
     <Window.Resources>
+        <DataTemplate x:Key="PlaybackSettingsTemplate">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6,0,4">
+                <CheckBox Content="{DynamicResource L.Library.Mute}" Margin="0,0,16,0"
+                          Style="{DynamicResource EditorMergeCheckBox}"
+                          AutomationProperties.Name="{DynamicResource L.Library.Mute}"
+                          VerticalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}"
+                          ToolTip="{DynamicResource L.Library.MuteHint}"
+                          IsChecked="{Binding PlaybackMuted, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}"/>
+                <TextBlock Text="{DynamicResource L.Library.Volume}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <Slider Width="110" Minimum="0" Maximum="100" SmallChange="5" LargeChange="10"
+                        VerticalAlignment="Center" Style="{StaticResource FullscreenProgressSlider}"
+                        AutomationProperties.Name="{DynamicResource L.Library.Volume}"
+                        Value="{Binding PlaybackVolume, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}"/>
+                <TextBlock Width="42" Margin="8,0,20,0" VerticalAlignment="Center"
+                           FontFamily="{StaticResource FontMono}"
+                           Text="{Binding PlaybackVolume, RelativeSource={RelativeSource AncestorType=Window}, StringFormat={}{0:0}%}"/>
+                <TextBlock Text="{DynamicResource L.Library.Speed}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <ComboBox Width="82" VerticalAlignment="Center" Style="{StaticResource DarkCombo}"
+                          DropDownOpened="PlaybackSpeedMenu_Opened" DropDownClosed="PlaybackSpeedMenu_Closed"
+                          AutomationProperties.Name="{DynamicResource L.Library.Speed}"
+                          SelectedIndex="{Binding PlaybackSpeedIndex, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}">
+                    <ComboBoxItem Content="0.25×"/>
+                    <ComboBoxItem Content="0.5×"/>
+                    <ComboBoxItem Content="0.75×"/>
+                    <ComboBoxItem Content="1×"/>
+                    <ComboBoxItem Content="1.25×"/>
+                    <ComboBoxItem Content="1.5×"/>
+                    <ComboBoxItem Content="2×"/>
+                </ComboBox>
+            </StackPanel>
+        </DataTemplate>
         <Style x:Key="EditorMergeCheckBox" TargetType="CheckBox">
             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
             <Setter Property="Background" Value="{StaticResource BgControlBrush}"/>
@@ -167,11 +198,16 @@
                 </Border>
 
                 <Grid x:Name="NormalPlaybackBar" Grid.Row="1" Margin="1,11,1,8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
+                    <ContentControl Grid.Row="1" Grid.ColumnSpan="3" ContentTemplate="{StaticResource PlaybackSettingsTemplate}"/>
                     <TextBlock x:Name="PlaybackTimeText" Text="00:00 / 00:00"
                                FontFamily="{StaticResource FontMono}" FontSize="11.5"
                                Foreground="{StaticResource TextSecondaryBrush}"/>
@@ -222,7 +258,9 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="16"/>
                             <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
+                        <ContentControl Grid.Row="2" ContentTemplate="{StaticResource PlaybackSettingsTemplate}"/>
                         <Slider x:Name="FullscreenProgressSlider"
                                 Style="{StaticResource FullscreenProgressSlider}"
                                 Margin="18,0" VerticalAlignment="Center"
@@ -543,6 +581,7 @@
                         </StackPanel>
                     </Grid>
                     <StackPanel Grid.Row="2" Margin="0,4,0,0">
+                        <ContentControl ContentTemplate="{StaticResource PlaybackSettingsTemplate}"/>
                         <TextBlock Text="{DynamicResource L.Section.Hotkeys}"
                                    Style="{StaticResource SectionHeaderText}"
                                    Margin="2,10,2,7"/>

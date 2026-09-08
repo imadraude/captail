@@ -394,4 +394,8 @@
   <sys:String x:Key="L.Engine.ReplaySuspendedDuringRecording">Instant Replay призупинено на час ручного запису.</sys:String>
   <sys:String x:Key="L.Video.KeepRecordingPipelineWarm">Тримати конвеєр запису прогрітим</sys:String>
   <sys:String x:Key="L.Help.KeepRecordingPipelineWarm">Попередньо ініціалізує конвеєр захоплення, коли Instant Replay вимкнений, щоб скоротити затримку старту запису за рахунок незначної пам'яті в простої.</sys:String>
+  <sys:String x:Key="L.Library.Volume">Гучність</sys:String>
+  <sys:String x:Key="L.Library.Speed">Швидкість</sys:String>
+  <sys:String x:Key="L.Library.Mute">Без звуку</sys:String>
+  <sys:String x:Key="L.Library.MuteHint">Вимкнути / увімкнути звук (M)</sys:String>
 </ResourceDictionary>

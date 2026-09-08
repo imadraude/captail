@@ -392,4 +392,8 @@
   <sys:String x:Key="L.Engine.ReplaySuspendedDuringRecording">手動録画中はインスタントリプレイが一時停止されます。</sys:String>
   <sys:String x:Key="L.Video.KeepRecordingPipelineWarm">録画パイプラインをウォーム状態に維持</sys:String>
   <sys:String x:Key="L.Help.KeepRecordingPipelineWarm">インスタントリプレイが無効な場合でもキャプチャパイプラインを事前初期化し、待機メモリをわずかに消費して録画開始遅延を短縮します。</sys:String>
+  <sys:String x:Key="L.Library.Volume">音量</sys:String>
+  <sys:String x:Key="L.Library.Speed">速度</sys:String>
+  <sys:String x:Key="L.Library.Mute">ミュート</sys:String>
+  <sys:String x:Key="L.Library.MuteHint">ミュート切り替え (M)</sys:String>
 </ResourceDictionary>

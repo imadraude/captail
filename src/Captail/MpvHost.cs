@@ -240,6 +240,14 @@ public sealed class MpvHost : HwndHost
             normalized.ToString("0.##", CultureInfo.InvariantCulture));
     }
 
+    public void SetVolume(double volume, bool muted)
+    {
+        if (!IsReady)
+            return;
+        SetProperty("volume", Math.Clamp(volume, 0, 100).ToString("0.##", CultureInfo.InvariantCulture));
+        SetProperty("mute", muted ? "yes" : "no");
+    }
+
     public void Seek(double positionSeconds, bool exact)
     {
         if (!IsReady)
