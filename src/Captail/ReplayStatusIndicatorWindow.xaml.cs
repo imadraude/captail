@@ -260,13 +260,18 @@ public partial class ReplayStatusIndicatorWindow : Window
         CenterDot.Visibility = Visibility.Visible;
         IndicatorRoot.Opacity = 1;
 
+        // Keep runtime status colors aligned with the Captail 0.7 palette.
+        // Coral is the primary active/recording state; green is reserved for
+        // the transient "saved" confirmation rather than normal operation.
         Color accent = state switch
         {
-            ReplayIndicatorState.Recording => Color.FromRgb(255, 95, 99),
-            ReplayIndicatorState.Recovering => Color.FromRgb(242, 194, 66),
+            ReplayIndicatorState.Active => Color.FromRgb(255, 112, 90),
+            ReplayIndicatorState.Recording => Color.FromRgb(255, 112, 90),
+            ReplayIndicatorState.Recovering => Color.FromRgb(242, 184, 75),
             ReplayIndicatorState.Error => Color.FromRgb(255, 95, 99),
-            ReplayIndicatorState.Suspended => Color.FromRgb(160, 170, 185),
-            _ => Color.FromRgb(99, 224, 189),
+            ReplayIndicatorState.Saved => Color.FromRgb(94, 214, 178),
+            ReplayIndicatorState.Suspended => Color.FromRgb(132, 146, 167),
+            _ => Color.FromRgb(255, 112, 90),
         };
         var brush = new SolidColorBrush(accent);
         StateRing.Stroke = brush;
@@ -275,16 +280,17 @@ public partial class ReplayStatusIndicatorWindow : Window
         switch (state)
         {
             case ReplayIndicatorState.Recording:
-                StateRing.StrokeDashArray = new DoubleCollection([4.77, 2.9]);
+                // Manual recording is the strongest persistent state.
+                StateRing.StrokeDashArray = null;
                 break;
             case ReplayIndicatorState.Active:
-                StateRing.StrokeDashArray = new DoubleCollection([5.93, 4.3]);
+                StateRing.StrokeDashArray = new DoubleCollection([4.4, 3.1]);
                 break;
             case ReplayIndicatorState.Suspended:
-                StateRing.StrokeDashArray = new DoubleCollection([9.5, 5.84]);
+                StateRing.StrokeDashArray = new DoubleCollection([2.2, 3.6]);
                 break;
             case ReplayIndicatorState.Recovering:
-                StateRing.StrokeDashArray = new DoubleCollection([2.5, 2.615]);
+                StateRing.StrokeDashArray = new DoubleCollection([1.5, 2.2]);
                 break;
             case ReplayIndicatorState.Error:
                 CenterDot.Visibility = Visibility.Collapsed;
