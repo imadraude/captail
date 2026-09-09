@@ -4,17 +4,16 @@
         Title="{DynamicResource L.AdvancedAudio.Title}"
         Icon="pack://application:,,,/Captail;component/Assets/Captail.ico"
         Width="620" Height="640"
-        MinWidth="560" MinHeight="520"
         WindowStartupLocation="CenterOwner"
         WindowStyle="None"
-        ResizeMode="CanResizeWithGrip"
+        ResizeMode="NoResize"
         AllowsTransparency="True"
         Background="Transparent"
         Foreground="{StaticResource TextPrimaryBrush}"
         FontFamily="{StaticResource FontUi}"
-        KeyboardNavigation.TabNavigation="None"
-        KeyboardNavigation.ControlTabNavigation="None"
-        KeyboardNavigation.DirectionalNavigation="None"
+        KeyboardNavigation.TabNavigation="Cycle"
+        KeyboardNavigation.ControlTabNavigation="Cycle"
+        KeyboardNavigation.DirectionalNavigation="Contained"
         PreviewKeyDown="Window_PreviewKeyDown">
     <Window.Resources>
         <Style x:Key="RouteCheckBox" TargetType="CheckBox">
@@ -42,8 +41,8 @@
                                       Margin="3" Stretch="Uniform"/>
                             </Border>
                             <Border x:Name="FocusBorder" Margin="-3"
-                                    BorderBrush="{StaticResource AccentBrush}"
-                                    BorderThickness="1.5" CornerRadius="7"
+                                    BorderBrush="{StaticResource FocusBrush}"
+                                    BorderThickness="2" CornerRadius="6"
                                     Visibility="Collapsed" IsHitTestVisible="False"/>
                         </Grid>
                         <ControlTemplate.Triggers>
@@ -85,13 +84,21 @@
                     <ControlTemplate TargetType="ListBoxItem">
                         <Border x:Name="Row"
                                 Background="{TemplateBinding Background}"
-                                CornerRadius="9"
-                                Padding="10,9"
+                                BorderBrush="Transparent"
+                                BorderThickness="2"
+                                CornerRadius="6"
+                                Padding="8,7"
                                 Margin="5,1">
                             <ContentPresenter/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Row" Property="Background"
+                                        Value="{StaticResource BgHoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="Row" Property="BorderBrush"
+                                        Value="{StaticResource FocusBrush}"/>
                                 <Setter TargetName="Row" Property="Background"
                                         Value="{StaticResource BgHoverBrush}"/>
                             </Trigger>
@@ -162,7 +169,8 @@
                 </StackPanel>
                 <Button Grid.Column="2" Style="{StaticResource IconButton}"
                         Click="Close_Click"
-                        ToolTip="{DynamicResource L.Close}">
+                        ToolTip="{DynamicResource L.Close}"
+                        AutomationProperties.Name="{DynamicResource L.Close}">
                     <Path Data="M6 6l12 12 M18 6L6 18"
                           Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                           StrokeThickness="1.8" Width="13" Height="13"
@@ -176,6 +184,7 @@
             <Grid Grid.Row="2" Margin="18,14,18,10">
                 <TextBox x:Name="SearchBox"
                          AutomationProperties.AutomationId="ProcessAudioSearchBox"
+                         AutomationProperties.Name="{DynamicResource L.AdvancedAudio.Search}"
                          Style="{StaticResource DarkTextBox}"
                          Height="38"
                          FontFamily="{StaticResource FontUi}"
@@ -238,6 +247,7 @@
                                 </Grid.ColumnDefinitions>
 
                                 <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                          AutomationProperties.Name="{Binding DisplayName}"
                                           Style="{StaticResource RouteCheckBox}"
                                           VerticalAlignment="Center"
                                           Margin="0,0,11,0"/>
@@ -297,6 +307,7 @@
                                              VerticalAlignment="Center"/>
 
                                 <ComboBox Grid.Column="4"
+                                          AutomationProperties.Name="{DynamicResource L.Audio.Tracks}"
                                           Style="{StaticResource DarkCombo}"
                                           Height="34"
                                           ItemsSource="{Binding DataContext.AvailableTracks, RelativeSource={RelativeSource AncestorType=Window}}"
@@ -361,6 +372,7 @@
                                    Margin="0,3,0,0"/>
                     </StackPanel>
                     <ComboBox x:Name="MicrophoneTrackBox" Grid.Column="2"
+                              AutomationProperties.Name="{DynamicResource L.Audio.Tracks}"
                               Style="{StaticResource DarkCombo}"
                               Height="34"
                               ItemsSource="{Binding AvailableTracks}"
@@ -400,13 +412,13 @@
                     Visibility="Collapsed"
                     VerticalAlignment="Bottom"
                     Margin="18,0,18,70"
-                    Background="#FF201B19"
-                    BorderBrush="#FF76503D"
+                    Background="{StaticResource AccentChipBgBrush}"
+                    BorderBrush="{StaticResource AccentChipBorderBrush}"
                     BorderThickness="1"
                     CornerRadius="9"
                     Padding="12,9">
                 <TextBlock x:Name="ValidationText"
-                           Foreground="#FFE7C0A6"
+                           Foreground="{StaticResource TextPrimaryBrush}"
                            FontSize="11.5"
                            TextWrapping="Wrap"/>
             </Border>

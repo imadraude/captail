@@ -10,9 +10,9 @@
         AllowsTransparency="False" Background="{StaticResource BgWindowBrush}"
         Foreground="{StaticResource TextPrimaryBrush}"
         FontFamily="{StaticResource FontUi}"
-        KeyboardNavigation.TabNavigation="None"
-        KeyboardNavigation.ControlTabNavigation="None"
-        KeyboardNavigation.DirectionalNavigation="None"
+        KeyboardNavigation.TabNavigation="Cycle"
+        KeyboardNavigation.ControlTabNavigation="Cycle"
+        KeyboardNavigation.DirectionalNavigation="Contained"
         PreviewKeyDown="Window_PreviewKeyDown">
     <Window.Resources>
         <DataTemplate x:Key="PlaybackSettingsTemplate">
@@ -52,8 +52,8 @@
             <Setter Property="BorderBrush" Value="{StaticResource BorderControlBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Focusable" Value="False"/>
-            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="Focusable" Value="True"/>
+            <Setter Property="IsTabStop" Value="True"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -68,15 +68,15 @@
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="{TemplateBinding BorderThickness}">
                                 <Path x:Name="Check" Visibility="Collapsed"
-                                      Data="M4 9l3 3 7-7" Stroke="#07110E"
+                                      Data="M4 9l3 3 7-7" Stroke="{StaticResource OnAccentBrush}"
                                       StrokeThickness="2" StrokeStartLineCap="Round"
                                       StrokeEndLineCap="Round" StrokeLineJoin="Round"/>
                             </Border>
                             <ContentPresenter Grid.Column="1" Margin="8,0,0,0"
                                               VerticalAlignment="Center"/>
                             <Border x:Name="FocusBorder" Grid.ColumnSpan="2" Margin="-4"
-                                    BorderBrush="{StaticResource AccentBrush}"
-                                    BorderThickness="1" CornerRadius="7"
+                                    BorderBrush="{StaticResource FocusBrush}"
+                                    BorderThickness="2" CornerRadius="6"
                                     Visibility="Collapsed" IsHitTestVisible="False"/>
                         </Grid>
                         <ControlTemplate.Triggers>
@@ -114,7 +114,7 @@
             <Setter Property="Background" Value="{StaticResource BgControlBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource BorderControlBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="CornerRadius" Value="6"/>
             <Setter Property="HorizontalAlignment" Value="Right"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
@@ -132,7 +132,7 @@
             <Setter Property="Background" Value="{StaticResource AccentChipBgBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource AccentChipBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="CornerRadius" Value="6"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
     </Window.Resources>
@@ -167,7 +167,8 @@
                            TextTrimming="CharacterEllipsis" VerticalAlignment="Center"
                            Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
                 <Button Grid.Column="2" Style="{StaticResource IconButton}"
-                        Click="Close_Click" ToolTip="{DynamicResource L.Close}">
+                        Click="Close_Click" ToolTip="{DynamicResource L.Close}"
+                        AutomationProperties.Name="{DynamicResource L.Close}">
                     <Path Data="M6 6l12 12 M18 6L6 18"
                           Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                           StrokeThickness="1.8" Width="13" Height="13" Stretch="Uniform"/>
@@ -182,13 +183,13 @@
                     <RowDefinition x:Name="ActionsRow" Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <Border x:Name="PreviewBorder" Background="#FF070A0C"
+                <Border x:Name="PreviewBorder" Background="{StaticResource BgDesktopBrush}"
                         BorderBrush="{StaticResource DividerBrush}"
                         BorderThickness="1" CornerRadius="12" ClipToBounds="True">
                     <Grid x:Name="PreviewSurface">
                         <Image x:Name="PreviewImage" Stretch="Uniform"/>
                         <local:MpvHost x:Name="PreviewPlayer" Visibility="Collapsed"/>
-                        <Grid x:Name="PreviewLoadingOverlay" Background="#D6070A0C"
+                        <Grid x:Name="PreviewLoadingOverlay" Background="#E6070A11"
                               Panel.ZIndex="8">
                             <Control Style="{StaticResource LoadingIndicator}"
                                      Width="34" Height="34"
@@ -214,20 +215,23 @@
                     <StackPanel x:Name="EditorTransportControls" Grid.Column="1"
                                 Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button Style="{StaticResource ClipActionButton}" Click="Back_Click"
-                                ToolTip="{DynamicResource L.Library.Back5}">
+                                ToolTip="{DynamicResource L.Library.Back5}"
+                                AutomationProperties.Name="{DynamicResource L.Library.Back5}">
                             <Path Data="M15 5L8 12l7 7 M8 12h10"
                                   Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                                   StrokeThickness="2" StrokeLineJoin="Round" Stretch="Uniform"/>
                         </Button>
                         <Button x:Name="PlayButton" Style="{StaticResource ClipActionButton}"
                                 Click="PlayPause_Click" ToolTip="{DynamicResource L.Library.Play}"
+                                AutomationProperties.Name="{DynamicResource L.Library.Play}"
                                 Margin="6,0,0,0" IsEnabled="False">
                             <Path x:Name="PlayIcon" Data="{StaticResource IconPlay}"
                                   Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                                   Stretch="Uniform"/>
                         </Button>
                         <Button Style="{StaticResource ClipActionButton}" Click="Forward_Click"
-                                ToolTip="{DynamicResource L.Library.Forward5}" Margin="6,0,0,0">
+                                ToolTip="{DynamicResource L.Library.Forward5}"
+                                AutomationProperties.Name="{DynamicResource L.Library.Forward5}" Margin="6,0,0,0">
                             <Path Data="M9 5l7 7-7 7 M6 12h10"
                                   Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                                   StrokeThickness="2" StrokeLineJoin="Round" Stretch="Uniform"/>
@@ -250,7 +254,7 @@
                 </Grid>
 
                 <Border x:Name="FullscreenControlBar" Grid.Row="1"
-                        Background="#FF0B0F11" BorderBrush="{StaticResource DividerBrush}"
+                        Background="{StaticResource BgDesktopBrush}" BorderBrush="{StaticResource DividerBrush}"
                         BorderThickness="0,1,0,0"
                         Visibility="Collapsed" Opacity="0"
                         MouseMove="FullscreenControls_MouseMove">
@@ -344,9 +348,9 @@
                             </ItemsControl>
                         </Border>
                         <Canvas x:Name="RangeOverlay" Background="Transparent">
-                            <Border x:Name="LeftShade" Height="76" Background="#C4070A0C"
+                            <Border x:Name="LeftShade" Height="76" Background="#D9070A11"
                                     CornerRadius="0" IsHitTestVisible="False"/>
-                            <Border x:Name="RightShade" Height="76" Background="#C4070A0C"
+                            <Border x:Name="RightShade" Height="76" Background="#D9070A11"
                                     CornerRadius="0" IsHitTestVisible="False"/>
                             <Border x:Name="SelectionBorder" Height="76"
                                     BorderBrush="{StaticResource AccentBrush}" BorderThickness="3"
@@ -383,8 +387,8 @@
                                 <Thumb.Template>
                                     <ControlTemplate TargetType="Thumb">
                                         <Grid>
-                                            <Rectangle Width="2" Fill="#FFF1F6F4" RadiusX="1" RadiusY="1"/>
-                                            <Ellipse Width="9" Height="9" Fill="#FFF1F6F4"
+                                            <Rectangle Width="2" Fill="{StaticResource TextPrimaryBrush}" RadiusX="1" RadiusY="1"/>
+                                            <Ellipse Width="9" Height="9" Fill="{StaticResource TextPrimaryBrush}"
                                                      VerticalAlignment="Top"/>
                                         </Grid>
                                     </ControlTemplate>
@@ -434,11 +438,11 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Height="42" Margin="0,0,0,6">
-                                        <Border Background="#FF101518" BorderBrush="{StaticResource DividerBrush}"
+                                        <Border Background="{StaticResource BgControlBrush}" BorderBrush="{StaticResource DividerBrush}"
                                                 BorderThickness="1" CornerRadius="8" ClipToBounds="True">
                                             <Grid>
                                                 <Image Source="{Binding Waveform}" Stretch="Fill" Opacity="0.66"/>
-                                                <Border Background="#5A101518"/>
+                                                <Border Background="#70141C29"/>
                                             </Grid>
                                         </Border>
                                         <ToggleButton IsChecked="{Binding IsSelected, Mode=TwoWay}"
@@ -699,7 +703,7 @@
             </Grid>
 
             <Border x:Name="OverwriteConfirmOverlay" Grid.RowSpan="2" Panel.ZIndex="30"
-                    Visibility="Collapsed" Background="#C20A0D0F"
+                    Visibility="Collapsed" Background="#D2070A11"
                     CornerRadius="0">
                 <Border Width="370" Padding="20" HorizontalAlignment="Center"
                         VerticalAlignment="Center" Style="{StaticResource SettingsGroup}">
@@ -730,7 +734,7 @@
                   TextOptions.TextRenderingMode="Grayscale"
                   TextOptions.TextFormattingMode="Display">
                 <Border x:Name="SavingBackdrop" Opacity="0"
-                        Background="#DC0A0D0F"
+                        Background="#EC070A11"
                         CornerRadius="0"/>
                 <StackPanel Width="260" HorizontalAlignment="Center"
                             VerticalAlignment="Center">

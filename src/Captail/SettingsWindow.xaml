@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="{DynamicResource L.Brand}"
         Icon="pack://application:,,,/Captail;component/Assets/Captail.ico"
-        Width="404" Height="650"
+        Width="432" Height="690"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         ResizeMode="NoResize"
@@ -13,9 +13,9 @@
         FontFamily="{StaticResource FontUi}"
         SnapsToDevicePixels="True"
         UseLayoutRounding="True"
-        KeyboardNavigation.TabNavigation="None"
-        KeyboardNavigation.ControlTabNavigation="None"
-        KeyboardNavigation.DirectionalNavigation="None"
+        KeyboardNavigation.TabNavigation="Cycle"
+        KeyboardNavigation.ControlTabNavigation="Cycle"
+        KeyboardNavigation.DirectionalNavigation="Contained"
         Closing="Window_Closing"
         Deactivated="Window_Deactivated"
         PreviewMouseDown="Window_PreviewMouseDown"
@@ -33,13 +33,13 @@
         </Border.RenderTransform>
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="54"/>
+                <RowDefinition Height="56"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="34"/>
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0"
-                  Margin="16,0"
+                  Margin="18,0"
                   Background="Transparent"
                   MouseLeftButtonDown="Header_MouseLeftButtonDown">
                 <Grid.ColumnDefinitions>
@@ -47,12 +47,17 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Grid Width="20" Height="20" VerticalAlignment="Center" Margin="0,0,10,0">
-                    <Ellipse Stroke="{StaticResource AccentBrush}" StrokeThickness="2.4"
-                             StrokeDashArray="15,5" StrokeStartLineCap="Round"/>
-                    <Ellipse Width="5" Height="5" Fill="{StaticResource AccentBrush}"/>
-                </Grid>
-                <TextBlock Grid.Column="1" Text="{DynamicResource L.Brand}" FontSize="14.5" FontWeight="ExtraBold"
+                <Border Width="24" Height="24" VerticalAlignment="Center" Margin="0,0,10,0"
+                        Background="{StaticResource AccentSubtleBrush}"
+                        BorderBrush="{StaticResource AccentDimBrush}" BorderThickness="1"
+                        CornerRadius="6">
+                    <Grid Width="14" Height="14">
+                        <Rectangle Stroke="{StaticResource AccentBrush}" StrokeThickness="1.8"
+                                   RadiusX="3" RadiusY="3"/>
+                        <Ellipse Width="4" Height="4" Fill="{StaticResource AccentBrush}"/>
+                    </Grid>
+                </Border>
+                <TextBlock Grid.Column="1" Text="{DynamicResource L.Brand}" FontSize="15" FontWeight="ExtraBold"
                            VerticalAlignment="Center"/>
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                     <ToggleButton x:Name="LanguageButton"
@@ -61,9 +66,11 @@
                                   FontSize="10.5"
                                   FontWeight="ExtraBold"
                                   IsChecked="{Binding IsOpen, ElementName=LanguagePopup, Mode=TwoWay}"
-                                  ToolTip="{DynamicResource L.LanguageTip}"/>
+                                  ToolTip="{DynamicResource L.LanguageTip}"
+                                  AutomationProperties.Name="{DynamicResource L.LanguageTip}"/>
                     <Button x:Name="SettingsButton" Style="{StaticResource IconButton}"
-                            Click="Settings_Click" ToolTip="{DynamicResource L.Settings}">
+                            Click="Settings_Click" ToolTip="{DynamicResource L.Settings}"
+                            AutomationProperties.Name="{DynamicResource L.Settings}">
                         <Path Data="{StaticResource IconGear}"
                               Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                               StrokeThickness="1.8" Width="15" Height="15" Stretch="Uniform"/>
@@ -87,11 +94,13 @@
                             Margin="0,0,6,0"
                             FontSize="12.5"
                             Click="Apply_Click"/>
-                    <Button Style="{StaticResource IconButton}" Click="Minimize_Click" ToolTip="{DynamicResource L.Minimize}">
+                    <Button Style="{StaticResource IconButton}" Click="Minimize_Click" ToolTip="{DynamicResource L.Minimize}"
+                            AutomationProperties.Name="{DynamicResource L.Minimize}">
                         <Path Data="M4 12h16" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                               StrokeThickness="1.8" Width="13" Height="13" Stretch="Uniform"/>
                     </Button>
-                    <Button Style="{StaticResource CloseIconButton}" Click="Close_Click" ToolTip="{DynamicResource L.Close}">
+                    <Button Style="{StaticResource CloseIconButton}" Click="Close_Click" ToolTip="{DynamicResource L.Close}"
+                            AutomationProperties.Name="{DynamicResource L.Close}">
                         <Path Data="M6 6l12 12 M18 6L6 18"
                               Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                               StrokeThickness="1.8" Width="13" Height="13" Stretch="Uniform"/>
@@ -113,7 +122,7 @@
                 <Border x:Name="LanguagePopupPanel"
                         Width="252"
                         Padding="9"
-                        Background="#FF151A1D"
+                        Background="{StaticResource BgSurfaceBrush}"
                         BorderBrush="{StaticResource WindowBorderBrush}"
                         BorderThickness="1"
                         CornerRadius="12"
@@ -145,30 +154,40 @@
                 </Border>
             </Popup>
 
-            <Grid x:Name="DashboardPanel" Grid.Row="1" Margin="16,4,10,10">
+            <Grid x:Name="DashboardPanel" Grid.Row="1" Margin="18,4,12,12">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <StackPanel Grid.Row="0" Margin="0,0,6,0">
-                <Border Style="{StaticResource SettingsGroup}" Padding="14">
+                <Grid Grid.Row="0" Margin="0,0,6,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" Style="{StaticResource SettingsGroup}" Padding="15,14">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <Grid Width="38" Height="38" Margin="0,0,12,0">
-                            <Ellipse Stroke="{StaticResource DividerBrush}" StrokeThickness="2"/>
-                            <Ellipse x:Name="StatusRing" Stroke="{StaticResource AccentBrush}" StrokeThickness="2"
-                                     StrokeDashCap="Round"
-                                     StrokeDashArray="45, 11.55"
-                                     RenderTransformOrigin="0.5,0.5"/>
-                            <Ellipse x:Name="StatusDot" Width="6" Height="6" Fill="{StaticResource AccentBrush}"/>
-                        </Grid>
+                        <Border Width="42" Height="42" Margin="0,0,13,0"
+                                Background="{StaticResource BgControlBrush}"
+                                BorderBrush="{StaticResource BorderControlBrush}"
+                                BorderThickness="1" CornerRadius="7">
+                            <Grid Width="28" Height="28">
+                                <Rectangle x:Name="StatusRing" Stroke="{StaticResource AccentBrush}"
+                                           StrokeThickness="1.7" RadiusX="5" RadiusY="5"/>
+                                <Ellipse x:Name="StatusDot" Width="7" Height="7"
+                                         Fill="{StaticResource AccentBrush}"/>
+                            </Grid>
+                        </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                             <TextBlock x:Name="StatusTitleText" Text="{DynamicResource L.Status.Enabled}"
-                                       FontSize="14.5" FontWeight="Bold"
+                                       FontSize="15.5" FontWeight="ExtraBold"
                                        TextTrimming="CharacterEllipsis"/>
                             <TextBlock x:Name="StatusDetailText" Text="{DynamicResource L.Status.Idle}"
                                        Style="{StaticResource SecondaryText}" Margin="0,3,0,0"
@@ -177,11 +196,12 @@
                         <ToggleButton x:Name="ReplayToggle" Grid.Column="2"
                                       Style="{StaticResource ToggleSwitch}"
                                       VerticalAlignment="Center"
+                                      AutomationProperties.Name="{DynamicResource L.Replay.Instant}"
                                       Click="ReplayToggle_Click"/>
                     </Grid>
                 </Border>
 
-                <Grid x:Name="DashboardAudioSourceHost" Margin="0,14,0,0"
+                <Grid x:Name="DashboardAudioSourceHost" Grid.Row="2" Margin="0,12,0,0"
                       Height="42" ClipToBounds="True">
                     <Grid x:Name="SimpleAudioSourcePanel">
                         <Grid.ColumnDefinitions>
@@ -250,7 +270,7 @@
                     </Border>
                 </Grid>
 
-                <StackPanel Margin="4,13,4,0">
+                <StackPanel Grid.Row="3" Margin="3,12,3,0">
                     <Grid Margin="0,0,0,8">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <Button x:Name="CodecSummaryButton" Style="{StaticResource DashboardLinkButton}"
@@ -274,16 +294,16 @@
                                  Height="4" Minimum="0" Maximum="100"/>
                 </StackPanel>
 
-                <Grid Margin="0,14,0,0">
+                <Grid Grid.Row="1" Margin="0,12,0,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="1.65*"/>
                         <ColumnDefinition Width="10"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
                     <Button x:Name="SaveReplayButton" Grid.Column="0"
                             Style="{StaticResource AccentButton}"
-                            Height="44" Padding="9,0"
+                            Height="50" Padding="12,0"
                             HorizontalContentAlignment="Stretch"
                             Click="SaveReplay_Click">
                         <Grid>
@@ -300,12 +320,12 @@
                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Grid.Column="1" x:Name="SaveButtonText" Text="Save 5 min"
-                                       FontSize="12" FontWeight="Bold" VerticalAlignment="Center"
+                                       FontSize="13" FontWeight="ExtraBold" VerticalAlignment="Center"
                                        TextTrimming="CharacterEllipsis" Margin="0,0,5,0"/>
                             <Border Grid.Column="2" Background="#24000000" CornerRadius="5"
                                     Padding="5,2" HorizontalAlignment="Right" VerticalAlignment="Center">
                                 <TextBlock x:Name="HotkeySummaryText" Text="Ctrl+Shift+F10"
-                                           FontFamily="{StaticResource FontMono}" FontSize="9"
+                                           FontFamily="{StaticResource FontMono}" FontSize="11"
                                            VerticalAlignment="Center"/>
                             </Border>
                         </Grid>
@@ -313,7 +333,7 @@
 
                     <Button x:Name="RecordButton" Grid.Column="2"
                             Style="{StaticResource RecordActionButton}"
-                            Height="44" Padding="9,0"
+                            Height="50" Padding="11,0"
                             HorizontalContentAlignment="Stretch"
                             Click="RecordButton_Click">
                         <Grid>
@@ -324,9 +344,9 @@
                             </Grid.ColumnDefinitions>
                             <Grid Width="16" Height="16" Margin="0,0,6,0" VerticalAlignment="Center">
                                 <Ellipse x:Name="RecordDot" Width="8" Height="8"
-                                         Fill="#FF5F63" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                         Fill="{StaticResource DangerBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <Rectangle x:Name="RecordSquare" Width="8" Height="8" RadiusX="1.5" RadiusY="1.5"
-                                           Fill="#FF5F63" Visibility="Collapsed"
+                                           Fill="{StaticResource DangerBrush}" Visibility="Collapsed"
                                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Grid.Column="1" x:Name="RecordButtonText" Text="{DynamicResource L.Record.Start}"
@@ -336,7 +356,7 @@
                                     BorderThickness="1" CornerRadius="5"
                                     Padding="5,1.5" HorizontalAlignment="Right" VerticalAlignment="Center">
                                 <TextBlock x:Name="RecordHotkeySummaryText" Text="Ctrl+Shift+F11"
-                                           FontFamily="{StaticResource FontMono}" FontSize="9"
+                                           FontFamily="{StaticResource FontMono}" FontSize="11"
                                            Foreground="{StaticResource TextSecondaryBrush}"
                                            VerticalAlignment="Center"/>
                             </Border>
@@ -344,7 +364,7 @@
                     </Button>
                 </Grid>
 
-                <Grid Margin="2,10,2,0">
+                <Grid Grid.Row="4" Margin="2,10,2,0">
                     <Button x:Name="OutputFolderSummaryButton"
                             HorizontalAlignment="Left" Style="{StaticResource DashboardLinkButton}"
                             Click="OutputFolderSummary_Click" ToolTip="{DynamicResource L.OpenFolderSettings}">
@@ -359,7 +379,7 @@
                         </StackPanel>
                     </Button>
                 </Grid>
-                </StackPanel>
+                </Grid>
 
                 <Grid Grid.Row="1" Margin="0,16,0,0">
                     <Grid.RowDefinitions>
@@ -369,12 +389,16 @@
                     <Grid Margin="2,0,8,8">
                         <TextBlock Text="{DynamicResource L.Library.Recent}"
                                    Style="{StaticResource SectionHeaderText}" Margin="0"
-                                   FontSize="12.5" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                   FontSize="12.5" Foreground="{StaticResource FocusBrush}"/>
                         <Button HorizontalAlignment="Right"
                                 Style="{StaticResource DashboardLinkButton}"
                                 Click="RefreshLibrary_Click"
-                                ToolTip="{DynamicResource L.Library.Refresh}">
-                            <TextBlock Text="↻" FontSize="16"/>
+                                ToolTip="{DynamicResource L.Library.Refresh}"
+                                AutomationProperties.Name="{DynamicResource L.Library.Refresh}">
+                            <Path Data="{StaticResource IconRefresh}"
+                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                  StrokeThickness="1.8" StrokeStartLineCap="Round"
+                                  StrokeEndLineCap="Round" Width="15" Height="15" Stretch="Uniform"/>
                         </Button>
                     </Grid>
                     <StackPanel x:Name="ReplayLibraryLoading" Grid.Row="1"
@@ -406,7 +430,8 @@
                          ScrollViewer.CanContentScroll="True"
                          VirtualizingPanel.IsVirtualizing="True"
                          VirtualizingPanel.VirtualizationMode="Recycling"
-                         ScrollViewer.ScrollChanged="RecentReplays_ScrollChanged">
+                         ScrollViewer.ScrollChanged="RecentReplays_ScrollChanged"
+                         PreviewKeyDown="RecentReplays_PreviewKeyDown">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <VirtualizingStackPanel/>
@@ -419,11 +444,22 @@
                             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                             <Setter Property="Background" Value="Transparent"/>
                             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
-                            <Setter Property="Focusable" Value="False"/>
+                            <Setter Property="Focusable" Value="True"/>
+                            <Setter Property="IsTabStop" Value="True"/>
+                            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="ListBoxItem">
-                                        <ContentPresenter/>
+                                        <Border x:Name="FocusBorder" BorderBrush="Transparent"
+                                                BorderThickness="2" CornerRadius="11">
+                                            <ContentPresenter/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                                <Setter TargetName="FocusBorder" Property="BorderBrush"
+                                                        Value="{StaticResource FocusBrush}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
                                     </ControlTemplate>
                                 </Setter.Value>
                             </Setter>
@@ -439,8 +475,8 @@
                                      <Setter Property="Height" Value="24"/>
                                      <Setter Property="Padding" Value="6"/>
                                      <Setter Property="Margin" Value="1,0,0,0"/>
-                                     <Setter Property="Focusable" Value="False"/>
-                                     <Setter Property="IsTabStop" Value="False"/>
+                                     <Setter Property="Focusable" Value="True"/>
+                                     <Setter Property="IsTabStop" Value="True"/>
                                  </Style>
                              </DataTemplate.Resources>
                              <Border x:Name="ClipCard" Height="74" Margin="0,0,0,8"
@@ -474,14 +510,14 @@
                                              </Border>
                                              <Border HorizontalAlignment="Right" VerticalAlignment="Bottom"
                                                      Margin="5" Padding="5,2" CornerRadius="4"
-                                                     Background="#BB0B0F11">
+                                                     Background="#CC070A11">
                                                  <TextBlock Text="{Binding Duration}" FontFamily="{StaticResource FontMono}"
                                                             FontSize="10.5" Foreground="White"/>
                                              </Border>
                                              <Border x:Name="ThumbnailPlayBadge"
                                                      HorizontalAlignment="Center" VerticalAlignment="Center"
                                                      Width="32" Height="32" CornerRadius="16"
-                                                     Background="#CC0B0F11" BorderBrush="{StaticResource AccentBrush}"
+                                                     Background="#DD070A11" BorderBrush="{StaticResource AccentBrush}"
                                                      BorderThickness="1.5" Opacity="0" IsHitTestVisible="False"
                                                      RenderTransformOrigin="0.5,0.5">
                                                  <Border.RenderTransform>
@@ -508,7 +544,7 @@
                                          <Border x:Name="ClipActionTray"
                                                  HorizontalAlignment="Right" VerticalAlignment="Center"
                                                  Margin="0,0,8,0" Padding="2" CornerRadius="7"
-                                                 Background="#F213171A" BorderBrush="{StaticResource BorderControlBrush}"
+                                                 Background="#F2141C29" BorderBrush="{StaticResource BorderControlBrush}"
                                                  BorderThickness="1" Opacity="0" IsHitTestVisible="False"
                                                  RenderTransformOrigin="0.5,0.5">
                                              <Border.Effect>
@@ -520,22 +556,26 @@
                                              <StackPanel Orientation="Horizontal">
                                                  <Button Style="{StaticResource ReplayCardActionButton}"
                                                          Click="TrimReplay_Click" ToolTip="{DynamicResource L.Library.Trim}"
+                                                         AutomationProperties.Name="{DynamicResource L.Library.Trim}"
                                                          IsEnabled="{Binding CanTrim}">
                                                      <Path Data="{StaticResource IconScissors}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                                                            StrokeThickness="1.8" Stretch="Uniform"/>
                                                  </Button>
                                                  <Button Style="{StaticResource ReplayCardActionButton}"
-                                                         Click="RevealReplay_Click" ToolTip="{DynamicResource L.Library.Open}">
+                                                         Click="RevealReplay_Click" ToolTip="{DynamicResource L.Library.Open}"
+                                                         AutomationProperties.Name="{DynamicResource L.Library.Open}">
                                                      <Path Data="{StaticResource IconFolder}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                                                            StrokeThickness="1.8" Stretch="Uniform"/>
                                                  </Button>
                                                  <Button Style="{StaticResource ReplayCardActionButton}"
-                                                         Click="RequestRenameReplay_Click" ToolTip="{DynamicResource L.Library.Rename}">
+                                                         Click="RequestRenameReplay_Click" ToolTip="{DynamicResource L.Library.Rename}"
+                                                         AutomationProperties.Name="{DynamicResource L.Library.Rename}">
                                                      <Path Data="{StaticResource IconEdit}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                                                            StrokeThickness="1.8" Stretch="Uniform"/>
                                                  </Button>
                                                  <Button Style="{StaticResource ReplayCardActionButton}"
-                                                         Click="RequestDeleteReplay_Click" ToolTip="{DynamicResource L.Library.Delete}">
+                                                         Click="RequestDeleteReplay_Click" ToolTip="{DynamicResource L.Library.Delete}"
+                                                         AutomationProperties.Name="{DynamicResource L.Library.Delete}">
                                                      <Path Data="{StaticResource IconTrash}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                                                            StrokeThickness="1.8" Stretch="Uniform"/>
                                                  </Button>
@@ -548,12 +588,21 @@
                                  <Trigger SourceName="ClipCard" Property="IsMouseOver" Value="True">
                                      <Setter TargetName="ClipActionTray" Property="IsHitTestVisible" Value="True"/>
                                      <Setter TargetName="ClipCard" Property="Background" Value="{StaticResource BgHoverBrush}"/>
-                                     <Setter TargetName="ClipCard" Property="BorderBrush" Value="#FF34423E"/>
+                                     <Setter TargetName="ClipCard" Property="BorderBrush" Value="{StaticResource FocusBrush}"/>
                                  </Trigger>
                                  <Trigger SourceName="ThumbnailContainer" Property="IsMouseOver" Value="True">
                                      <Setter TargetName="ThumbnailPlayBadge" Property="Background" Value="{StaticResource AccentBrush}"/>
                                      <Setter TargetName="ThumbnailPlayBadge" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
-                                     <Setter TargetName="ThumbnailPlayIcon" Property="Fill" Value="#FF0B0F11"/>
+                                     <Setter TargetName="ThumbnailPlayIcon" Property="Fill" Value="{StaticResource BgDesktopBrush}"/>
+                                 </Trigger>
+                                 <Trigger SourceName="ClipCard" Property="IsKeyboardFocusWithin" Value="True">
+                                     <Setter TargetName="ClipActionTray" Property="IsHitTestVisible" Value="True"/>
+                                     <Setter TargetName="ClipActionTray" Property="Opacity" Value="1"/>
+                                     <Setter TargetName="ClipText" Property="Margin" Value="12,10,142,10"/>
+                                     <Setter TargetName="ThumbnailHoverShade" Property="Opacity" Value="1"/>
+                                     <Setter TargetName="ThumbnailPlayBadge" Property="Opacity" Value="1"/>
+                                     <Setter TargetName="ClipCard" Property="Background" Value="{StaticResource BgHoverBrush}"/>
+                                     <Setter TargetName="ClipCard" Property="BorderBrush" Value="{StaticResource FocusBrush}"/>
                                  </Trigger>
                                  <EventTrigger SourceName="ClipCard" RoutedEvent="MouseEnter">
                                      <BeginStoryboard>
@@ -624,12 +673,20 @@
 
             <Grid x:Name="SettingsPanel" Grid.Row="1" Visibility="Collapsed">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="64"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
+                <Border Grid.Row="0" Margin="16,4,10,8" Padding="3,9"
+                        BorderBrush="{StaticResource DividerBrush}"
+                        BorderThickness="0,0,0,1">
+                    <TextBlock Text="{DynamicResource L.Settings}"
+                               FontSize="13" FontWeight="ExtraBold"
+                               Foreground="{StaticResource FocusBrush}"
+                               VerticalAlignment="Center"/>
+                </Border>
                 <Border x:Name="UnsavedChangesBar"
-                        Grid.Row="0" Margin="16,4,10,8" Padding="11,9"
-                        Visibility="Collapsed" Opacity="0"
+                        Grid.Row="0" Panel.ZIndex="2" Margin="16,4,10,8" Padding="11,9"
+                        Visibility="Hidden" Opacity="0"
                         Background="{StaticResource AccentChipBgBrush}"
                         BorderBrush="{StaticResource AccentChipBorderBrush}"
                         BorderThickness="1" CornerRadius="11">
@@ -642,7 +699,7 @@
                                        Foreground="{StaticResource AccentBrush}"
                                        TextTrimming="CharacterEllipsis"/>
                             <TextBlock Text="{DynamicResource L.Settings.UnsavedHint}"
-                                       FontSize="9.5"
+                                       FontSize="11"
                                        Foreground="{StaticResource TextSecondaryBrush}"
                                        TextTrimming="CharacterEllipsis"/>
                     </StackPanel>
@@ -663,6 +720,7 @@
                                     <TextBlock Text="{DynamicResource L.Replay.Instant}" Style="{StaticResource RowLabelText}"
                                                TextWrapping="Wrap" Margin="0,0,12,0"/>
                                     <ToggleButton x:Name="SettingsReplayToggle" Grid.Column="1"
+                                                  AutomationProperties.Name="{DynamicResource L.Replay.Instant}"
                                                   Style="{StaticResource ToggleSwitch}"/>
                                 </Grid>
                                 <Border Style="{StaticResource RowDivider}"/>
@@ -695,10 +753,11 @@
                                         </Grid>
                                         <TextBlock Text="{DynamicResource L.Replay.WarnGameOffHint}"
                                                    Style="{StaticResource SecondaryText}"
-                                                   FontSize="10" Margin="0,2,0,0"
+                                                   FontSize="11" Margin="0,2,0,0"
                                                    TextWrapping="Wrap"/>
                                     </StackPanel>
                                     <ToggleButton x:Name="WarnGameOffBox" Grid.Column="1"
+                                                  AutomationProperties.Name="{DynamicResource L.Replay.WarnGameOff}"
                                                   Style="{StaticResource ToggleSwitch}"
                                                   VerticalAlignment="Center"/>
                                 </Grid>
@@ -732,10 +791,11 @@
                                         </Grid>
                                         <TextBlock Text="{DynamicResource L.Replay.RecordingIndicatorHint}"
                                                    Style="{StaticResource SecondaryText}"
-                                                   FontSize="10" Margin="0,2,0,0"
+                                                   FontSize="11" Margin="0,2,0,0"
                                                    TextWrapping="Wrap"/>
                                     </StackPanel>
                                     <ToggleButton x:Name="RecordingIndicatorBox" Grid.Column="1"
+                                                  AutomationProperties.Name="{DynamicResource L.Replay.RecordingIndicator}"
                                                   Style="{StaticResource ToggleSwitch}"
                                                   VerticalAlignment="Center"/>
                                 </Grid>
@@ -841,7 +901,7 @@
                                         <TextBlock x:Name="BufferLimitHintText"
                                                    Text="{DynamicResource L.Replay.BufferLimitHint}"
                                                    Style="{StaticResource SecondaryText}"
-                                                   FontSize="10" Margin="0,2,0,0"
+                                                   FontSize="11" Margin="0,2,0,0"
                                                    TextWrapping="Wrap"/>
                                     </StackPanel>
                                     <ComboBox x:Name="ReplaySizeLimitBox" Grid.Column="1"
@@ -864,6 +924,7 @@
                                     <TextBlock Text="{DynamicResource L.Replay.StartWindows}" Style="{StaticResource RowLabelText}"
                                                TextWrapping="Wrap" Margin="0,0,12,0"/>
                                     <ToggleButton x:Name="AutostartBox" Grid.Column="1"
+                                                  AutomationProperties.Name="{DynamicResource L.Replay.StartWindows}"
                                                   Style="{StaticResource ToggleSwitch}"/>
                                 </Grid>
                                 <Border Style="{StaticResource RowDivider}"/>
@@ -875,6 +936,7 @@
                                     <TextBlock Text="{DynamicResource L.App.StartInTray}" Style="{StaticResource RowLabelText}"
                                                TextWrapping="Wrap" Margin="0,0,12,0"/>
                                     <ToggleButton x:Name="StartInTrayBox" Grid.Column="1"
+                                                  AutomationProperties.Name="{DynamicResource L.App.StartInTray}"
                                                   Style="{StaticResource ToggleSwitch}"/>
                                 </Grid>
                                 <Border Style="{StaticResource RowDivider}"/>
@@ -886,6 +948,7 @@
                                     <TextBlock Text="{DynamicResource L.Update.AutoUpdate}" Style="{StaticResource RowLabelText}"
                                                TextWrapping="Wrap" Margin="0,0,12,0"/>
                                     <ToggleButton x:Name="AutoUpdateBox" Grid.Column="1"
+                                                  AutomationProperties.Name="{DynamicResource L.Update.AutoUpdate}"
                                                   Style="{StaticResource ToggleSwitch}"/>
                                 </Grid>
                             </StackPanel>
@@ -943,7 +1006,7 @@
                                         </StackPanel>
                                         <TextBlock x:Name="HardwareEncoderText"
                                                    Style="{StaticResource SecondaryText}"
-                                                   FontSize="10" Margin="0,2,0,0"
+                                                   FontSize="11" Margin="0,2,0,0"
                                                    TextTrimming="CharacterEllipsis"/>
                                     </StackPanel>
                                     <ComboBox x:Name="CodecBox" Grid.Column="1"
@@ -1037,7 +1100,7 @@
                                         <TextBlock Text="{DynamicResource L.Video.EstimatedRamBuffer}" Style="{StaticResource RowLabelText}"
                                                    TextWrapping="Wrap"/>
                                         <TextBlock x:Name="RamEstimateText" Style="{StaticResource SecondaryText}"
-                                                   FontSize="10" Margin="0,2,0,0"
+                                                   FontSize="11" Margin="0,2,0,0"
                                                    TextWrapping="Wrap"/>
                                     </StackPanel>
                                 </Grid>
@@ -1195,6 +1258,7 @@
                                                    Style="{StaticResource RowLabelText}"
                                                    TextWrapping="Wrap" Margin="0,0,12,0"/>
                                         <ToggleButton x:Name="SystemAudioBox" Grid.Column="1"
+                                                      AutomationProperties.Name="{DynamicResource L.Audio.SystemAudio}"
                                                       Style="{StaticResource ToggleSwitch}" Click="AudioToggle_Click"/>
                                     </Grid>
                                     <ComboBox x:Name="AudioDeviceBox" Style="{StaticResource DarkCombo}" Margin="13,0,13,11"/>
@@ -1223,6 +1287,7 @@
                                     <TextBlock Text="{DynamicResource L.Audio.Microphone}" Style="{StaticResource RowLabelText}"
                                                TextWrapping="Wrap" Margin="0,0,12,0"/>
                                     <ToggleButton x:Name="MicBox" Grid.Column="1"
+                                                  AutomationProperties.Name="{DynamicResource L.Audio.Microphone}"
                                                   Style="{StaticResource ToggleSwitch}" Click="AudioToggle_Click"/>
                                 </Grid>
                                 <ComboBox x:Name="MicDeviceBox" Style="{StaticResource DarkCombo}" Margin="13,0,13,11"/>
@@ -1393,6 +1458,7 @@
                                                    Style="{StaticResource SecondaryText}" TextWrapping="Wrap" MaxWidth="285"/>
                                     </StackPanel>
                                     <ToggleButton x:Name="OrganizeByGameBox" Grid.Column="1"
+                                                  AutomationProperties.Name="{DynamicResource L.Storage.OrganizeByGame}"
                                                   Style="{StaticResource ToggleSwitch}" VerticalAlignment="Center"/>
                                 </Grid>
                                 <Border Style="{StaticResource RowDivider}"/>
@@ -1499,7 +1565,7 @@
                            Closed="AboutPopup_Closed">
                         <Border x:Name="AboutPopupPanel"
                                 Width="218" Padding="7"
-                                Background="#FF151A1D"
+                                Background="{StaticResource BgSurfaceBrush}"
                                 BorderBrush="{StaticResource WindowBorderBrush}"
                                 BorderThickness="1" CornerRadius="12"
                                 Opacity="0" RenderTransformOrigin="0.5,1">
@@ -1576,7 +1642,7 @@
             <Border x:Name="NoticeBanner" Grid.RowSpan="3" Panel.ZIndex="20"
                     Visibility="Collapsed" Opacity="0"
                     VerticalAlignment="Bottom" Margin="16"
-                    Background="#FF171C1F" BorderBrush="#FF5A3B35" BorderThickness="1"
+                    Background="{StaticResource BgSurfaceBrush}" BorderBrush="{StaticResource AccentChipBorderBrush}" BorderThickness="1"
                     CornerRadius="11" Padding="12">
                 <Border.RenderTransform>
                     <TranslateTransform x:Name="NoticeTranslate" Y="12"/>
@@ -1587,7 +1653,7 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <Border Width="28" Height="28" CornerRadius="14" Background="#26E0A163"
+                    <Border Width="28" Height="28" CornerRadius="7" Background="{StaticResource AccentSubtleBrush}"
                             BorderBrush="{StaticResource ErrorBrush}" BorderThickness="1">
                         <TextBlock Text="!" Foreground="{StaticResource ErrorBrush}"
                                    FontWeight="ExtraBold" FontSize="15"
@@ -1610,7 +1676,7 @@
             </Border>
 
             <Border x:Name="RenameOverlay" Grid.RowSpan="3" Panel.ZIndex="30"
-                    Visibility="Collapsed" Background="#B80A0D0F" CornerRadius="15">
+                    Visibility="Collapsed" Background="#D2070A11" CornerRadius="11">
                 <Border Width="340" Padding="18" HorizontalAlignment="Center" VerticalAlignment="Center"
                         Style="{StaticResource SettingsGroup}">
                     <StackPanel>
@@ -1624,7 +1690,7 @@
                                  KeyDown="RenameTextBox_KeyDown"
                                  TextChanged="RenameTextBox_TextChanged"/>
                         <TextBlock x:Name="RenameErrorText"
-                                   Foreground="#FFDC3545" FontSize="11"
+                                   Foreground="{StaticResource DangerBrush}" FontSize="11"
                                    Margin="0,2,0,8" Visibility="Collapsed"
                                    TextWrapping="Wrap"/>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
@@ -1639,7 +1705,7 @@
             </Border>
 
             <Border x:Name="DeleteConfirmOverlay" Grid.RowSpan="3" Panel.ZIndex="30"
-                    Visibility="Collapsed" Background="#B80A0D0F" CornerRadius="15">
+                    Visibility="Collapsed" Background="#D2070A11" CornerRadius="11">
                 <Border Width="320" Padding="18" HorizontalAlignment="Center" VerticalAlignment="Center"
                         Style="{StaticResource SettingsGroup}">
                     <StackPanel>

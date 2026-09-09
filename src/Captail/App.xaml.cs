@@ -348,6 +348,15 @@ public partial class App : Application
                 StartActivationServer();
                 OpenSettings();
 #if DEBUG
+                if (e.Args.Contains("--qa-active", StringComparer.OrdinalIgnoreCase))
+                {
+                    _config.ReplayEnabled = true;
+                    _settingsWindow?.UpdateRuntimeState(
+                        active: true,
+                        activeCodec: _config.Codec,
+                        activeCaptureSource: _config.CaptureSource,
+                        availableReplaySeconds: _config.BufferSeconds);
+                }
                 if (e.Args.Contains("--qa-recovery", StringComparer.OrdinalIgnoreCase))
                 {
                     _config.ReplayEnabled = true;

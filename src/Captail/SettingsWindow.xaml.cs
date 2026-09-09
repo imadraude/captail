@@ -18,6 +18,7 @@ public partial class SettingsWindow : Window
 {
     private const double DashboardHeight = 650;
     private const int ReplayPageSize = 64;
+    private static bool UiAnimationsEnabled => SystemParameters.ClientAreaAnimation;
 
     private readonly Config _config;
     private readonly Action _saveReplay;
@@ -637,6 +638,13 @@ public partial class SettingsWindow : Window
         outgoing.BeginAnimation(OpacityProperty, null);
         outgoing.Visibility = Visibility.Collapsed;
         incoming.Visibility = Visibility.Visible;
+        if (!UiAnimationsEnabled)
+        {
+            incoming.Opacity = 1;
+            if (incoming.RenderTransform is TranslateTransform finalTranslate)
+                finalTranslate.Y = 0;
+            return;
+        }
         incoming.Opacity = 0;
         if (incoming.RenderTransform is TranslateTransform translate)
         {
@@ -888,20 +896,29 @@ public partial class SettingsWindow : Window
     private void LanguagePopup_Opened(object? sender, EventArgs e)
     {
         UpdateLanguageMenuSelection();
-        LanguagePopupPanel.BeginAnimation(
-            OpacityProperty,
-            new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(120)));
-        if (LanguagePopupPanel.RenderTransform is TranslateTransform translate)
+        if (UiAnimationsEnabled)
         {
-            translate.BeginAnimation(
-                TranslateTransform.YProperty,
-                new DoubleAnimation(-5, 0, TimeSpan.FromMilliseconds(150))
-                {
-                    EasingFunction = new CubicEase
+            LanguagePopupPanel.BeginAnimation(
+                OpacityProperty,
+                new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(120)));
+            if (LanguagePopupPanel.RenderTransform is TranslateTransform translate)
+            {
+                translate.BeginAnimation(
+                    TranslateTransform.YProperty,
+                    new DoubleAnimation(-5, 0, TimeSpan.FromMilliseconds(150))
                     {
-                        EasingMode = EasingMode.EaseOut,
-                    },
-                });
+                        EasingFunction = new CubicEase
+                        {
+                            EasingMode = EasingMode.EaseOut,
+                        },
+                    });
+            }
+        }
+        else
+        {
+            LanguagePopupPanel.Opacity = 1;
+            if (LanguagePopupPanel.RenderTransform is TranslateTransform translate)
+                translate.Y = 0;
         }
 
         Dispatcher.BeginInvoke(DispatcherPriority.Input, () =>
@@ -945,20 +962,29 @@ public partial class SettingsWindow : Window
 
     private void AboutPopup_Opened(object? sender, EventArgs e)
     {
-        AboutPopupPanel.BeginAnimation(
-            OpacityProperty,
-            new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(110)));
-        if (AboutPopupPanel.RenderTransform is TranslateTransform translate)
+        if (UiAnimationsEnabled)
         {
-            translate.BeginAnimation(
-                TranslateTransform.YProperty,
-                new DoubleAnimation(5, 0, TimeSpan.FromMilliseconds(145))
-                {
-                    EasingFunction = new CubicEase
+            AboutPopupPanel.BeginAnimation(
+                OpacityProperty,
+                new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(110)));
+            if (AboutPopupPanel.RenderTransform is TranslateTransform translate)
+            {
+                translate.BeginAnimation(
+                    TranslateTransform.YProperty,
+                    new DoubleAnimation(5, 0, TimeSpan.FromMilliseconds(145))
                     {
-                        EasingMode = EasingMode.EaseOut,
-                    },
-                });
+                        EasingFunction = new CubicEase
+                        {
+                            EasingMode = EasingMode.EaseOut,
+                        },
+                    });
+            }
+        }
+        else
+        {
+            AboutPopupPanel.Opacity = 1;
+            if (AboutPopupPanel.RenderTransform is TranslateTransform translate)
+                translate.Y = 0;
         }
         Dispatcher.BeginInvoke(
             DispatcherPriority.Input,
@@ -1176,6 +1202,7 @@ public partial class SettingsWindow : Window
 
     private void SetSettingsDirty(bool dirty, bool animate = true)
     {
+        animate &= UiAnimationsEnabled;
         _settingsDirty = dirty;
         if (dirty)
         {
@@ -1222,7 +1249,7 @@ public partial class SettingsWindow : Window
         UnsavedChangesTranslate.BeginAnimation(TranslateTransform.YProperty, null);
         if (!animate)
         {
-            UnsavedChangesBar.Visibility = Visibility.Collapsed;
+            UnsavedChangesBar.Visibility = Visibility.Hidden;
             UnsavedChangesBar.Opacity = 0;
             UnsavedChangesTranslate.Y = -6;
             return;
@@ -1233,7 +1260,7 @@ public partial class SettingsWindow : Window
         {
             if (_settingsDirty)
                 return;
-            UnsavedChangesBar.Visibility = Visibility.Collapsed;
+            UnsavedChangesBar.Visibility = Visibility.Hidden;
             UnsavedChangesBar.Opacity = 0;
             UnsavedChangesTranslate.Y = -6;
         };
@@ -1249,6 +1276,12 @@ public partial class SettingsWindow : Window
 
     private void AnimateUnsavedPrompt()
     {
+        if (!UiAnimationsEnabled)
+        {
+            WindowShakeTransform.X = 0;
+            UnsavedChangesBar.Opacity = 1;
+            return;
+        }
         WindowShakeTransform.BeginAnimation(TranslateTransform.XProperty, null);
         var shake = new DoubleAnimationUsingKeyFrames
         {
@@ -1525,18 +1558,21 @@ public partial class SettingsWindow : Window
             RenderUpdateStatus();
             if (_availableUpdate is not null)
             {
-                AnimatePress(UpdateVersionButton);
-                var pulse = new DoubleAnimation(
-                    0.28,
-                    1,
-                    TimeSpan.FromMilliseconds(420))
+                if (UiAnimationsEnabled)
                 {
-                    AutoReverse = true,
-                    RepeatBehavior = new RepeatBehavior(2),
-                };
-                UpdateStatusDot.BeginAnimation(
-                    OpacityProperty,
-                    pulse);
+                    AnimatePress(UpdateVersionButton);
+                    var pulse = new DoubleAnimation(
+                        0.28,
+                        1,
+                        TimeSpan.FromMilliseconds(420))
+                    {
+                        AutoReverse = true,
+                        RepeatBehavior = new RepeatBehavior(2),
+                    };
+                    UpdateStatusDot.BeginAnimation(
+                        OpacityProperty,
+                        pulse);
+                }
             }
         }
         catch (OperationCanceledException)
@@ -2089,11 +2125,6 @@ public partial class SettingsWindow : Window
     {
         if (_capturingHotkeyButton is null)
         {
-            if (e.Key == Key.Tab && RenameOverlay.Visibility != Visibility.Visible)
-            {
-                e.Handled = true;
-                return;
-            }
             if (e.Key == Key.Escape && AboutPopup.IsOpen)
             {
                 AboutPopup.IsOpen = false;
@@ -2582,6 +2613,11 @@ public partial class SettingsWindow : Window
     {
         if (((FrameworkElement)sender).DataContext is not ReplayClipItem item)
             return;
+        RevealReplay(item);
+    }
+
+    private void RevealReplay(ReplayClipItem item)
+    {
         try
         {
             _replayLibrary.Reveal(_outputDirectory, item.Clip);
@@ -2596,6 +2632,11 @@ public partial class SettingsWindow : Window
     {
         if (((FrameworkElement)sender).DataContext is not ReplayClipItem item || !item.CanTrim)
             return;
+        TrimReplay(item);
+    }
+
+    private void TrimReplay(ReplayClipItem item)
+    {
         var editor = new ClipEditorWindow(
             _replayLibrary,
             _outputDirectory,
@@ -2615,6 +2656,11 @@ public partial class SettingsWindow : Window
     {
         if (((FrameworkElement)sender).DataContext is not ReplayClipItem item || !item.CanTrim)
             return;
+        PlayReplay(item);
+    }
+
+    private void PlayReplay(ReplayClipItem item)
+    {
         var player = new ClipEditorWindow(
             _replayLibrary,
             _outputDirectory,
@@ -2644,6 +2690,11 @@ public partial class SettingsWindow : Window
     {
         if (((FrameworkElement)sender).DataContext is not ReplayClipItem item)
             return;
+        RequestRenameReplay(item);
+    }
+
+    private void RequestRenameReplay(ReplayClipItem item)
+    {
         _pendingRenameClip = item.Clip;
         RenameOriginalFileText.Text = item.Clip.Name;
         RenameTextBox.Text = Path.GetFileNameWithoutExtension(item.Clip.Name);
@@ -2762,10 +2813,46 @@ public partial class SettingsWindow : Window
     {
         if (((FrameworkElement)sender).DataContext is not ReplayClipItem item)
             return;
+        RequestDeleteReplay(item);
+    }
+
+    private void RequestDeleteReplay(ReplayClipItem item)
+    {
         _pendingDeleteClip = item.Clip;
         DeleteConfirmFileText.Text = item.Clip.Name;
         DeleteConfirmOverlay.Visibility = Visibility.Visible;
         AnimateView(DeleteConfirmOverlay);
+    }
+
+    private void RecentReplays_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (RecentReplaysList.SelectedItem is not ReplayClipItem item)
+            return;
+
+        switch (e.Key)
+        {
+            case Key.Enter:
+            case Key.Space:
+                if (item.CanTrim)
+                    PlayReplay(item);
+                break;
+            case Key.T when item.CanTrim:
+                TrimReplay(item);
+                break;
+            case Key.O:
+                RevealReplay(item);
+                break;
+            case Key.F2:
+                RequestRenameReplay(item);
+                break;
+            case Key.Delete:
+                RequestDeleteReplay(item);
+                break;
+            default:
+                return;
+        }
+
+        e.Handled = true;
     }
 
     private void CancelDeleteReplay_Click(object sender, RoutedEventArgs e) =>
@@ -2841,6 +2928,12 @@ public partial class SettingsWindow : Window
         NoticeTitleText.Text = title;
         NoticeMessageText.Text = message;
         NoticeBanner.Visibility = Visibility.Visible;
+        if (!UiAnimationsEnabled)
+        {
+            NoticeBanner.Opacity = 1;
+            NoticeTranslate.Y = 0;
+            return;
+        }
         NoticeBanner.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(180))
         {
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
@@ -2866,6 +2959,12 @@ public partial class SettingsWindow : Window
 
     private void HideNotice()
     {
+        if (!UiAnimationsEnabled)
+        {
+            NoticeBanner.Visibility = Visibility.Collapsed;
+            NoticeBanner.Opacity = 0;
+            return;
+        }
         var fade = new DoubleAnimation(NoticeBanner.Opacity, 0, TimeSpan.FromMilliseconds(140));
         fade.Completed += (_, _) =>
         {
@@ -2877,6 +2976,12 @@ public partial class SettingsWindow : Window
 
     private static void AnimateView(FrameworkElement view)
     {
+        if (!UiAnimationsEnabled)
+        {
+            view.RenderTransform = Transform.Identity;
+            view.Opacity = 1;
+            return;
+        }
         var translate = new TranslateTransform(0, 8);
         view.RenderTransform = translate;
         view.Opacity = 0;
@@ -2893,6 +2998,8 @@ public partial class SettingsWindow : Window
 
     private static void AnimatePress(FrameworkElement element)
     {
+        if (!UiAnimationsEnabled)
+            return;
         element.RenderTransformOrigin = new Point(0.5, 0.5);
         var scale = element.RenderTransform as ScaleTransform ?? new ScaleTransform(1, 1);
         element.RenderTransform = scale;

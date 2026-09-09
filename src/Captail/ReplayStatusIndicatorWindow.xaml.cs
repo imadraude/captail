@@ -228,17 +228,20 @@ public partial class ReplayStatusIndicatorWindow : Window
     {
         if (!IsVisible)
         {
-            Opacity = 0;
+            Opacity = SystemParameters.ClientAreaAnimation ? 0 : BaseIndicatorOpacity;
             Show();
-            BeginAnimation(
-                OpacityProperty,
-                new DoubleAnimation(0, BaseIndicatorOpacity, TimeSpan.FromMilliseconds(140))
-                {
-                    EasingFunction = new CubicEase
+            if (SystemParameters.ClientAreaAnimation)
+            {
+                BeginAnimation(
+                    OpacityProperty,
+                    new DoubleAnimation(0, BaseIndicatorOpacity, TimeSpan.FromMilliseconds(140))
                     {
-                        EasingMode = EasingMode.EaseOut,
-                    },
-                });
+                        EasingFunction = new CubicEase
+                        {
+                            EasingMode = EasingMode.EaseOut,
+                        },
+                    });
+            }
         }
         PositionOnForegroundMonitor();
         _positionTimer.Start();

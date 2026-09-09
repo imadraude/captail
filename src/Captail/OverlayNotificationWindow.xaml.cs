@@ -117,6 +117,14 @@ public partial class OverlayNotificationWindow : Window
         if (!IsVisible)
             Show();
 
+        if (!SystemParameters.ClientAreaAnimation)
+        {
+            Opacity = 1;
+            _translate.X = 0;
+            LifeScale.ScaleX = 1;
+            return;
+        }
+
         Opacity = 0;
         _translate.X = 14;
         BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(160))
@@ -141,6 +149,11 @@ public partial class OverlayNotificationWindow : Window
     private void HideAnimated()
     {
         _hideTimer.Stop();
+        if (!SystemParameters.ClientAreaAnimation)
+        {
+            Hide();
+            return;
+        }
         long token = _sequence;
         var fade = new DoubleAnimation(Opacity, 0, TimeSpan.FromMilliseconds(150));
         fade.Completed += (_, _) =>

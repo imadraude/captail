@@ -20,7 +20,7 @@
             <ToggleButton x:Name="Toggle"
                           Focusable="False"
                           IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
-                          BorderBrush="{StaticResource DividerBrush}"
+                          BorderBrush="{StaticResource BorderControlBrush}"
                           ClickMode="Press"
                           Cursor="Hand">
               <ToggleButton.Template>
@@ -29,9 +29,9 @@
                           Background="{StaticResource BgControlBrush}"
                           BorderBrush="{TemplateBinding BorderBrush}"
                           BorderThickness="1"
-                          CornerRadius="8">
+                          CornerRadius="6">
                     <Path x:Name="Chevron" Data="{StaticResource IconChevron}"
-                          Stroke="#FF7D8891"
+                          Stroke="{StaticResource TextMutedBrush}"
                           StrokeThickness="2.4"
                           StrokeStartLineCap="Round"
                           StrokeEndLineCap="Round"
@@ -44,7 +44,7 @@
                   </Border>
                   <ControlTemplate.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
-                      <Setter TargetName="Bd" Property="BorderBrush" Value="#FF3A4A45"/>
+                      <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource FocusBrush}"/>
                       <Setter TargetName="Chevron" Property="Stroke" Value="{StaticResource TextPrimaryBrush}"/>
                     </Trigger>
                     <Trigger Property="IsChecked" Value="True">
@@ -90,10 +90,10 @@
                    AllowsTransparency="True"
                    StaysOpen="False"
                    VerticalOffset="4">
-              <Border Background="#FF15191C"
+              <Border Background="{StaticResource BgSurfaceBrush}"
                       BorderBrush="{StaticResource WindowBorderBrush}"
                       BorderThickness="1"
-                      CornerRadius="10"
+                      CornerRadius="7"
                       Padding="2"
                       MinWidth="{TemplateBinding ActualWidth}"
                       MaxHeight="280">
@@ -109,7 +109,7 @@
               <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
             </Trigger>
             <Trigger Property="IsKeyboardFocusWithin" Value="True">
-              <Setter TargetName="Toggle" Property="BorderBrush" Value="{StaticResource AccentDimBrush}"/>
+              <Setter TargetName="Toggle" Property="BorderBrush" Value="{StaticResource FocusBrush}"/>
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
               <Setter Property="Opacity" Value="0.45"/>

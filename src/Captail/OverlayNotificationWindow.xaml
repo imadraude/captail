@@ -7,9 +7,9 @@
         ShowInTaskbar="False" ShowActivated="False" Topmost="True"
         Focusable="False">
     <Border x:Name="Card"
-            Margin="8"
-            Background="#F5181D20"
-            BorderBrush="#FF2B3236"
+            Margin="12"
+            Background="#F50C111B"
+            BorderBrush="#FF35445A"
             BorderThickness="1"
             CornerRadius="10"
             ClipToBounds="True">
@@ -29,17 +29,17 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Grid x:Name="NotificationIcon" Width="26" Height="26"
+                <Grid x:Name="NotificationIcon" Width="26" Height="26" Margin="0,-2,0,0"
                       VerticalAlignment="Center"
                       SnapsToDevicePixels="True">
-                    <Ellipse x:Name="IconSurface" Fill="#2063E0BD"/>
-                    <Ellipse x:Name="IconRing" Stroke="#7063E0BD" StrokeThickness="1"/>
+                    <Rectangle x:Name="IconSurface" Fill="#2BFF705A" RadiusX="8" RadiusY="8"/>
+                    <Rectangle x:Name="IconRing" Stroke="#66FF705A" StrokeThickness="1" RadiusX="8" RadiusY="8"/>
                     <Viewbox Width="14" Height="14"
                              HorizontalAlignment="Center"
                              VerticalAlignment="Center">
                         <Canvas Width="14" Height="14">
                             <Path x:Name="IconPath"
-                                  Stroke="#FF63E0BD"
+                                  Stroke="#FF5ED6B2"
                                   StrokeThickness="1.7"
                                   StrokeStartLineCap="Round"
                                   StrokeEndLineCap="Round"
@@ -49,7 +49,7 @@
                     </Viewbox>
                     <TextBlock x:Name="IconText"
                                Visibility="Collapsed"
-                               Foreground="#FF63E0BD"
+                               Foreground="#FFFF705A"
                                FontFamily="Segoe UI Variable Text"
                                FontSize="11" FontWeight="SemiBold"
                                HorizontalAlignment="Center"
@@ -58,12 +58,12 @@
 
                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
                     <TextBlock x:Name="TitleText"
-                               Foreground="#FFE7ECEA"
+                               Foreground="#FFF7F4EB"
                                FontFamily="Segoe UI Variable Text"
                                FontSize="12.5" FontWeight="SemiBold"
                                TextTrimming="CharacterEllipsis"/>
                     <TextBlock x:Name="DetailText"
-                               Foreground="#FF9AA5AB"
+                               Foreground="#FFAAB5C6"
                                FontFamily="Segoe UI Variable Text"
                                FontSize="10.5"
                                Margin="0,2,0,0"
@@ -75,10 +75,10 @@
                     Height="2"
                     Margin="12,0,12,7"
                     CornerRadius="1"
-                    Background="#FF252C30"
+                    Background="#FF253044"
                     ClipToBounds="True">
                 <Border x:Name="LifeBar"
-                        Background="#FF63E0BD"
+                        Background="#FFFF705A"
                         RenderTransformOrigin="0,0.5"
                         HorizontalAlignment="Stretch">
                     <Border.RenderTransform>

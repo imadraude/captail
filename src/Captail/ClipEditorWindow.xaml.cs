@@ -1220,8 +1220,13 @@ public partial class ClipEditorWindow : Window
     private void ShowSavingOverlay()
     {
         SavingBackdrop.BeginAnimation(OpacityProperty, null);
-        SavingBackdrop.Opacity = 0;
         SavingOverlay.Visibility = Visibility.Visible;
+        if (!SystemParameters.ClientAreaAnimation)
+        {
+            SavingBackdrop.Opacity = 1;
+            return;
+        }
+        SavingBackdrop.Opacity = 0;
         SavingBackdrop.BeginAnimation(
             OpacityProperty,
             new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(140))
@@ -1396,6 +1401,12 @@ public partial class ClipEditorWindow : Window
         _lastPointerActivityUtc = DateTime.UtcNow;
         PlaybackRow.Height = new GridLength(FullscreenControlsHeight);
         FullscreenControlBar.Visibility = Visibility.Visible;
+        if (!SystemParameters.ClientAreaAnimation)
+        {
+            FullscreenControlBar.Opacity = 1;
+            RefreshFullscreenLayout();
+            return;
+        }
         var animation = new DoubleAnimation(1, TimeSpan.FromMilliseconds(120))
         {
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
@@ -1408,6 +1419,14 @@ public partial class ClipEditorWindow : Window
     {
         if (!_isFullscreen || FullscreenControlBar.Visibility != Visibility.Visible)
             return;
+        if (!SystemParameters.ClientAreaAnimation)
+        {
+            FullscreenControlBar.Opacity = 0;
+            FullscreenControlBar.Visibility = Visibility.Collapsed;
+            PlaybackRow.Height = new GridLength(0);
+            RefreshFullscreenLayout();
+            return;
+        }
         var animation = new DoubleAnimation(0, TimeSpan.FromMilliseconds(170));
         animation.Completed += (_, _) =>
         {
@@ -1469,11 +1488,6 @@ public partial class ClipEditorWindow : Window
              FindAncestor<CheckBox>(source) is not null) &&
             e.Key is Key.Left or Key.Right or Key.Up or Key.Down or Key.Space or Key.Enter or Key.Home or Key.End)
             return;
-        if (e.Key == Key.Tab)
-        {
-            e.Handled = true;
-            return;
-        }
         if (_saveInProgress)
         {
             e.Handled = true;
@@ -1588,7 +1602,7 @@ public partial class ClipEditorWindow : Window
             badge.BeginAnimation(OpacityProperty, null);
             if (badge.Visibility != Visibility.Visible)
                 continue;
-            if (immediate)
+            if (immediate || !SystemParameters.ClientAreaAnimation)
             {
                 badge.Opacity = 0;
                 badge.Visibility = Visibility.Collapsed;

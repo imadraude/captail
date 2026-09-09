@@ -4,6 +4,14 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-09-09
+
+### Improved
+
+- **Complete application UI overhaul:** Rebuilt Captail around a clearer operations-board layout with stronger capture-state hierarchy, a dominant Save Replay action, more readable replay rows, consistent controls, and a new high-contrast navy, coral, and ice-blue visual system across the dashboard, settings, player, trim editor, audio routing, notifications, and recording indicators.
+- **Keyboard and assistive navigation:** Restored Tab navigation across application windows, added visible high-contrast focus treatment, and supplied accessible names for important icon-only actions and recording controls. Mouse, existing hotkeys, and media keyboard behavior remain unchanged.
+- **Efficient native rendering:** The redesigned interface uses lightweight WPF shapes, semantic color resources, restrained motion, and virtualized replay and process lists so the visual update does not add effects to the capture hot path.
+
 ## [0.6.0] - 2026-09-09
 
 ### Added

@@ -30,15 +30,15 @@
 Captail is a focused alternative to NVIDIA ShadowPlay Instant Replay. It keeps the latest seconds or minutes in a rolling buffer, then saves them when you press a hotkey. No scenes, streaming setup, account, cloud upload, analytics, or telemetry.
 
 > [!WARNING]
-> Captail `v0.6.0` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA GeForce GTX 1650 and RTX 40/50 series are tested; other GPUs need broader public testing.
+> Captail `v0.7.0` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA GeForce GTX 1650 and RTX 40/50 series are tested; other GPUs need broader public testing.
 
-## What's new in Captail 0.6.0?
+## What's new in Captail 0.7.0?
 
-Replay playback now has visible volume and speed controls.
+Captail now has a completely redesigned native Windows interface focused on instant capture confidence and speed.
 
-- Adjust volume from 0–100% or toggle mute with M.
-- Select playback speeds from 0.25× to 2× in the preview, trim editor, or fullscreen player. The existing Up/Down shortcuts remain available.
-- Playback settings stay synchronized between views and do not alter saved or trimmed clips.
+- See recording health, capture source, storage, and the primary Save Replay action in a clearer hierarchy.
+- Use a consistent navy, coral, and ice-blue visual system across the dashboard, settings, player, trim editor, audio routing, notifications, and recording indicators.
+- Navigate application windows with Tab and follow a visible focus indicator while keeping existing hotkeys and media controls.
 
 ## Is Captail for me?
 

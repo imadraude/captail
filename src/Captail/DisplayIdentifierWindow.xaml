@@ -20,8 +20,8 @@
                 Width="194" Height="126"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
-                Background="#F2141A1C"
-                BorderBrush="#FF5BE0C0"
+                Background="{StaticResource BgWindowBrush}"
+                BorderBrush="{StaticResource AccentBrush}"
                 BorderThickness="1"
                 CornerRadius="18"
                 Opacity="0"
@@ -40,19 +40,19 @@
                         Margin="0,13,0,0"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Top"
-                        Background="#FF5BE0C0"
+                        Background="{StaticResource AccentBrush}"
                         CornerRadius="2"/>
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                     <TextBlock Text="{DynamicResource L.Video.DisplayLabel}"
                                HorizontalAlignment="Center"
-                               Foreground="#FF93A1A7"
+                               Foreground="{StaticResource TextSecondaryBrush}"
                                FontFamily="Segoe UI Variable Text, Segoe UI"
                                FontSize="10"
                                FontWeight="SemiBold"/>
                     <TextBlock x:Name="DisplayNumberText"
                                Margin="0,-4,0,0"
                                HorizontalAlignment="Center"
-                               Foreground="#FFF3F7F5"
+                               Foreground="{StaticResource TextPrimaryBrush}"
                                FontFamily="Segoe UI Variable Display, Segoe UI"
                                FontSize="62"
                                FontWeight="SemiBold"/>
