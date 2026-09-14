@@ -45,6 +45,14 @@ foreach ($directory in @(
 
 Add-Type -AssemblyName System.Drawing.Common
 
+# Captail 0.7 visual tokens. Keep these synchronized with Theme.xaml.
+$colorWindow = [Drawing.Color]::FromArgb(255, 12, 17, 27)       # #0C111B
+$colorSurface = [Drawing.Color]::FromArgb(255, 20, 28, 41)      # #141C29
+$colorBorder = [Drawing.Color]::FromArgb(255, 41, 54, 74)       # #29364A
+$colorTextPrimary = [Drawing.Color]::FromArgb(255, 247, 244, 235) # #F7F4EB
+$colorTextMuted = [Drawing.Color]::FromArgb(255, 132, 146, 167) # #8492A7
+$colorAccent = [Drawing.Color]::FromArgb(255, 255, 112, 90)     # #FF705A
+
 function New-RoundedRectanglePath {
     param(
         [Drawing.RectangleF]$Bounds,
@@ -78,30 +86,38 @@ function Draw-CaptailMark {
         [Drawing.Color]$Color
     )
 
-    $ringWidth = [single]($Bounds.Width * 0.108)
-    $ringInset = [single]($Bounds.Width * 0.135)
-    $ringBounds = [Drawing.RectangleF]::new(
-        [single]($Bounds.Left + $ringInset),
-        [single]($Bounds.Top + $ringInset),
-        [single]($Bounds.Width - 2 * $ringInset),
-        [single]($Bounds.Height - 2 * $ringInset))
-    $pen = [Drawing.Pen]::new($Color, $ringWidth)
-    $pen.StartCap = [Drawing.Drawing2D.LineCap]::Round
-    $pen.EndCap = [Drawing.Drawing2D.LineCap]::Round
+    # Canonical 0.7 mark: a perfectly centered rounded-square outline plus
+    # one centered capture dot. Use the shorter side so rectangular slots do
+    # not distort the mark.
+    $side = [single][Math]::Min($Bounds.Width, $Bounds.Height)
+    $left = [single]($Bounds.Left + ($Bounds.Width - $side) / 2)
+    $top = [single]($Bounds.Top + ($Bounds.Height - $side) / 2)
+    $stroke = [single]($side * 0.065)
+    $inset = [single]($side * 0.085 + $stroke / 2)
+    $markBounds = [Drawing.RectangleF]::new(
+        [single]($left + $inset),
+        [single]($top + $inset),
+        [single]($side - 2 * $inset),
+        [single]($side - 2 * $inset))
+    $radius = [single]($side * 0.19)
+    $path = New-RoundedRectanglePath $markBounds $radius
+    $pen = [Drawing.Pen]::new($Color, $stroke)
     try {
-        $Graphics.DrawArc($pen, $ringBounds, -72, 304)
+        $pen.LineJoin = [Drawing.Drawing2D.LineJoin]::Round
+        $Graphics.DrawPath($pen, $path)
     }
     finally {
         $pen.Dispose()
+        $path.Dispose()
     }
 
-    $dotSize = [single]($Bounds.Width * 0.145)
+    $dotSize = [single]($side * 0.15)
     $dotBrush = [Drawing.SolidBrush]::new($Color)
     try {
         $Graphics.FillEllipse(
             $dotBrush,
-            [single]($Bounds.Left + ($Bounds.Width - $dotSize) / 2),
-            [single]($Bounds.Top + ($Bounds.Height - $dotSize) / 2),
+            [single]($left + ($side - $dotSize) / 2),
+            [single]($top + ($side - $dotSize) / 2),
             $dotSize,
             $dotSize)
     }
@@ -133,11 +149,8 @@ function New-CaptailMaster {
                 [single]($Size - 2 * $inset),
                 [single]($Size - 2 * $inset))
             $tilePath = New-RoundedRectanglePath $tileBounds ([single]($Size * 0.21))
-            $background = [Drawing.SolidBrush]::new(
-                [Drawing.Color]::FromArgb(255, 18, 23, 26))
-            $border = [Drawing.Pen]::new(
-                [Drawing.Color]::FromArgb(255, 40, 49, 54),
-                [single]($Size * 0.018))
+            $background = [Drawing.SolidBrush]::new($colorWindow)
+            $border = [Drawing.Pen]::new($colorBorder, [single]($Size * 0.018))
             try {
                 $graphics.FillPath($background, $tilePath)
                 $graphics.DrawPath($border, $tilePath)
@@ -155,16 +168,10 @@ function New-CaptailMaster {
             [single]$markInset,
             [single]($Size - 2 * $markInset),
             [single]($Size - 2 * $markInset))
-        $markColor = if ($Transparent) {
-            [Drawing.Color]::FromArgb(255, 69, 201, 167)
-        }
-        else {
-            [Drawing.Color]::FromArgb(255, 99, 224, 189)
-        }
         Draw-CaptailMark `
             -Graphics $graphics `
             -Bounds $markBounds `
-            -Color $markColor
+            -Color $colorAccent
     }
     finally {
         $graphics.Dispose()
@@ -227,7 +234,7 @@ function Save-CoverPng {
     $graphics = [Drawing.Graphics]::FromImage($bitmap)
     try {
         Set-HighQualityGraphics $graphics
-        $graphics.Clear([Drawing.Color]::FromArgb(17, 23, 25))
+        $graphics.Clear($colorWindow)
         $graphics.DrawImage(
             $Source,
             [Drawing.Rectangle]::new(0, 0, $Width, $Height),
@@ -254,11 +261,11 @@ function New-WideLogo {
     $graphics = [Drawing.Graphics]::FromImage($bitmap)
     try {
         Set-HighQualityGraphics $graphics
-        $graphics.Clear([Drawing.Color]::FromArgb(255, 18, 23, 26))
+        $graphics.Clear($colorWindow)
         Draw-CaptailMark `
             -Graphics $graphics `
-            -Bounds ([Drawing.RectangleF]::new(91, 16, 128, 118)) `
-            -Color ([Drawing.Color]::FromArgb(255, 99, 224, 189))
+            -Bounds ([Drawing.RectangleF]::new(91, 11, 128, 128)) `
+            -Color $colorAccent
         $bitmap.Save($Path, [Drawing.Imaging.ImageFormat]::Png)
     }
     finally {
@@ -339,7 +346,11 @@ finally {
 }
 
 & (Join-Path $PSScriptRoot "GenerateAppIcon.ps1") `
+    -Mode Active `
     -OutputPath (Join-Path $windowsDirectory "Captail.ico") | Out-Null
+& (Join-Path $PSScriptRoot "GenerateAppIcon.ps1") `
+    -Mode Inactive `
+    -OutputPath (Join-Path $windowsDirectory "CaptailInactive.ico") | Out-Null
 
 $previewPath = Join-Path $previewDirectory "Captail-Store-Asset-Pack-Preview.png"
 $preview = [Drawing.Bitmap]::new(
@@ -349,11 +360,11 @@ $preview = [Drawing.Bitmap]::new(
 $previewGraphics = [Drawing.Graphics]::FromImage($preview)
 try {
     Set-HighQualityGraphics $previewGraphics
-    $previewGraphics.Clear([Drawing.Color]::FromArgb(255, 12, 16, 18))
+    $previewGraphics.Clear($colorWindow)
     $titleFont = [Drawing.Font]::new("Segoe UI Semibold", 34)
     $labelFont = [Drawing.Font]::new("Segoe UI", 18)
-    $mutedBrush = [Drawing.SolidBrush]::new([Drawing.Color]::FromArgb(255, 151, 163, 169))
-    $whiteBrush = [Drawing.SolidBrush]::new([Drawing.Color]::FromArgb(255, 236, 241, 243))
+    $mutedBrush = [Drawing.SolidBrush]::new($colorTextMuted)
+    $whiteBrush = [Drawing.SolidBrush]::new($colorTextPrimary)
     try {
         $previewGraphics.DrawString("Captail Store Asset Pack", $titleFont, $whiteBrush, 54, 35)
         $previewGraphics.DrawString("Store listing logos", $labelFont, $mutedBrush, 58, 102)
@@ -416,10 +427,10 @@ Use either super banner, not both. Both versions contain no product name, as req
 
 - `Master`: 1024 x 1024 tile, transparent mark, and generated banner source.
 - `MSIX`: package logos plus default, dark-theme, and light-theme target-size variants.
-- `Windows`: common PNG sizes and multi-resolution `Captail.ico`.
+- `Windows`: common PNG sizes and multi-resolution active/inactive Captail icons.
 - `Preview`: contact sheet for quick visual review.
 
-All files are PNG except `Captail.ico`, use the Captail graphite/mint palette, and are generated without third-party marks.
+All generated graphics use the Captail 0.7 graphite/coral palette and canonical centered rounded-square capture mark. No third-party marks are included.
 '@
 [IO.File]::WriteAllText(
     (Join-Path $outputRoot "README.md"),
@@ -433,11 +444,11 @@ Mode: built-in image generation, followed by deterministic local resizing and ic
 
 ## Banner generation prompt
 
-Create a premium abstract 16:9 Microsoft Store super banner for Captail, a lightweight instant replay recorder. Use a deep graphite matte background, subtle rounded layers, a horizontal replay-buffer timeline, restrained waveform details, and mint-teal frame trails. Convey continuous capture, stability, and smooth high-frame-rate motion. Keep important elements inside the central 80% safe area. Use Captail colors `#111719`, `#182024`, `#283238`, `#63E0BD`, and muted teal. No text, product name, letters, numbers, third-party logos, game screenshots, people, devices, cyberpunk, excessive glow, rainbow colors, noisy particles, fake UI text, or watermark.
+Create a premium abstract 16:9 Microsoft Store super banner for Captail, a lightweight instant replay recorder. Use a near-black graphite background, subtle rounded layers, a horizontal replay-buffer timeline, restrained waveform details, coral frame trails, and small ice-blue secondary accents. Convey continuous capture, stability, and smooth high-frame-rate motion. Keep important elements inside the central 80% safe area. Use Captail colors `#0C111B`, `#141C29`, `#29364A`, `#FF705A`, and `#79AEFF`. No text, product name, letters, numbers, third-party logos, game screenshots, people, devices, cyberpunk, excessive glow, rainbow colors, noisy particles, fake UI text, or watermark.
 
 ## Targeted symbol edit prompt
 
-Replace only the central circular arrow with Captail's brand motif: a thick mint circular ring with one clean gap near the upper-right, rounded ends, and a solid mint capture dot centered inside. Remove the arrowhead. Preserve composition, graphite background, timeline, waveform, frame trails, lighting, colors, and all other elements. No text or watermark.
+Replace only the central symbol with Captail's 0.7 brand motif: a clean coral rounded-square outline with even stroke weight and a solid coral capture dot exactly centered inside. Preserve composition, graphite background, timeline, waveform, frame trails, lighting, colors, and all other elements. No text or watermark.
 '@
 [IO.File]::WriteAllText(
     (Join-Path $outputRoot "GENERATION-NOTES.md"),

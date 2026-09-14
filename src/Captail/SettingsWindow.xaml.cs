@@ -516,8 +516,8 @@ public partial class SettingsWindow : Window
                 ? Localization.Text("L.Audio.GameToggleTip")
                 : Localization.Text("L.Audio.ToggleTip");
         SystemSourceChip.IsEnabled = !advancedAudio && _actionInProgress == 0;
-        SystemSourceDot.Fill = FindBrush(hasPrimaryAudio ? "AccentBrush" : "TextMutedBrush");
-        MicSourceDot.Fill = FindBrush(_config.CaptureMicrophone ? "AccentBrush" : "TextMutedBrush");
+        UpdateSourceStatusDot(SystemSourceChip, SystemSourceDot);
+        UpdateSourceStatusDot(MicSourceChip, MicSourceDot);
         UpdateDashboardAudioSources(advancedAudio);
 
         string codec = FormatCodec(activeCodec ?? _config.Codec);
