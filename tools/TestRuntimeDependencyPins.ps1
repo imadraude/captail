@@ -7,10 +7,10 @@ $ffmpegScript = [IO.File]::ReadAllText(
     (Join-Path $repoRoot "tools\AcquireFfmpegRuntime.ps1"))
 
 foreach ($required in @(
-    '$version = "n8.1-2026-09-01"',
-    '14fea72ee692a5f832b8d7b0c7f1c050af124f72cf43d6a948faf98ff3c0072d',
-    '7aeceacf1d52f19a9d3eb232a094d8cfe2883dfd0f566e5c00ea84151b146a55',
-    'autobuild-2026-09-01-13-13'
+    '$version = "n8.1-2026-09-14"',
+    '398be5fb6e09ff3ae419ad62436d566c62705b1cc59bd4f98e8cd79646d42708',
+    '72aed4497d242b5456fc81e924310875727805a40d1d7ad5ff4cb9dbb41558fb',
+    'autobuild-2026-09-14-13-17'
 )) {
     if ($ffmpegScript.IndexOf($required, [StringComparison]::Ordinal) -lt 0) {
         throw "FFmpeg acquisition is missing pinned value: $required"
