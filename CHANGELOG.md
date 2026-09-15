@@ -4,6 +4,12 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.8.8] - 2026-09-15
+
+### Fixed
+
+- **Unified overlay status icons:** Recording, stopping, saving, recovery, warning, information, and error overlays now use the same lightweight Lucide geometry and consistent stroke weight; the persistent replay indicator follows the same circular state language.
+
 ## [0.8.7] - 2026-09-15
 
 ### Fixed

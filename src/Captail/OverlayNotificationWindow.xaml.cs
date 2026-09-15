@@ -68,39 +68,8 @@ public partial class OverlayNotificationWindow : Window
         OverlayTone tone,
         int durationMilliseconds = 3200)
     {
-        Brush accent = new SolidColorBrush(tone switch
-        {
-            OverlayTone.Warning => Color.FromRgb(224, 179, 99),
-            OverlayTone.Error => Color.FromRgb(224, 130, 99),
-            OverlayTone.Neutral => Color.FromRgb(148, 163, 171),
-            _ => Color.FromRgb(99, 224, 189),
-        });
-        Brush accentSurface = new SolidColorBrush(tone switch
-        {
-            OverlayTone.Warning => Color.FromArgb(34, 224, 179, 99),
-            OverlayTone.Error => Color.FromArgb(34, 224, 130, 99),
-            OverlayTone.Neutral => Color.FromArgb(30, 148, 163, 171),
-            _ => Color.FromArgb(32, 99, 224, 189),
-        });
-        Brush accentRing = new SolidColorBrush(tone switch
-        {
-            OverlayTone.Warning => Color.FromArgb(128, 224, 179, 99),
-            OverlayTone.Error => Color.FromArgb(128, 224, 130, 99),
-            OverlayTone.Neutral => Color.FromArgb(112, 148, 163, 171),
-            _ => Color.FromArgb(128, 99, 224, 189),
-        });
-
         _sequence++;
-
-        ApplyIcon(glyph, accent, tone);
-        IconSurface.Fill = accentSurface;
-        IconRing.Stroke = accentRing;
-        LifeBar.Background = accent;
-        TitleText.Text = title;
-        DetailText.Text = detail;
-        DetailText.Visibility = string.IsNullOrWhiteSpace(detail)
-            ? Visibility.Collapsed
-            : Visibility.Visible;
+        ApplyPresentation(glyph, title, detail, tone);
 
         // Card keeps 8 px of transparent room for its shadow. Position the
         // visible card, rather than the layered window, 16 px from the edge.
@@ -134,6 +103,44 @@ public partial class OverlayNotificationWindow : Window
             });
         LifeScale.BeginAnimation(ScaleTransform.ScaleXProperty,
             new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(durationMilliseconds)));
+    }
+
+    internal void PrepareSnapshot(string glyph, string title, OverlayTone tone) =>
+        ApplyPresentation(glyph, title, "Overlay icon QA", tone);
+
+    private void ApplyPresentation(string glyph, string title, string detail, OverlayTone tone)
+    {
+        Brush accent = new SolidColorBrush(tone switch
+        {
+            OverlayTone.Warning => Color.FromRgb(224, 179, 99),
+            OverlayTone.Error => Color.FromRgb(224, 130, 99),
+            OverlayTone.Neutral => Color.FromRgb(148, 163, 171),
+            _ => Color.FromRgb(99, 224, 189),
+        });
+        Brush accentSurface = new SolidColorBrush(tone switch
+        {
+            OverlayTone.Warning => Color.FromArgb(34, 224, 179, 99),
+            OverlayTone.Error => Color.FromArgb(34, 224, 130, 99),
+            OverlayTone.Neutral => Color.FromArgb(30, 148, 163, 171),
+            _ => Color.FromArgb(32, 99, 224, 189),
+        });
+        Brush accentRing = new SolidColorBrush(tone switch
+        {
+            OverlayTone.Warning => Color.FromArgb(128, 224, 179, 99),
+            OverlayTone.Error => Color.FromArgb(128, 224, 130, 99),
+            OverlayTone.Neutral => Color.FromArgb(112, 148, 163, 171),
+            _ => Color.FromArgb(128, 99, 224, 189),
+        });
+
+        ApplyIcon(glyph, accent, tone);
+        IconSurface.Fill = accentSurface;
+        IconRing.Stroke = accentRing;
+        LifeBar.Background = accent;
+        TitleText.Text = title;
+        DetailText.Text = detail;
+        DetailText.Visibility = string.IsNullOrWhiteSpace(detail)
+            ? Visibility.Collapsed
+            : Visibility.Visible;
     }
 
     public void ClosePermanently()
@@ -196,13 +203,13 @@ public partial class OverlayNotificationWindow : Window
 
         if (normalized is "●" or "•" or "dot" or "record" or "live")
         {
-            SetVectorIcon(_recordGeometry, stroke: Brushes.Transparent, fill: accent, strokeThickness: 0);
+            SetVectorIcon(_recordGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.6);
             return;
         }
 
         if (normalized is "■" or "stop" or "square")
         {
-            SetVectorIcon(_stopGeometry, stroke: Brushes.Transparent, fill: accent, strokeThickness: 0);
+            SetVectorIcon(_stopGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.6);
             return;
         }
 

@@ -78,6 +78,23 @@ internal static class Program
             AudioRoutingFormatCapabilities.For("opus"));
         CaptureWindow(routing, "audio-routing", outputDirectory);
 
+        (string Name, string Glyph, string Title, OverlayTone Tone)[] notifications =
+        [
+            ("notification-record", "record", "Recording started", OverlayTone.Neutral),
+            ("notification-stop", "stop", "Recording stopped", OverlayTone.Neutral),
+            ("notification-saved", "success", "Replay saved", OverlayTone.Success),
+            ("notification-error", "error", "Replay failed", OverlayTone.Error),
+            ("notification-warning", "warning", "Capture warning", OverlayTone.Warning),
+            ("notification-info", "info", "Capture information", OverlayTone.Neutral),
+            ("notification-recovering", "recovering", "Recovering capture", OverlayTone.Warning),
+        ];
+        foreach ((string name, string glyph, string title, OverlayTone tone) in notifications)
+        {
+            var notification = new OverlayNotificationWindow();
+            notification.PrepareSnapshot(glyph, title, tone);
+            CaptureWindow(notification, name, outputDirectory);
+        }
+
         string scratch = Path.Combine(outputDirectory, "scratch");
         Directory.CreateDirectory(scratch);
         var library = new ReplayLibrary(new FfmpegAdapter(), scratch);
@@ -98,6 +115,12 @@ internal static class Program
 
         var indicator = new ReplayStatusIndicatorWindow();
         CaptureWindow(indicator, "indicator-active", outputDirectory);
+        indicator.PrepareSnapshotState(ReplayIndicatorState.Recording);
+        CaptureWindow(indicator, "indicator-recording", outputDirectory);
+        indicator.PrepareSnapshotState(ReplayIndicatorState.Suspended);
+        CaptureWindow(indicator, "indicator-suspended", outputDirectory);
+        indicator.PrepareSnapshotState(ReplayIndicatorState.Recovering);
+        CaptureWindow(indicator, "indicator-recovering", outputDirectory);
         indicator.StateRing.Visibility = Visibility.Collapsed;
         indicator.CenterDot.Visibility = Visibility.Collapsed;
         indicator.SavedGlyph.Visibility = Visibility.Visible;
@@ -187,7 +210,7 @@ internal static class Program
         foreach (string key in keys)
         {
             var tile = new StackPanel { Width = 132, Height = 92 };
-            bool isFilled = key is "IconGitHub" or "IconRecord" or "IconStop";
+            bool isFilled = key is "IconGitHub";
             tile.Children.Add(new System.Windows.Shapes.Path
             {
                 Data = (Geometry)Application.Current.FindResource(key),

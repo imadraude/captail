@@ -42,9 +42,7 @@ public sealed class XamlResourceTests
         string[] xamlFiles = Directory.GetFiles(sourceDirectory, "*.xaml", SearchOption.AllDirectories);
         var filledIcons = new HashSet<string>(StringComparer.Ordinal)
         {
-            "IconGitHub",
-            "IconRecord",
-            "IconStop"
+            "IconGitHub"
         };
 
         var violations = new List<string>();
@@ -92,6 +90,25 @@ public sealed class XamlResourceTests
         Assert.DoesNotContain(
             "<Rectangle Stroke=\"{StaticResource AccentBrush}\"",
             xaml,
+            StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void OverlayRecordAndStopStatesUseTheSharedStrokeIconSystem()
+    {
+        string sourceDirectory = FindSourceDirectory();
+        string indicatorXaml = File.ReadAllText(Path.Combine(sourceDirectory, "ReplayStatusIndicatorWindow.xaml"));
+        string notificationCode = File.ReadAllText(Path.Combine(sourceDirectory, "OverlayNotificationWindow.xaml.cs"));
+
+        Assert.Contains("Data=\"{StaticResource IconRecord}\"", indicatorXaml, StringComparison.Ordinal);
+        Assert.DoesNotContain("<Rectangle x:Name=\"StateRing\"", indicatorXaml, StringComparison.Ordinal);
+        Assert.Contains(
+            "SetVectorIcon(_recordGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.6)",
+            notificationCode,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "SetVectorIcon(_stopGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.6)",
+            notificationCode,
             StringComparison.Ordinal);
     }
 

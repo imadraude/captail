@@ -128,6 +128,9 @@ public partial class ReplayStatusIndicatorWindow : Window
         ShowIndicator();
     }
 
+    internal void PrepareSnapshotState(ReplayIndicatorState state) =>
+        ApplyState(state, force: true);
+
     internal void SetPlacement(string placement)
     {
         ReplayIndicatorPlacement normalized = placement switch
