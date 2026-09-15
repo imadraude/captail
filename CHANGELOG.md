@@ -4,6 +4,13 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-09-15
+
+### Fixed
+
+- **Unsaved settings prompt:** The warning rail now replaces the settings heading while it is visible, so the two text layers no longer overlap.
+- **Notification text clipping:** Overlay notifications reserve enough vertical space for both title and detail text, preventing the bottom of characters from being cut off.
+
 ## [0.8.0] - 2026-09-15
 
 ### Added
