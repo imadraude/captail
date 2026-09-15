@@ -676,9 +676,21 @@
                     <RowDefinition Height="64"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Border Grid.Row="0" Margin="16,4,10,8" Padding="3,9"
+                <Border x:Name="SettingsSectionHeader"
+                        Grid.Row="0" Margin="16,4,10,8" Padding="3,9"
                         BorderBrush="{StaticResource DividerBrush}"
                         BorderThickness="0,0,0,1">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Visibility, ElementName=UnsavedChangesBar}"
+                                             Value="Visible">
+                                    <Setter Property="Visibility" Value="Hidden"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
                     <TextBlock Text="{DynamicResource L.Settings}"
                                FontSize="13" FontWeight="ExtraBold"
                                Foreground="{StaticResource FocusBrush}"

@@ -9,6 +9,7 @@ Add-Type -AssemblyName PresentationCore
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $languageRoot = Join-Path $repoRoot "src\Captail\Languages"
 $settingsPath = Join-Path $repoRoot "src\Captail\SettingsWindow.xaml"
+$notificationPath = Join-Path $repoRoot "src\Captail\OverlayNotificationWindow.xaml"
 $statusTitleKeys = @(
     "L.Status.Enabled",
     "L.Status.Disabled",
@@ -52,10 +53,37 @@ $failures = [Collections.Generic.List[string]]::new()
 $files = @(Get-ChildItem -LiteralPath $languageRoot -Filter "Strings.*.xaml")
 
 [xml]$settings = Get-Content -LiteralPath $settingsPath -Encoding utf8
+[xml]$notification = Get-Content -LiteralPath $notificationPath -Encoding utf8
 $namespaces = [Xml.XmlNamespaceManager]::new($settings.NameTable)
 $namespaces.AddNamespace(
     "x",
     "http://schemas.microsoft.com/winfx/2006/xaml")
+
+$settingsHeader = $settings.SelectSingleNode(
+    "//*[@x:Name='SettingsSectionHeader']",
+    $namespaces)
+$unsavedChangesBar = $settings.SelectSingleNode(
+    "//*[@x:Name='UnsavedChangesBar']",
+    $namespaces)
+if ($null -eq $settingsHeader) {
+    $failures.Add(
+        "SettingsWindow.xaml: missing named settings section header")
+}
+else {
+    $hideTrigger = $settingsHeader.SelectSingleNode(
+        ".//*[local-name()='DataTrigger' and contains(@Binding, 'ElementName=UnsavedChangesBar') and @Value='Visible']/*[local-name()='Setter' and @Property='Visibility' and @Value='Hidden']")
+    if ($null -eq $hideTrigger) {
+        $failures.Add(
+            "SettingsWindow.xaml: hide the settings heading while the unsaved prompt occupies its row")
+    }
+}
+
+$notificationHeight = [double]$notification.Window.Height
+if ($notificationHeight -lt 86.0) {
+    $failures.Add(
+        "OverlayNotificationWindow.xaml: ${notificationHeight}px height clips the notification text; at least 86px is required")
+}
+
 foreach ($contract in $settingsLayoutContracts) {
     $node = $settings.SelectSingleNode(
         "//*[@x:Name='$($contract.Name)']",
