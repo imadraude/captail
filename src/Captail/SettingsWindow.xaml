@@ -96,12 +96,12 @@
                             Click="Apply_Click"/>
                     <Button Style="{StaticResource IconButton}" Click="Minimize_Click" ToolTip="{DynamicResource L.Minimize}"
                             AutomationProperties.Name="{DynamicResource L.Minimize}">
-                        <Path Data="M4 12h16" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                        <Path Data="{StaticResource IconMinimize}" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                               StrokeThickness="1.8" Width="13" Height="13" Stretch="Uniform"/>
                     </Button>
                     <Button Style="{StaticResource CloseIconButton}" Click="Close_Click" ToolTip="{DynamicResource L.Close}"
                             AutomationProperties.Name="{DynamicResource L.Close}">
-                        <Path Data="M6 6l12 12 M18 6L6 18"
+                        <Path Data="{StaticResource IconClose}"
                               Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                               StrokeThickness="1.8" Width="13" Height="13" Stretch="Uniform"/>
                     </Button>
@@ -1718,7 +1718,7 @@
                     </StackPanel>
                     <Button Grid.Column="2" Style="{StaticResource IconButton}"
                             Width="24" Height="24" Click="NoticeClose_Click">
-                        <Path Data="M6 6l12 12 M18 6L6 18"
+                        <Path Data="{StaticResource IconClose}"
                               Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                               StrokeThickness="1.8" Width="11" Height="11" Stretch="Uniform"/>
                     </Button>

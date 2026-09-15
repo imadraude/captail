@@ -4,6 +4,12 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.8.4] - 2026-09-15
+
+### Improved
+
+- **Consistent interface icons:** Refined the capture, library, editor, audio-routing, window, and help icons around one balanced 24-pixel vector grid, improving clarity and visual alignment at compact Windows display sizes.
+
 ## [0.8.3] - 2026-09-15
 
 ### Fixed

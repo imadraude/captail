@@ -171,7 +171,7 @@
                         Click="Close_Click"
                         ToolTip="{DynamicResource L.Close}"
                         AutomationProperties.Name="{DynamicResource L.Close}">
-                    <Path Data="M6 6l12 12 M18 6L6 18"
+                    <Path Data="{StaticResource IconClose}"
                           Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                           StrokeThickness="1.8" Width="13" Height="13"
                           Stretch="Uniform"/>
@@ -191,7 +191,7 @@
                          FontSize="12.5"
                          Padding="34,8,12,8"
                          TextChanged="SearchBox_TextChanged"/>
-                <Path Data="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14z M16 16l5 5"
+                <Path Data="{StaticResource IconSearch}"
                       Stroke="{StaticResource TextMutedBrush}"
                       StrokeThickness="1.7"
                       StrokeStartLineCap="Round"
