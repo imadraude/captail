@@ -37,7 +37,7 @@
                     <Viewbox Width="14" Height="14"
                              HorizontalAlignment="Center"
                              VerticalAlignment="Center">
-                        <Canvas Width="14" Height="14">
+                        <Canvas Width="24" Height="24">
                             <Path x:Name="IconPath"
                                   Stroke="#FF5ED6B2"
                                   StrokeThickness="1.7"

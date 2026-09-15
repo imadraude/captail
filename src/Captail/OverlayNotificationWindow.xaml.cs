@@ -17,24 +17,13 @@ public enum OverlayTone
 
 public partial class OverlayNotificationWindow : Window
 {
-    private static readonly Geometry CheckmarkGeometry = Geometry.Parse("M 2.8 7.2 L 5.8 10.2 L 11.2 3.8");
-    private static readonly Geometry CrossGeometry = Geometry.Parse("M 3.6 3.6 L 10.4 10.4 M 10.4 3.6 L 3.6 10.4");
-    private static readonly Geometry WarningGeometry = Geometry.Parse("M 7 1.8 L 12.4 11.6 C 12.7 12.1 12.3 12.8 11.7 12.8 L 2.3 12.8 C 1.7 12.8 1.3 12.1 1.6 11.6 Z M 7 5.4 L 7 8.6 M 7 10.8 L 7 11.0");
-    private static readonly Geometry InfoGeometry = Geometry.Parse("M 7 3.2 L 7 3.4 M 7 5.8 L 7 10.8");
-    private static readonly Geometry DotGeometry = Geometry.Parse("M 7 3.4 A 3.6 3.6 0 1 0 7.01 3.4 Z");
-    private static readonly Geometry SquareGeometry = Geometry.Parse("M 5 3.6 H 9 C 9.8 3.6 10.4 4.2 10.4 5 V 9 C 10.4 9.8 9.8 10.4 9 10.4 H 5 C 4.2 10.4 3.6 9.8 3.6 9 V 5 C 3.6 4.2 4.2 3.6 5 3.6 Z");
-    private static readonly Geometry ReloadGeometry = Geometry.Parse("M 10.5 4.5 A 4.3 4.3 0 1 0 11.3 7 M 10.5 2.2 L 10.5 4.5 L 8.2 4.5");
-
-    static OverlayNotificationWindow()
-    {
-        CheckmarkGeometry.Freeze();
-        CrossGeometry.Freeze();
-        WarningGeometry.Freeze();
-        InfoGeometry.Freeze();
-        DotGeometry.Freeze();
-        SquareGeometry.Freeze();
-        ReloadGeometry.Freeze();
-    }
+    private readonly Geometry _checkmarkGeometry;
+    private readonly Geometry _crossGeometry;
+    private readonly Geometry _warningGeometry;
+    private readonly Geometry _infoGeometry;
+    private readonly Geometry _recordGeometry;
+    private readonly Geometry _stopGeometry;
+    private readonly Geometry _reloadGeometry;
 
     private const int GwlExStyle = -20;
     private const int WsExTransparent = 0x00000020;
@@ -51,6 +40,13 @@ public partial class OverlayNotificationWindow : Window
     public OverlayNotificationWindow()
     {
         InitializeComponent();
+        _checkmarkGeometry = (Geometry)FindResource("IconCheck");
+        _crossGeometry = (Geometry)FindResource("IconClose");
+        _warningGeometry = (Geometry)FindResource("IconWarning");
+        _infoGeometry = (Geometry)FindResource("IconInfo");
+        _recordGeometry = (Geometry)FindResource("IconRecord");
+        _stopGeometry = (Geometry)FindResource("IconStop");
+        _reloadGeometry = (Geometry)FindResource("IconReload");
         Card.RenderTransform = _translate;
         _hideTimer = new DispatcherTimer();
         _hideTimer.Tick += (_, _) => HideAnimated();
@@ -176,43 +172,43 @@ public partial class OverlayNotificationWindow : Window
 
         if (normalized is "✓" or "✔" or "check" or "success")
         {
-            SetVectorIcon(CheckmarkGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.7);
+            SetVectorIcon(_checkmarkGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.8);
             return;
         }
 
         if (normalized is "✕" or "✖" or "x" or "X" or "error")
         {
-            SetVectorIcon(CrossGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.7);
+            SetVectorIcon(_crossGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.8);
             return;
         }
 
         if (normalized is "⚠" or "!" or "warning" or "alert")
         {
-            SetVectorIcon(WarningGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.35);
+            SetVectorIcon(_warningGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.65);
             return;
         }
 
         if (normalized is "ℹ" or "i" or "info")
         {
-            SetVectorIcon(InfoGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.7);
+            SetVectorIcon(_infoGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.8);
             return;
         }
 
         if (normalized is "●" or "•" or "dot" or "record" or "live")
         {
-            SetVectorIcon(DotGeometry, stroke: Brushes.Transparent, fill: accent, strokeThickness: 0);
+            SetVectorIcon(_recordGeometry, stroke: Brushes.Transparent, fill: accent, strokeThickness: 0);
             return;
         }
 
         if (normalized is "■" or "stop" or "square")
         {
-            SetVectorIcon(SquareGeometry, stroke: Brushes.Transparent, fill: accent, strokeThickness: 0);
+            SetVectorIcon(_stopGeometry, stroke: Brushes.Transparent, fill: accent, strokeThickness: 0);
             return;
         }
 
         if (normalized is "⟳" or "↻" or "reload" or "sync" or "saving" or "recovering")
         {
-            SetVectorIcon(ReloadGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.5);
+            SetVectorIcon(_reloadGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.8);
             return;
         }
 
@@ -221,16 +217,16 @@ public partial class OverlayNotificationWindow : Window
             switch (tone)
             {
                 case OverlayTone.Success:
-                    SetVectorIcon(CheckmarkGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.7);
+                    SetVectorIcon(_checkmarkGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.8);
                     break;
                 case OverlayTone.Warning:
-                    SetVectorIcon(WarningGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.35);
+                    SetVectorIcon(_warningGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.65);
                     break;
                 case OverlayTone.Error:
-                    SetVectorIcon(CrossGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.7);
+                    SetVectorIcon(_crossGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.8);
                     break;
                 default:
-                    SetVectorIcon(InfoGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.7);
+                    SetVectorIcon(_infoGeometry, stroke: accent, fill: Brushes.Transparent, strokeThickness: 1.8);
                     break;
             }
             return;

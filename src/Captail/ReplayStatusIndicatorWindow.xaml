@@ -35,15 +35,15 @@
                      Fill="#FFFF705A"
                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
             <Path x:Name="SavedGlyph" Visibility="Collapsed"
-                  Data="M 2.7 6.2 L 4.8 8.3 L 9.6 3.7"
+                  Data="{StaticResource IconCheck}"
                   Stroke="#FF5ED6B2" StrokeThickness="1.45"
                   StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                  StrokeLineJoin="Round"/>
+                  StrokeLineJoin="Round" Margin="1.8" Stretch="Uniform"/>
             <Path x:Name="ErrorGlyph" Visibility="Collapsed"
-                  Data="M 3.4 3.4 L 8.6 8.6 M 8.6 3.4 L 3.4 8.6"
+                  Data="{StaticResource IconClose}"
                   Stroke="#FFFF5F63" StrokeThickness="1.45"
                   StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                  StrokeLineJoin="Round"/>
+                  StrokeLineJoin="Round" Margin="2" Stretch="Uniform"/>
         </Grid>
     </Grid>
 </Window>

@@ -68,9 +68,10 @@
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="{TemplateBinding BorderThickness}">
                                 <Path x:Name="Check" Visibility="Collapsed"
-                                      Data="M4 9l3 3 7-7" Stroke="{StaticResource OnAccentBrush}"
+                                      Data="{StaticResource IconCheck}" Stroke="{StaticResource OnAccentBrush}"
                                       StrokeThickness="2" StrokeStartLineCap="Round"
-                                      StrokeEndLineCap="Round" StrokeLineJoin="Round"/>
+                                      StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                                      Margin="3" Stretch="Uniform"/>
                             </Border>
                             <ContentPresenter Grid.Column="1" Margin="8,0,0,0"
                                               VerticalAlignment="Center"/>

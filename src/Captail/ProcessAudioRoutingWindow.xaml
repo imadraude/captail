@@ -31,7 +31,7 @@
                                     BorderThickness="1"
                                     CornerRadius="5">
                                 <Path x:Name="Check"
-                                      Data="M4 9l3 3 7-7"
+                                      Data="{StaticResource IconCheck}"
                                       Stroke="{StaticResource OnAccentBrush}"
                                       StrokeThickness="2"
                                       StrokeStartLineCap="Round"

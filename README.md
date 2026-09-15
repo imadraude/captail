@@ -30,13 +30,13 @@
 Captail is a focused alternative to NVIDIA ShadowPlay Instant Replay. It keeps the latest seconds or minutes in a rolling buffer, then saves them when you press a hotkey. No scenes, streaming setup, account, cloud upload, analytics, or telemetry.
 
 > [!WARNING]
-> Captail `v0.8.4` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA GeForce GTX 1650 and RTX 40/50 series are tested; other GPUs need broader public testing.
+> Captail `v0.8.5` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA GeForce GTX 1650 and RTX 40/50 series are tested; other GPUs need broader public testing.
 
-## What's new in Captail 0.8.4?
+## What's new in Captail 0.8.5?
 
-Captail 0.8.4 gives the interface a cleaner, more consistent icon system:
+Captail 0.8.5 completes the interface-wide icon-system refresh:
 
-- **Unified vector icons:** Window controls, capture actions, replay tools, editor navigation, audio routing, search, and help now share a balanced 24-pixel grid for sharper alignment at compact Windows display sizes.
+- **One coherent icon language:** Actions, statuses, checkboxes, notifications, replay indicators, app and tray marks, favicon, and social artwork now share the same compact geometry and Captail palette. Icons belonging to other applications remain untouched and recognizable.
 
 ## Is Captail for me?
 

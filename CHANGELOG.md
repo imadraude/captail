@@ -4,6 +4,12 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.8.5] - 2026-09-15
+
+### Improved
+
+- **Complete icon-system unification:** Consolidated every Captail-owned action, status, checkbox, notification, replay indicator, app, tray, favicon, and social icon into the same compact geometry, rounded construction, and coral-and-ice visual language. Third-party process icons remain unchanged so applications stay recognizable.
+
 ## [0.8.4] - 2026-09-15
 
 ### Improved
