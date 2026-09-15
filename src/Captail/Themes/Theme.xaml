@@ -82,38 +82,44 @@
   <CornerRadius x:Key="RadiusControl">6</CornerRadius>
 
   <!-- ============ ICON GEOMETRY (viewbox 24) ============ -->
-  <!-- One optical family: 24 px grid, rounded 1.8 px stroke, restrained detail. -->
-  <Geometry x:Key="IconDownload">M12 3v12 M7.5 10.5L12 15l4.5-4.5 M4 15.5V20h16v-4.5</Geometry>
-  <Geometry x:Key="IconFolder">M3 6h6l2 2h10v11H3z</Geometry>
-  <Geometry x:Key="IconChevron">M7 9.5l5 5 5-5</Geometry>
-  <Geometry x:Key="IconBack">M19 12H5 M10.5 6.5L5 12l5.5 5.5</Geometry>
-  <Geometry x:Key="IconClose">M6.5 6.5l11 11 M17.5 6.5l-11 11</Geometry>
+  <!-- Lucide UI icons: official 24 px geometry, rendered with round caps/joins. -->
+  <Geometry x:Key="IconDownload">M12 15V3 M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M7 10l5 5 5-5</Geometry>
+  <Geometry x:Key="IconFolder">M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z</Geometry>
+  <Geometry x:Key="IconChevron">M6 9l6 6 6-6</Geometry>
+  <Geometry x:Key="IconBack">M12 19l-7-7 7-7 M19 12H5</Geometry>
+  <Geometry x:Key="IconClose">M18 6L6 18 M6 6l12 12</Geometry>
   <Geometry x:Key="IconMinimize">M5 12h14</Geometry>
-  <Geometry x:Key="IconPrevious">M15.5 6.5L10 12l5.5 5.5 M10 12h9</Geometry>
-  <Geometry x:Key="IconNext">M8.5 6.5L14 12l-5.5 5.5 M14 12H5</Geometry>
-  <Geometry x:Key="IconSearch">M10.5 4.5a6 6 0 1 0 0 12 6 6 0 0 0 0-12z M15 15l4.5 4.5</Geometry>
-  <Geometry x:Key="IconDisplay">M3 4.5h18v12H3z M8 20h8 M12 16.5V20</Geometry>
-  <Geometry x:Key="IconMic">M9 4a3 3 0 0 1 6 0v7a3 3 0 0 1-6 0z M5.5 10.5v.5a6.5 6.5 0 0 0 13 0v-.5 M12 17.5V21 M8.5 21h7</Geometry>
-  <Geometry x:Key="IconGear">M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z M19.4 13.5l1.6 1.2-2 3.5-1.9-.8a7.7 7.7 0 0 1-2.1 1.2l-.2 2H9.2l-.2-2a7.7 7.7 0 0 1-2.1-1.2l-1.9.8-2-3.5 1.6-1.2a7.3 7.3 0 0 1 0-3L3 9.3l2-3.5 1.9.8A7.7 7.7 0 0 1 9 5.4l.2-2h5.6l.2 2a7.7 7.7 0 0 1 2.1 1.2l1.9-.8 2 3.5-1.6 1.2a7.3 7.3 0 0 1 0 3z</Geometry>
-  <Geometry x:Key="IconScissors">M6.5 4a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z M6.5 15a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z M8.7 8.2L20 19.5 M8.7 15.8L20 4.5</Geometry>
-  <Geometry x:Key="IconTrash">M4 7h16 M9 7V4h6v3 M18.5 7l-.8 13H6.3L5.5 7 M10 11v5 M14 11v5</Geometry>
-  <Geometry x:Key="IconEdit">M14.5 5.5l4 4 M5 19l1-4L16.5 4.5a1.4 1.4 0 0 1 2 0l1 1a1.4 1.4 0 0 1 0 2L9 18z M4 21h16</Geometry>
-  <Geometry x:Key="IconPlay">M8.5 5.5v13l10-6.5z</Geometry>
-  <Geometry x:Key="IconPause">M8 5.5h3v13H8z M14 5.5h3v13h-3z</Geometry>
-  <Geometry x:Key="IconFullscreen">M9 4H4v5 M15 4h5v5 M9 20H4v-5 M15 20h5v-5</Geometry>
-  <Geometry x:Key="IconExitFullscreen">M4 9h5V4 M20 9h-5V4 M4 15h5v5 M20 15h-5v5</Geometry>
-  <Geometry x:Key="IconRefresh">M20 7v5h-5 M4 17v-5h5 M6.2 8.5A7 7 0 0 1 18.5 7L20 9 M4 15l1.5 2A7 7 0 0 0 17.8 15.5</Geometry>
-  <Geometry x:Key="IconCheck">M5.5 12.5l4 4 9-9</Geometry>
-  <Geometry x:Key="IconWarning">M12 3.5l9 16H3z M12 9v4.5 M12 17h.01</Geometry>
+  <Geometry x:Key="IconPrevious">M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8 M3 3v5h5</Geometry>
+  <Geometry x:Key="IconNext">M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8 M21 3v5h-5</Geometry>
+  <Geometry x:Key="IconSearch">M21 21l-4.34-4.34 M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0z</Geometry>
+  <Geometry x:Key="IconDisplay">M4 3h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z M8 21h8 M12 17v4</Geometry>
+  <Geometry x:Key="IconMic">M12 19v3 M19 10v2a7 7 0 0 1-14 0v-2 M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z</Geometry>
+  <Geometry x:Key="IconGear">M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915 M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z</Geometry>
+  <Geometry x:Key="IconScissors">M9 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z M8.12 8.12L12 12 M20 4L8.12 15.88 M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0z M14.8 14.8L20 20</Geometry>
+  <Geometry x:Key="IconTrash">M10 11v6 M14 11v6 M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6 M3 6h18 M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2</Geometry>
+  <Geometry x:Key="IconEdit">M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z M15 5l4 4</Geometry>
+  <Geometry x:Key="IconPlay">M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z</Geometry>
+  <Geometry x:Key="IconPause">M6 3h3a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z M15 3h3a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z</Geometry>
+  <Geometry x:Key="IconFullscreen">M8 3H5a2 2 0 0 0-2 2v3 M21 8V5a2 2 0 0 0-2-2h-3 M3 16v3a2 2 0 0 0 2 2h3 M16 21h3a2 2 0 0 0 2-2v-3</Geometry>
+  <Geometry x:Key="IconExitFullscreen">M8 3v3a2 2 0 0 1-2 2H3 M21 8h-3a2 2 0 0 1-2-2V3 M3 16h3a2 2 0 0 1 2 2v3 M16 21v-3a2 2 0 0 1 2-2h3</Geometry>
+  <Geometry x:Key="IconRefresh">M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8 M21 3v5h-5 M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16 M8 16H3v5</Geometry>
+  <Geometry x:Key="IconCheck">M20 6L9 17l-5-5</Geometry>
+  <Geometry x:Key="IconWarning">M21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3 M12 9v4 M12 17h.01</Geometry>
   <Geometry x:Key="IconRecord">M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10z</Geometry>
   <Geometry x:Key="IconStop">M7.5 7.5h9v9h-9z</Geometry>
-  <Geometry x:Key="IconReload">M19 8v5h-5 M18.2 8.2A7 7 0 1 0 19 15</Geometry>
-  <Geometry x:Key="IconHelp">M8.2 8a3.8 3.8 0 1 1 5.1 3.6c-.9.4-1.3 1-1.3 2 M12 17.5h.01 M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z</Geometry>
+  <Geometry x:Key="IconReload">M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8 M21 3v5h-5</Geometry>
+  <Geometry x:Key="IconHelp">M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3 M12 17h.01</Geometry>
 
   <Geometry x:Key="IconGitHub">M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.69c-2.78.6-3.37-1.18-3.37-1.18-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.35 1.09 2.92.83.09-.65.35-1.09.64-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.58 9.58 0 0 1 12 7.7a9.6 9.6 0 0 1 2.5.34c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.86V21c0 .27.18.58.69.48A10 10 0 0 0 12 2z</Geometry>
-  <Geometry x:Key="IconInfo">M12 10.5V17 M12 7h.01 M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z</Geometry>
-  <Geometry x:Key="IconIssue">M12 7.5v6 M12 17h.01 M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z</Geometry>
-  <Geometry x:Key="IconFeature">M12 7.5v9 M7.5 12h9 M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z</Geometry>
+  <Geometry x:Key="IconInfo">M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z M12 16v-4 M12 8h.01</Geometry>
+  <Geometry x:Key="IconIssue">M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z M12 8v4 M12 16h.01</Geometry>
+  <Geometry x:Key="IconFeature">M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z M8 12h8 M12 8v8</Geometry>
+
+  <Style TargetType="Path">
+    <Setter Property="StrokeStartLineCap" Value="Round"/>
+    <Setter Property="StrokeEndLineCap" Value="Round"/>
+    <Setter Property="StrokeLineJoin" Value="Round"/>
+  </Style>
 
   <!-- ============ TEXT STYLES ============ -->
   <Style x:Key="SectionHeaderText" TargetType="TextBlock">
@@ -319,9 +325,9 @@
           <Border x:Name="Badge"
                   Width="15" Height="15" CornerRadius="8"
                   Background="{TemplateBinding Background}"
-                  BorderBrush="{StaticResource RingIdleBrush}" BorderThickness="1">
+                  BorderBrush="Transparent" BorderThickness="0">
             <Path Data="{StaticResource IconHelp}"
-                  Stroke="{TemplateBinding Foreground}" StrokeThickness="1.8"
+                  Stroke="{TemplateBinding Foreground}" StrokeThickness="1.6"
                   StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                   Width="10" Height="11" Stretch="Uniform"
                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -1014,7 +1020,7 @@
                 <ColumnDefinition Width="Auto"/>
               </Grid.ColumnDefinitions>
               <Path x:Name="Check" Data="{StaticResource IconCheck}"
-                    Stroke="{StaticResource AccentBrush}" StrokeThickness="2"
+                    Stroke="{StaticResource AccentBrush}" StrokeThickness="1.7"
                     StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                     Width="13" Height="13" Stretch="Uniform"
                     VerticalAlignment="Center" Visibility="Hidden"/>
@@ -1252,7 +1258,7 @@
                     BorderThickness="1" CornerRadius="4"
                     VerticalAlignment="Center">
               <Path x:Name="Check" Data="{StaticResource IconCheck}"
-                    Stroke="{StaticResource AccentBrush}" StrokeThickness="2"
+                    Stroke="{StaticResource AccentBrush}" StrokeThickness="1.7"
                     StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                     StrokeLineJoin="Round" Visibility="Collapsed"
                     Margin="2.5" Stretch="Uniform"/>
@@ -1329,7 +1335,7 @@
                 <ControlTemplate TargetType="ToggleButton">
                   <Border x:Name="Bd" Background="{StaticResource BgControlBrush}"
                           BorderBrush="{StaticResource BorderControlBrush}" BorderThickness="1" CornerRadius="6">
-                    <Path Data="{StaticResource IconChevron}" Stroke="{StaticResource TextMutedBrush}" StrokeThickness="2.2"
+                    <Path Data="{StaticResource IconChevron}" Stroke="{StaticResource TextMutedBrush}" StrokeThickness="1.7"
                           StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
                           Width="11" Height="11" Stretch="Uniform"
                           HorizontalAlignment="Right" Margin="0,0,10,0"/>

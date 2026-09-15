@@ -69,7 +69,7 @@
                                     BorderThickness="{TemplateBinding BorderThickness}">
                                 <Path x:Name="Check" Visibility="Collapsed"
                                       Data="{StaticResource IconCheck}" Stroke="{StaticResource OnAccentBrush}"
-                                      StrokeThickness="2" StrokeStartLineCap="Round"
+                                      StrokeThickness="1.7" StrokeStartLineCap="Round"
                                       StrokeEndLineCap="Round" StrokeLineJoin="Round"
                                       Margin="3" Stretch="Uniform"/>
                             </Border>
@@ -155,10 +155,11 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <Path x:Name="HeaderTrimIcon" Data="{StaticResource IconScissors}"
-                          Stroke="{StaticResource AccentBrush}" StrokeThickness="1.8"
+                          Stroke="{StaticResource AccentBrush}" StrokeThickness="1.6"
                           Width="15" Height="15" Stretch="Uniform"/>
                     <Path x:Name="HeaderPreviewIcon" Data="{StaticResource IconPlay}"
-                          Fill="{StaticResource AccentBrush}" Width="15" Height="15"
+                          Stroke="{StaticResource AccentBrush}" StrokeThickness="1.6"
+                          Width="15" Height="15"
                           Stretch="Uniform" Visibility="Collapsed"/>
                     <TextBlock x:Name="HeaderTitleText"
                                Text="{DynamicResource L.Library.TrimTitle}"
@@ -172,7 +173,7 @@
                         AutomationProperties.Name="{DynamicResource L.Close}">
                     <Path Data="{StaticResource IconClose}"
                           Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                          StrokeThickness="1.8" Width="13" Height="13" Stretch="Uniform"/>
+                          StrokeThickness="1.6" Width="12" Height="12" Stretch="Uniform"/>
                 </Button>
             </Grid>
 
@@ -220,14 +221,15 @@
                                 AutomationProperties.Name="{DynamicResource L.Library.Back5}">
                             <Path Data="{StaticResource IconPrevious}"
                                   Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                  StrokeThickness="2" StrokeLineJoin="Round" Stretch="Uniform"/>
+                                  StrokeThickness="1.6" StrokeLineJoin="Round" Stretch="Uniform"/>
                         </Button>
                         <Button x:Name="PlayButton" Style="{StaticResource ClipActionButton}"
                                 Click="PlayPause_Click" ToolTip="{DynamicResource L.Library.Play}"
                                 AutomationProperties.Name="{DynamicResource L.Library.Play}"
                                 Margin="6,0,0,0" IsEnabled="False">
                             <Path x:Name="PlayIcon" Data="{StaticResource IconPlay}"
-                                  Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                  StrokeThickness="1.6"
                                   Stretch="Uniform"/>
                         </Button>
                         <Button Style="{StaticResource ClipActionButton}" Click="Forward_Click"
@@ -235,7 +237,7 @@
                                 AutomationProperties.Name="{DynamicResource L.Library.Forward5}" Margin="6,0,0,0">
                             <Path Data="{StaticResource IconNext}"
                                   Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                  StrokeThickness="2" StrokeLineJoin="Round" Stretch="Uniform"/>
+                                  StrokeThickness="1.6" StrokeLineJoin="Round" Stretch="Uniform"/>
                         </Button>
                     </StackPanel>
                     <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
@@ -248,7 +250,7 @@
                                 ToolTip="{DynamicResource L.Library.Fullscreen}">
                             <Path Data="{StaticResource IconFullscreen}"
                                   Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                  StrokeThickness="1.8" StrokeStartLineCap="Round"
+                                  StrokeThickness="1.6" StrokeStartLineCap="Round"
                                   StrokeEndLineCap="Round" Stretch="Uniform"/>
                         </Button>
                     </StackPanel>
@@ -284,20 +286,21 @@
                                         ToolTip="{DynamicResource L.Library.Back5}">
                                     <Path Data="{StaticResource IconPrevious}"
                                           Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                          StrokeThickness="2" StrokeLineJoin="Round" Stretch="Uniform"/>
+                                          StrokeThickness="1.6" StrokeLineJoin="Round" Stretch="Uniform"/>
                                 </Button>
                                 <Button Style="{StaticResource ClipActionButton}"
                                         Click="PlayPause_Click" ToolTip="{DynamicResource L.Library.Play}"
                                         Margin="7,0,0,0">
                                     <Path x:Name="FullscreenPlayIcon" Data="{StaticResource IconPlay}"
-                                          Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                          StrokeThickness="1.6"
                                           Stretch="Uniform"/>
                                 </Button>
                                 <Button Style="{StaticResource ClipActionButton}" Click="Forward_Click"
                                         ToolTip="{DynamicResource L.Library.Forward5}" Margin="7,0,0,0">
                                     <Path Data="{StaticResource IconNext}"
                                           Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                          StrokeThickness="2" StrokeLineJoin="Round" Stretch="Uniform"/>
+                                          StrokeThickness="1.6" StrokeLineJoin="Round" Stretch="Uniform"/>
                                 </Button>
                             </StackPanel>
                             <StackPanel Grid.Column="1" Orientation="Horizontal"
@@ -319,7 +322,7 @@
                                     ToolTip="{DynamicResource L.Library.ExitFullscreen}">
                                 <Path Data="{StaticResource IconExitFullscreen}"
                                       Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                      StrokeThickness="1.8" StrokeStartLineCap="Round"
+                                      StrokeThickness="1.6" StrokeStartLineCap="Round"
                                       StrokeEndLineCap="Round" Stretch="Uniform"/>
                             </Button>
                         </Grid>
@@ -540,21 +543,22 @@
                                     ToolTip="{DynamicResource L.Library.Back5}">
                                 <Path Data="{StaticResource IconPrevious}"
                                       Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                      StrokeThickness="2" StrokeLineJoin="Round" Stretch="Uniform"/>
+                                      StrokeThickness="1.6" StrokeLineJoin="Round" Stretch="Uniform"/>
                             </Button>
                             <Button x:Name="PreviewPlayButton"
                                     Style="{StaticResource ClipActionButton}"
                                     Click="PlayPause_Click" ToolTip="{DynamicResource L.Library.Play}"
                                     Margin="7,0,0,0" IsEnabled="False">
                                 <Path x:Name="PreviewPlayIcon" Data="{StaticResource IconPlay}"
-                                      Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                      StrokeThickness="1.6"
                                       Stretch="Uniform"/>
                             </Button>
                             <Button Style="{StaticResource ClipActionButton}" Click="Forward_Click"
                                     ToolTip="{DynamicResource L.Library.Forward5}" Margin="7,0,0,0">
                                 <Path Data="{StaticResource IconNext}"
                                       Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                      StrokeThickness="2" StrokeLineJoin="Round" Stretch="Uniform"/>
+                                      StrokeThickness="1.6" StrokeLineJoin="Round" Stretch="Uniform"/>
                             </Button>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal"
@@ -580,7 +584,7 @@
                                     ToolTip="{DynamicResource L.Library.Fullscreen}">
                                 <Path Data="{StaticResource IconFullscreen}"
                                       Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                      StrokeThickness="1.8" StrokeStartLineCap="Round"
+                                      StrokeThickness="1.6" StrokeStartLineCap="Round"
                                       StrokeEndLineCap="Round" Stretch="Uniform"/>
                             </Button>
                         </StackPanel>

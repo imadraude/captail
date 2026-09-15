@@ -40,7 +40,7 @@
                         <Canvas Width="24" Height="24">
                             <Path x:Name="IconPath"
                                   Stroke="#FF5ED6B2"
-                                  StrokeThickness="1.7"
+                                  StrokeThickness="1.6"
                                   StrokeStartLineCap="Round"
                                   StrokeEndLineCap="Round"
                                   StrokeLineJoin="Round"

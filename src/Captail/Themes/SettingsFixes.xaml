@@ -32,7 +32,7 @@
                           CornerRadius="6">
                     <Path x:Name="Chevron" Data="{StaticResource IconChevron}"
                           Stroke="{StaticResource TextMutedBrush}"
-                          StrokeThickness="2.4"
+                          StrokeThickness="1.7"
                           StrokeStartLineCap="Round"
                           StrokeEndLineCap="Round"
                           StrokeLineJoin="Round"

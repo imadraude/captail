@@ -4,3 +4,4 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("ProcessAudioQa")]
 [assembly: InternalsVisibleTo("Captail.Tests")]
 [assembly: InternalsVisibleTo("ReplayPerformanceQa")]
+[assembly: InternalsVisibleTo("Captail.UiSnapshotQa")]

@@ -4,6 +4,12 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.8.6] - 2026-09-15
+
+### Fixed
+
+- **Cleaner, consistent interface icons:** Replaced uneven custom action icons with a cohesive Lucide-based set and normalized their visual weight, alignment, and rounded strokes across the main window, settings, editor, notifications, audio routing, and replay indicator.
+
 ## [0.8.5] - 2026-09-15
 
 ### Improved

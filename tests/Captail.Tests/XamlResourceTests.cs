@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using System.Globalization;
 using Xunit;
 
 namespace Captail.Tests;
@@ -32,6 +33,50 @@ public sealed class XamlResourceTests
             .ToArray();
 
         Assert.Empty(missingKeys);
+    }
+
+    [Fact]
+    public void ServiceIconsUseAConsistentLightStroke()
+    {
+        string sourceDirectory = FindSourceDirectory();
+        string[] xamlFiles = Directory.GetFiles(sourceDirectory, "*.xaml", SearchOption.AllDirectories);
+        var filledIcons = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "IconGitHub",
+            "IconRecord",
+            "IconStop"
+        };
+
+        var violations = new List<string>();
+        var pathPattern = new Regex("<Path\\b[^>]*Data=\"\\{StaticResource\\s+(Icon[^}\\s]+)\\}\"[^>]*/?>", RegexOptions.Singleline);
+
+        foreach (string path in xamlFiles)
+        {
+            string xaml = File.ReadAllText(path);
+            foreach (Match match in pathPattern.Matches(xaml))
+            {
+                string iconKey = match.Groups[1].Value;
+                if (filledIcons.Contains(iconKey))
+                    continue;
+
+                string element = match.Value;
+                Match thicknessMatch = Regex.Match(element, "StrokeThickness=\"([0-9.]+)\"");
+                if (!element.Contains("Stroke=", StringComparison.Ordinal) || !thicknessMatch.Success)
+                {
+                    violations.Add($"{Path.GetRelativePath(sourceDirectory, path)}: {iconKey} must use an explicit stroke.");
+                    continue;
+                }
+
+                double thickness = double.Parse(thicknessMatch.Groups[1].Value, CultureInfo.InvariantCulture);
+                if (thickness > 1.7)
+                    violations.Add($"{Path.GetRelativePath(sourceDirectory, path)}: {iconKey} uses StrokeThickness {thickness:0.##}.");
+
+                if (element.Contains("Fill=", StringComparison.Ordinal))
+                    violations.Add($"{Path.GetRelativePath(sourceDirectory, path)}: {iconKey} must not be rendered as a filled icon.");
+            }
+        }
+
+        Assert.Empty(violations);
     }
 
     private static string FindSourceDirectory()
