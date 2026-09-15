@@ -18,7 +18,7 @@ public sealed class Config
     /// <summary>Directory for disk buffer storage; empty uses the default temporary buffer directory.</summary>
     public string DiskBufferDirectory { get; set; } = "";
     /// <summary>0 = duration-only limit.</summary>
-    public int MaxReplaySizeMb { get; set; }
+    public int MaxReplaySizeMb { get; set; } = 2000;
     public int FrameRate { get; set; } = 60;
     /// <summary>0 = adaptive bitrate based on codec and load.</summary>
     public int BitrateMbps { get; set; }
@@ -323,7 +323,7 @@ public sealed class Config
             BufferSeconds,
             [15, 30, 60, 120, 300, 600, 900, 1200, 1800],
             300);
-        MaxReplaySizeMb = AllowedValue(MaxReplaySizeMb, [0, 250, 500, 1000, 2000, 5000, 10000], 0);
+        MaxReplaySizeMb = AllowedValue(MaxReplaySizeMb, [0, 250, 500, 1000, 2000, 5000, 10000], 2000);
         FrameRate = AllowedValue(FrameRate, [30, 60, 120, 144, 240], 60);
         BitrateMbps = BitrateMbps == 0 ? 0 : Math.Clamp(BitrateMbps, 2, 100);
         NvencMode = AllowedText(

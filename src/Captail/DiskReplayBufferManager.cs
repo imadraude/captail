@@ -32,14 +32,16 @@ internal sealed class DiskReplayBufferManager
                 {
                     File.Delete(file);
                 }
-                catch
+                catch (Exception exception)
                 {
-                    // In-use or transiently locked files are ignored.
+                    // In-use or transiently locked files are ignored with diagnostic record.
+                    Log.Write($"Temporary buffer file delete skipped for '{file}': {exception.Message}");
                 }
             }
         }
-        catch
+        catch (Exception exception)
         {
+            Log.Write($"Temporary buffer directory clean failed for '{directory}': {exception.Message}");
         }
     }
 
@@ -83,9 +85,10 @@ internal sealed class DiskReplayBufferManager
                 oldest.Delete();
                 deleted.Add(oldest.FullName);
             }
-            catch
+            catch (Exception exception)
             {
-                // If currently open/writing, ignore and move on
+                // If currently open/writing, log diagnostic and move on
+                Log.Write($"Prune old segment skipped for '{oldest.FullName}': {exception.Message}");
             }
         }
 
@@ -137,8 +140,9 @@ internal sealed class DiskReplayBufferManager
             var drive = new DriveInfo(root);
             return drive.IsReady ? drive.AvailableFreeSpace : long.MaxValue;
         }
-        catch
+        catch (Exception exception)
         {
+            Log.Write($"Failed to query available free space for '{directory}': {exception.Message}");
             return long.MaxValue;
         }
     }

@@ -4,6 +4,14 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.8.2] - 2026-09-15
+
+### Improved
+
+- **Fast clip editor timeline generation:** Parallelized frame thumbnail extraction across CPU cores with bounded concurrency, reducing clip editor opening time by up to 3–4× when working with unindexed video files.
+- **RAM buffer memory safety:** Set a default 2000 MB buffer ceiling for newly created configurations to prevent unbounded memory growth during high-resolution (1440p/4K) or high-bitrate instant replay sessions, while fully preserving explicit duration-only user choices.
+- **Disk buffer diagnostics and observability:** Replaced silent catch blocks in disk buffer cleanup, segment pruning, and volume space inspection with actionable diagnostic logging.
+
 ## [0.8.1] - 2026-09-15
 
 ### Fixed

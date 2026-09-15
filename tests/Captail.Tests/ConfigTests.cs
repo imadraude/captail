@@ -72,6 +72,21 @@ public sealed class ConfigTests
     }
 
     [Fact]
+    public void NewConfig_HasSafeMaxReplaySizeMbByDefault()
+    {
+        var config = new Config();
+        Assert.Equal(2000, config.MaxReplaySizeMb);
+    }
+
+    [Fact]
+    public void Normalize_PreservesExplicitZeroSizeLimit()
+    {
+        var config = new Config { MaxReplaySizeMb = 0 };
+        config.Normalize();
+        Assert.Equal(0, config.MaxReplaySizeMb);
+    }
+
+    [Fact]
     public void Deserialize_StartInTray_PreservesValue()
     {
         string json = """

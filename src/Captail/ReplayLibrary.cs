@@ -384,24 +384,34 @@ public sealed class ReplayLibrary
 
         string identity = $"{source}|{clip.SizeBytes}|{clip.SavedAt.ToUniversalTime().Ticks}";
         string hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(identity)));
-        var thumbnails = new List<string>(count);
-        for (int index = 0; index < count; index++)
+        var thumbnails = new string[count];
+        int maxConcurrency = Math.Clamp(Environment.ProcessorCount / 2, 2, 4);
+        var parallelOptions = new ParallelOptions
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            string path = Path.Combine(
-                _thumbnailDirectory,
-                $"{hash}_timeline_{index}.jpg");
-            if (!File.Exists(path))
+            MaxDegreeOfParallelism = maxConcurrency,
+            CancellationToken = cancellationToken,
+        };
+
+        await Parallel.ForEachAsync(
+            Enumerable.Range(0, count),
+            parallelOptions,
+            async (index, ct) =>
             {
-                double fraction = (index + 0.5) / count;
-                await _ffmpeg.CreateThumbnailAtAsync(
-                    source,
-                    path,
-                    TimeSpan.FromSeconds(clip.Duration.TotalSeconds * fraction),
-                    cancellationToken);
-            }
-            thumbnails.Add(path);
-        }
+                string path = Path.Combine(
+                    _thumbnailDirectory,
+                    $"{hash}_timeline_{index}.jpg");
+                if (!File.Exists(path))
+                {
+                    double fraction = (index + 0.5) / count;
+                    await _ffmpeg.CreateThumbnailAtAsync(
+                        source,
+                        path,
+                        TimeSpan.FromSeconds(clip.Duration.TotalSeconds * fraction),
+                        ct);
+                }
+                thumbnails[index] = path;
+            });
+
         return thumbnails;
     }
 
