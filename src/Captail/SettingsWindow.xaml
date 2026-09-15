@@ -47,16 +47,9 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Border Width="24" Height="24" VerticalAlignment="Center" Margin="0,0,10,0"
-                        Background="{StaticResource AccentSubtleBrush}"
-                        BorderBrush="{StaticResource AccentDimBrush}" BorderThickness="1"
-                        CornerRadius="6">
-                    <Grid Width="14" Height="14">
-                        <Rectangle Stroke="{StaticResource AccentBrush}" StrokeThickness="1.8"
-                                   RadiusX="3" RadiusY="3"/>
-                        <Ellipse Width="4" Height="4" Fill="{StaticResource AccentBrush}"/>
-                    </Grid>
-                </Border>
+                <Image Width="24" Height="24" VerticalAlignment="Center" Margin="0,0,9,0"
+                       Source="{StaticResource BrandMark24}"
+                       UseLayoutRounding="True" SnapsToDevicePixels="True"/>
                 <TextBlock Grid.Column="1" Text="{DynamicResource L.Brand}" FontSize="15" FontWeight="ExtraBold"
                            VerticalAlignment="Center"/>
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">

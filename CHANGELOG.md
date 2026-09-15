@@ -4,6 +4,12 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.8.7] - 2026-09-15
+
+### Fixed
+
+- **Balanced header logo:** Rebuilt the compact Captail mark as a pixel-aligned vector, correcting its uneven border weight, internal alignment, and spacing beside the product name at common Windows display scales.
+
 ## [0.8.6] - 2026-09-15
 
 ### Fixed

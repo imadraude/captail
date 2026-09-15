@@ -81,6 +81,32 @@
   <CornerRadius x:Key="RadiusGroup">8</CornerRadius>
   <CornerRadius x:Key="RadiusControl">6</CornerRadius>
 
+  <!-- Pixel-aligned vector brand mark for compact title rails. -->
+  <Pen x:Key="BrandMarkOuterPen" Brush="{StaticResource AccentDimBrush}" Thickness="1"/>
+  <Pen x:Key="BrandMarkInnerPen" Brush="{StaticResource AccentBrush}" Thickness="2"/>
+  <DrawingImage x:Key="BrandMark24">
+    <DrawingImage.Drawing>
+      <DrawingGroup>
+        <GeometryDrawing Brush="{StaticResource AccentSubtleBrush}"
+                         Pen="{StaticResource BrandMarkOuterPen}">
+          <GeometryDrawing.Geometry>
+            <RectangleGeometry Rect="0.5,0.5,23,23" RadiusX="5.5" RadiusY="5.5"/>
+          </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+        <GeometryDrawing Pen="{StaticResource BrandMarkInnerPen}">
+          <GeometryDrawing.Geometry>
+            <RectangleGeometry Rect="6,6,12,12" RadiusX="3.5" RadiusY="3.5"/>
+          </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+        <GeometryDrawing Brush="{StaticResource AccentBrush}">
+          <GeometryDrawing.Geometry>
+            <EllipseGeometry Center="12,12" RadiusX="2" RadiusY="2"/>
+          </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+      </DrawingGroup>
+    </DrawingImage.Drawing>
+  </DrawingImage>
+
   <!-- ============ ICON GEOMETRY (viewbox 24) ============ -->
   <!-- Lucide UI icons: official 24 px geometry, rendered with round caps/joins. -->
   <Geometry x:Key="IconDownload">M12 15V3 M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M7 10l5 5 5-5</Geometry>

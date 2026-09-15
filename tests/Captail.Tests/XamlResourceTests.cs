@@ -79,6 +79,22 @@ public sealed class XamlResourceTests
         Assert.Empty(violations);
     }
 
+    [Fact]
+    public void HeaderUsesThePackagedBrandIconInsteadOfReconstructedShapes()
+    {
+        string settingsPath = Path.Combine(FindSourceDirectory(), "SettingsWindow.xaml");
+        string xaml = File.ReadAllText(settingsPath);
+
+        Assert.Contains(
+            "Source=\"{StaticResource BrandMark24}\"",
+            xaml,
+            StringComparison.Ordinal);
+        Assert.DoesNotContain(
+            "<Rectangle Stroke=\"{StaticResource AccentBrush}\"",
+            xaml,
+            StringComparison.Ordinal);
+    }
+
     private static string FindSourceDirectory()
     {
         DirectoryInfo? directory = new(AppContext.BaseDirectory);
