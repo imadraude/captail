@@ -423,6 +423,13 @@ public partial class ReplayStatusIndicatorWindow : Window
             ApplyState(state, force: true);
         InvalidateVisual();
         UpdateLayout();
+        // SourceInitialized can position the HWND before WPF/DWM has committed
+        // the first frame. On a cold Windows sign-in, Show() may then restore
+        // the window's initial bounds after our early SetWindowPos call. Force
+        // one native placement after rendering instead of letting the cached
+        // coordinates suppress it until the process is restarted.
+        ResetLastNativeBounds();
+        PositionOnForegroundMonitor();
         UpdateCaptureAffinity();
     }
 
@@ -619,10 +626,7 @@ public partial class ReplayStatusIndicatorWindow : Window
         if (Visibility != Visibility.Hidden)
         {
             Visibility = Visibility.Hidden;
-            _lastLeft = int.MinValue;
-            _lastTop = int.MinValue;
-            _lastWidth = int.MinValue;
-            _lastHeight = int.MinValue;
+            ResetLastNativeBounds();
             SetWindowPos(
                 hwnd,
                 0,
@@ -632,6 +636,14 @@ public partial class ReplayStatusIndicatorWindow : Window
                 0,
                 SwpNoActivate | SwpNoZOrder | SwpNoMove | SwpNoSize | SwpHideWindow);
         }
+    }
+
+    private void ResetLastNativeBounds()
+    {
+        _lastLeft = int.MinValue;
+        _lastTop = int.MinValue;
+        _lastWidth = int.MinValue;
+        _lastHeight = int.MinValue;
     }
 
     internal static Rect CalculateIndicatorBounds(

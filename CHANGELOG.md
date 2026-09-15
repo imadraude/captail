@@ -4,6 +4,12 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.8.3] - 2026-09-15
+
+### Fixed
+
+- **Recording indicator after Windows startup:** Reapplies the indicator's native window bounds after its first rendered frame, so the recording status icon appears reliably on the first Captail launch after turning on the PC.
+
 ## [0.8.2] - 2026-09-15
 
 ### Improved

@@ -74,6 +74,9 @@ Assert-Contains $indicator `
 Assert-Contains $indicator `
     'if\s*\(!_firstFrameRendered\)\s*return;' `
     "Recording indicator must not apply capture affinity before rendering."
+Assert-Contains $indicator `
+    'CompleteFirstFrame\(\)[\s\S]*?ResetLastNativeBounds\(\);[\s\S]*?PositionOnForegroundMonitor\(\);' `
+    "Recording indicator must reapply native bounds after its first rendered frame."
 Assert-Contains $settings `
     'Icon="pack://application:,,,/Captail;component/Assets/Captail\.ico"' `
     "Main window must use an absolute pack URI for its taskbar icon."
