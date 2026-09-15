@@ -4,6 +4,14 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-09-15
+
+### Improved
+
+- **Application and tray icon polish:** Replaced the legacy mint Windows and system tray icons with canonical coral rounded-square marks featuring exact horizontal and vertical symmetry across all generated 16–256 px frames, plus a muted inactive tray variant.
+- **Recording status visual alignment:** Aligned dashboard recording state markers and the compact in-game status indicator with the 0.7 coral palette, clearly distinguishing Instant Replay (dashed outline) from manual recording (solid outline) with device-pixel snapping.
+- **Capture source indicator states:** Dims inactive Game and Microphone audio source status dots on the dashboard instead of showing active accent color for idle inputs.
+
 ## [0.7.0] - 2026-09-09
 
 ### Improved
