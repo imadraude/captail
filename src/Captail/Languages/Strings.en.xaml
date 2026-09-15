@@ -76,6 +76,10 @@
   <sys:String x:Key="L.Replay.RecordingIndicator">Recording indicator</sys:String>
   <sys:String x:Key="L.Replay.RecordingIndicatorHint">Small status icon in the selected screen corner</sys:String>
   <sys:String x:Key="L.Replay.IndicatorPosition">Indicator position</sys:String>
+  <sys:String x:Key="L.Replay.BufferStorage">Buffer storage</sys:String>
+  <sys:String x:Key="L.Replay.StorageRam">Memory (RAM)</sys:String>
+  <sys:String x:Key="L.Replay.StorageDisk">Disk (Shadowplay)</sys:String>
+  <sys:String x:Key="L.Help.BufferStorage">Choose where the replay buffer is temporarily kept. System RAM produces zero SSD wear and zero disk I/O, ideal for 15s–10m clips. Disk buffer (Shadowplay mode) allows extended 15–30m replays without consuming system memory.</sys:String>
   <sys:String x:Key="L.Replay.BufferLength">Buffer length</sys:String>
   <sys:String x:Key="L.Duration.15s">15s</sys:String>
   <sys:String x:Key="L.Duration.30s">30s</sys:String>
@@ -84,6 +88,8 @@
   <sys:String x:Key="L.Duration.5m">5m</sys:String>
   <sys:String x:Key="L.Duration.10m">10m</sys:String>
   <sys:String x:Key="L.Duration.15m">15m</sys:String>
+  <sys:String x:Key="L.Duration.20m">20m</sys:String>
+  <sys:String x:Key="L.Duration.30m">30m</sys:String>
   <sys:String x:Key="L.Replay.BufferLimit">Buffer limit</sys:String>
   <sys:String x:Key="L.Replay.BufferLimitTip">Maximum compressed video and audio packet memory</sys:String>
   <sys:String x:Key="L.Replay.BufferLimitHint">Limits RAM use and duration</sys:String>
@@ -152,6 +158,7 @@
   <sys:String x:Key="L.Help.AudioCodec">AAC saves as MP4 and works with almost every player and editor. Opus is efficient and sounds good at lower bitrates, but uses MKV and may need a modern editor.</sys:String>
 
   <sys:String x:Key="L.Storage.ReplayFolder">Replay folder</sys:String>
+  <sys:String x:Key="L.Storage.DiskBufferFolder">Disk buffer folder</sys:String>
   <sys:String x:Key="L.Storage.Change">Change…</sys:String>
   <sys:String x:Key="L.Storage.FreeOn">{0} free on {1}</sys:String>
   <sys:String x:Key="L.Storage.Used">{0} used</sys:String>

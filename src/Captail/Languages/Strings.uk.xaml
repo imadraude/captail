@@ -73,6 +73,10 @@
   <sys:String x:Key="L.Replay.RecordingIndicator">Індикатор запису</sys:String>
   <sys:String x:Key="L.Replay.RecordingIndicatorHint">Маленький значок стану у вибраному куті екрана</sys:String>
   <sys:String x:Key="L.Replay.IndicatorPosition">Положення індикатора</sys:String>
+  <sys:String x:Key="L.Replay.BufferStorage">Зберігання буфера</sys:String>
+  <sys:String x:Key="L.Replay.StorageRam">Пам'ять (RAM)</sys:String>
+  <sys:String x:Key="L.Replay.StorageDisk">Диск (Shadowplay)</sys:String>
+  <sys:String x:Key="L.Help.BufferStorage">Виберіть, де тимчасово зберігати буфер повтору. Оперативна пам'ять (RAM) не зношує SSD і не створює дискових затримок, ідеально для коротких кліпів 15 с – 10 хв. Дисковий буфер (Shadowplay-режим) дозволяє записувати довгі повтори 15–30 хв без навантаження на системну пам'ять.</sys:String>
   <sys:String x:Key="L.Replay.BufferLength">Довжина буфера</sys:String>
   <sys:String x:Key="L.Duration.15s">15 с</sys:String>
   <sys:String x:Key="L.Duration.30s">30 с</sys:String>
@@ -81,6 +85,8 @@
   <sys:String x:Key="L.Duration.5m">5 хв</sys:String>
   <sys:String x:Key="L.Duration.10m">10 хв</sys:String>
   <sys:String x:Key="L.Duration.15m">15 хв</sys:String>
+  <sys:String x:Key="L.Duration.20m">20 хв</sys:String>
+  <sys:String x:Key="L.Duration.30m">30 хв</sys:String>
   <sys:String x:Key="L.Replay.BufferLimit">Ліміт буфера</sys:String>
   <sys:String x:Key="L.Replay.BufferLimitTip">Максимальний обсяг пам’яті для стислих відео- й аудіопакетів</sys:String>
   <sys:String x:Key="L.Replay.BufferLimitHint">Ліміт ОЗП і тривалості</sys:String>
@@ -149,6 +155,7 @@
   <sys:String x:Key="L.Help.AudioCodec">AAC зберігає як MP4 і працює майже з кожним програвачем і редактором. Opus ефективний і добре звучить на нижчих бітрейтах, але використовує MKV і може потребувати сучасного редактора.</sys:String>
 
   <sys:String x:Key="L.Storage.ReplayFolder">Папка повторів</sys:String>
+  <sys:String x:Key="L.Storage.DiskBufferFolder">Папка буфера повторів</sys:String>
   <sys:String x:Key="L.Storage.Change">Змінити…</sys:String>
   <sys:String x:Key="L.Storage.FreeOn">{0} вільно на {1}</sys:String>
   <sys:String x:Key="L.Storage.Used">{0} використано</sys:String>

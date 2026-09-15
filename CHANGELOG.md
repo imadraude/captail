@@ -4,6 +4,15 @@ All notable user-facing changes are documented here.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-09-15
+
+### Added
+
+- **Shadowplay-style rolling disk buffer:** Write replay buffer segments directly to disk instead of system RAM. Keeps system memory free during long gaming sessions while supporting extended replay windows without memory bloat.
+- **Replay buffer storage selection:** Choose between in-memory RAM buffer and disk buffer storage in settings, with a dedicated custom directory picker to place temporary buffer segments on high-speed NVMe storage.
+- **Extended replay duration presets:** Added 20-minute and 30-minute buffer lengths, enabling capture of full competitive matches and extended gameplay sessions.
+- **Bit-exact instant assembly:** Clips are assembled via rapid stream-copy concatenation without re-encoding, preserving 100% video and audio quality with zero encoder interruption.
+
 ## [0.7.1] - 2026-09-15
 
 ### Improved

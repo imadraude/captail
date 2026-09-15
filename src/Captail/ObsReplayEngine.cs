@@ -81,6 +81,12 @@ public sealed class ObsReplayEngine : IDisposable
     private static bool _contextOwned;
 
     private readonly Config _config;
+    private readonly FfmpegAdapter _ffmpeg = new();
+    private Timer? _diskBufferPruneTimer;
+
+    public bool IsDiskBuffer =>
+        string.Equals(_config.ReplayBufferStorage, ReplayBufferStorageModes.Disk, StringComparison.Ordinal);
+
     private readonly object _saveGate = new();
     private readonly object _recordingGate = new();
     private readonly ObsNative.SignalCallback _savedCallback;
@@ -757,13 +763,60 @@ public sealed class ObsReplayEngine : IDisposable
                 TaskCreationOptions.RunContinuationsAsynchronously);
             completion = _pendingSave.Task;
             initialMuxBytes = BufferedBytes;
-            nint procedures = ObsNative.obs_output_get_proc_handler(_output);
-            if (procedures == 0 ||
-                !ObsNative.proc_handler_call(procedures, "save", 0))
+            if (IsDiskBuffer)
             {
-                _pendingSave = null;
-                throw new InvalidOperationException(
-                    Localization.Text("L.Engine.SaveRejected"));
+                nint procedures = ObsNative.obs_output_get_proc_handler(_output);
+                if (procedures != 0)
+                {
+                    ObsNative.proc_handler_call(procedures, "split", 0);
+                }
+
+                string diskBufferDir = AppDataPaths.ResolveDiskBufferDirectory(_config.DiskBufferDirectory);
+                string captureDir = _config.OutputDirectory;
+                Directory.CreateDirectory(captureDir);
+                bool opus = string.Equals(_config.AudioCodec, "opus", StringComparison.OrdinalIgnoreCase);
+                string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+                string destinationPath = Path.Combine(captureDir, $"Replay_{timestamp}.{(opus ? "mkv" : "mp4")}");
+
+                TaskCompletionSource<string> pending = _pendingSave;
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await DiskReplayBufferManager.SaveReplayAsync(
+                            diskBufferDir,
+                            destinationPath,
+                            _config.BufferSeconds,
+                            TimeSpan.FromSeconds(DiskReplayBufferManager.DefaultSegmentSeconds),
+                            _ffmpeg,
+                            cancellationToken);
+
+                        pending.TrySetResult(Path.GetFullPath(destinationPath));
+                    }
+                    catch (Exception ex)
+                    {
+                        pending.TrySetException(ex);
+                    }
+                    finally
+                    {
+                        lock (_saveGate)
+                        {
+                            if (ReferenceEquals(_pendingSave, pending))
+                                _pendingSave = null;
+                        }
+                    }
+                }, cancellationToken);
+            }
+            else
+            {
+                nint procedures = ObsNative.obs_output_get_proc_handler(_output);
+                if (procedures == 0 ||
+                    !ObsNative.proc_handler_call(procedures, "save", 0))
+                {
+                    _pendingSave = null;
+                    throw new InvalidOperationException(
+                        Localization.Text("L.Engine.SaveRejected"));
+                }
             }
         }
 
@@ -1094,13 +1147,20 @@ public sealed class ObsReplayEngine : IDisposable
     }
 
     public bool HasSaveSnapshotStarted(ReplaySaveOperation operation) =>
-        BufferedBytes != operation.InitialMuxBytes;
+        IsDiskBuffer || BufferedBytes != operation.InitialMuxBytes;
 
     public void ResetReplayWindow()
     {
         if (!IsActive)
             throw new InvalidOperationException(
                 Localization.Text("L.Engine.BufferStopped"));
+
+        if (IsDiskBuffer)
+        {
+            _replayWindowStartedUtc = DateTime.UtcNow;
+            Log.Write("Disk replay window marker updated.");
+            return;
+        }
 
         _resettingReplayWindow = true;
         try
@@ -2254,34 +2314,79 @@ public sealed class ObsReplayEngine : IDisposable
         nint settings = ObsNative.obs_data_create();
         try
         {
-            ObsNative.obs_data_set_int(
-                settings,
-                "max_time_sec",
-                _config.BufferSeconds);
-            ObsNative.obs_data_set_int(
-                settings,
-                "max_size_mb",
-                Math.Max(0, _config.MaxReplaySizeMb));
-            ObsNative.obs_data_set_string(settings, "directory", captureDirectory);
-            ObsNative.obs_data_set_string(
-                settings,
-                "format",
-                "Replay_%CCYY-%MM-%DD_%hh-%mm-%ss");
-            ObsNative.obs_data_set_string(settings, "extension", opus ? "mkv" : "mp4");
-            ObsNative.obs_data_set_bool(settings, "allow_spaces", false);
-            if (!opus)
+            if (IsDiskBuffer)
             {
+                string diskBufferDir = AppDataPaths.ResolveDiskBufferDirectory(_config.DiskBufferDirectory);
+                DiskReplayBufferManager.PrepareBufferDirectory(diskBufferDir);
+                DiskReplayBufferManager.CleanTemporaryBuffer(diskBufferDir);
+
+                string pattern = Path.Combine(
+                    diskBufferDir,
+                    "buf_%CCYY-%MM-%DD_%hh-%mm-%ss." + (opus ? "mkv" : "mp4"));
+                ObsNative.obs_data_set_string(settings, "path", pattern);
+                ObsNative.obs_data_set_string(settings, "directory", diskBufferDir);
+                ObsNative.obs_data_set_string(settings, "extension", opus ? "mkv" : "mp4");
+                ObsNative.obs_data_set_bool(settings, "allow_spaces", false);
+                ObsNative.obs_data_set_bool(settings, "split_file", true);
+                ObsNative.obs_data_set_int(
+                    settings,
+                    "max_time",
+                    DiskReplayBufferManager.DefaultSegmentSeconds);
+                if (!opus)
+                {
+                    ObsNative.obs_data_set_string(
+                        settings,
+                        "muxer_settings",
+                        "movflags=frag_keyframe+empty_moov+delay_moov");
+                }
+
+                _output = ObsNative.obs_output_create(
+                    "ffmpeg_muxer",
+                    "Captail Disk Replay Buffer",
+                    settings,
+                    0);
+
+                _diskBufferPruneTimer?.Dispose();
+                _diskBufferPruneTimer = new Timer(
+                    _ => DiskReplayBufferManager.PruneOldSegments(
+                        diskBufferDir,
+                        _config.BufferSeconds,
+                        TimeSpan.FromSeconds(DiskReplayBufferManager.DefaultSegmentSeconds)),
+                    null,
+                    TimeSpan.FromSeconds(15),
+                    TimeSpan.FromSeconds(15));
+            }
+            else
+            {
+                ObsNative.obs_data_set_int(
+                    settings,
+                    "max_time_sec",
+                    _config.BufferSeconds);
+                ObsNative.obs_data_set_int(
+                    settings,
+                    "max_size_mb",
+                    Math.Max(0, _config.MaxReplaySizeMb));
+                ObsNative.obs_data_set_string(settings, "directory", captureDirectory);
                 ObsNative.obs_data_set_string(
                     settings,
-                    "muxer_settings",
-                    "movflags=frag_keyframe+empty_moov+delay_moov");
-            }
+                    "format",
+                    "Replay_%CCYY-%MM-%DD_%hh-%mm-%ss");
+                ObsNative.obs_data_set_string(settings, "extension", opus ? "mkv" : "mp4");
+                ObsNative.obs_data_set_bool(settings, "allow_spaces", false);
+                if (!opus)
+                {
+                    ObsNative.obs_data_set_string(
+                        settings,
+                        "muxer_settings",
+                        "movflags=frag_keyframe+empty_moov+delay_moov");
+                }
 
-            _output = ObsNative.obs_output_create(
-                "replay_buffer",
-                "Captail Replay Buffer",
-                settings,
-                0);
+                _output = ObsNative.obs_output_create(
+                    "replay_buffer",
+                    "Captail Replay Buffer",
+                    settings,
+                    0);
+            }
         }
         finally
         {
@@ -2302,11 +2407,14 @@ public sealed class ObsReplayEngine : IDisposable
         }
 
         _outputSignals = ObsNative.obs_output_get_signal_handler(_output);
-        ObsNative.signal_handler_connect(
-            _outputSignals,
-            "saved",
-            _savedCallback,
-            0);
+        if (!IsDiskBuffer)
+        {
+            ObsNative.signal_handler_connect(
+                _outputSignals,
+                "saved",
+                _savedCallback,
+                0);
+        }
         ObsNative.signal_handler_connect(
             _outputSignals,
             "stop",
@@ -2624,13 +2732,24 @@ public sealed class ObsReplayEngine : IDisposable
             return;
         }
 
+        _diskBufferPruneTimer?.Dispose();
+        _diskBufferPruneTimer = null;
+        if (IsDiskBuffer)
+        {
+            string diskBufferDir = AppDataPaths.ResolveDiskBufferDirectory(_config.DiskBufferDirectory);
+            DiskReplayBufferManager.CleanTemporaryBuffer(diskBufferDir);
+        }
+
         if (_outputSignals != 0)
         {
-            ObsNative.signal_handler_disconnect(
-                _outputSignals,
-                "saved",
-                _savedCallback,
-                0);
+            if (!IsDiskBuffer)
+            {
+                ObsNative.signal_handler_disconnect(
+                    _outputSignals,
+                    "saved",
+                    _savedCallback,
+                    0);
+            }
             ObsNative.signal_handler_disconnect(
                 _outputSignals,
                 "stop",

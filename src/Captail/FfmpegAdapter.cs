@@ -490,6 +490,58 @@ public sealed class FfmpegAdapter
         }
     }
 
+    public async Task ConcatenateSegmentsAsync(
+        IReadOnlyList<string> segmentPaths,
+        string destinationPath,
+        CancellationToken cancellationToken = default)
+    {
+        if (segmentPaths is null || segmentPaths.Count == 0)
+            throw new ArgumentException("At least one segment must be provided.", nameof(segmentPaths));
+
+        Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
+
+        if (segmentPaths.Count == 1)
+        {
+            await RunFileOperationWithRetryAsync(
+                () => File.Copy(segmentPaths[0], destinationPath, overwrite: true),
+                cancellationToken);
+            return;
+        }
+
+        string listFile = Path.Combine(
+            Path.GetDirectoryName(destinationPath)!,
+            $"concat_{Guid.NewGuid():N}.txt");
+        try
+        {
+            var lines = segmentPaths.Select(path => $"file '{path.Replace("'", "'\\''")}'");
+            await File.WriteAllLinesAsync(listFile, lines, cancellationToken);
+
+            await RunAsync(
+                _ffmpegPath,
+                [
+                    "-nostdin", "-hide_banner", "-loglevel", "error",
+                    "-f", "concat",
+                    "-safe", "0",
+                    "-i", listFile,
+                    "-c", "copy",
+                    "-y", destinationPath,
+                ],
+                TimeSpan.FromMinutes(2),
+                cancellationToken);
+        }
+        finally
+        {
+            try
+            {
+                if (File.Exists(listFile))
+                    File.Delete(listFile);
+            }
+            catch
+            {
+            }
+        }
+    }
+
     private static double ParseFrameRate(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))

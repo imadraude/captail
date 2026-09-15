@@ -30,15 +30,16 @@
 Captail is a focused alternative to NVIDIA ShadowPlay Instant Replay. It keeps the latest seconds or minutes in a rolling buffer, then saves them when you press a hotkey. No scenes, streaming setup, account, cloud upload, analytics, or telemetry.
 
 > [!WARNING]
-> Captail `v0.7.1` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA GeForce GTX 1650 and RTX 40/50 series are tested; other GPUs need broader public testing.
+> Captail `v0.8.0` is an early public preview. Recording works, but bugs and hardware-specific problems are expected. NVIDIA GeForce GTX 1650 and RTX 40/50 series are tested; other GPUs need broader public testing.
 
-## What's new in Captail 0.7.1?
+## What's new in Captail 0.8.0?
 
-Captail 0.7.1 refines the 0.7 visual identity with symmetric multi-resolution icons and sharper status indicators:
+Captail 0.8.0 introduces a Shadowplay-style disk replay buffer mode and extended capture durations:
 
-- Replaced legacy icons with canonical, pixel-symmetric coral rounded-square marks across Windows taskbar and tray surfaces, with a distinct inactive tray state.
-- Aligned dashboard recording badges and the in-game overlay indicator with the 0.7 color palette, distinguishing Instant Replay from manual recording at a glance.
-- Clarified inactive audio input indicators on the dashboard so idle sources no longer appear active.
+- **Shadowplay-style disk buffer:** Instant Replay can now write rolling buffer segments directly to disk rather than RAM, preventing memory pressure during extended gaming sessions.
+- **Extended replay durations:** Added 20-minute and 30-minute rolling buffer duration presets.
+- **Dedicated buffer storage selection:** Choose between RAM and disk storage in settings, with custom folder selection for fast SSD placement.
+- **Bit-exact instant assembly:** Replay clips are assembled via stream copy without re-encoding, preserving full video and audio quality with zero capture stutter.
 
 ## Is Captail for me?
 

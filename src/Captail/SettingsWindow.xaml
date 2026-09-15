@@ -847,6 +847,28 @@
                                 <Border Style="{StaticResource RowDivider}"/>
                                 <StackPanel Margin="13,11">
                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                        <TextBlock Text="{DynamicResource L.Replay.BufferStorage}" Style="{StaticResource RowLabelText}"/>
+                                        <Button Style="{StaticResource HelpIconButton}">
+                                            <Button.ToolTip>
+                                                <ToolTip Style="{StaticResource HelpToolTip}">
+                                                    <StackPanel>
+                                                        <TextBlock Text="{DynamicResource L.Replay.BufferStorage}" Style="{StaticResource HelpTipTitle}"/>
+                                                        <TextBlock Text="{DynamicResource L.Help.BufferStorage}" Style="{StaticResource HelpTipBody}"/>
+                                                    </StackPanel>
+                                                </ToolTip>
+                                            </Button.ToolTip>
+                                        </Button>
+                                    </StackPanel>
+                                    <Border Style="{StaticResource SegmentStrip}">
+                                         <UniformGrid x:Name="BufferStorageOptions" Rows="1">
+                                             <RadioButton GroupName="BufferStorage" Tag="ram" Content="{DynamicResource L.Replay.StorageRam}" Style="{StaticResource SegmentButton}"/>
+                                             <RadioButton GroupName="BufferStorage" Tag="disk" Content="{DynamicResource L.Replay.StorageDisk}" Style="{StaticResource SegmentButton}"/>
+                                         </UniformGrid>
+                                    </Border>
+                                </StackPanel>
+                                <Border Style="{StaticResource RowDivider}"/>
+                                <StackPanel Margin="13,11">
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                                         <TextBlock Text="{DynamicResource L.Replay.BufferLength}" Style="{StaticResource RowLabelText}"/>
                                         <Button Style="{StaticResource HelpIconButton}">
                                             <Button.ToolTip>
@@ -868,6 +890,8 @@
                                             <RadioButton GroupName="Buffer" Tag="300" Content="{DynamicResource L.Duration.5m}" Style="{StaticResource SegmentButton}"/>
                                             <RadioButton GroupName="Buffer" Tag="600" Content="{DynamicResource L.Duration.10m}" Style="{StaticResource SegmentButton}"/>
                                             <RadioButton GroupName="Buffer" Tag="900" Content="{DynamicResource L.Duration.15m}" Style="{StaticResource SegmentButton}"/>
+                                            <RadioButton GroupName="Buffer" Tag="1200" Content="{DynamicResource L.Duration.20m}" Style="{StaticResource SegmentButton}"/>
+                                            <RadioButton GroupName="Buffer" Tag="1800" Content="{DynamicResource L.Duration.30m}" Style="{StaticResource SegmentButton}"/>
                                         </UniformGrid>
                                     </Border>
                                 </StackPanel>
@@ -1445,6 +1469,20 @@
                                     <Button x:Name="BrowseOutputButton" Grid.Column="1" Content="{DynamicResource L.Storage.Change}"
                                             Style="{StaticResource SubtleButton}"
                                             Click="BrowseOutput_Click"/>
+                                </Grid>
+                                <Border Style="{StaticResource RowDivider}"/>
+                                <Grid x:Name="DiskBufferFolderSettingsRow" Margin="13,11">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Margin="0,0,10,0">
+                                        <TextBlock Text="{DynamicResource L.Storage.DiskBufferFolder}" Style="{StaticResource RowLabelText}" TextWrapping="Wrap"/>
+                                        <TextBlock x:Name="DiskBufferDirText" Style="{StaticResource MonoText}" MaxWidth="250" TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                    <Button x:Name="BrowseDiskBufferButton" Grid.Column="1" Content="{DynamicResource L.Storage.Change}"
+                                            Style="{StaticResource SubtleButton}"
+                                            Click="BrowseDiskBuffer_Click"/>
                                 </Grid>
                                 <Border Style="{StaticResource RowDivider}"/>
                                 <Grid Margin="13,11">

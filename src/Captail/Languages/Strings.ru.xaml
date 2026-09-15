@@ -76,6 +76,10 @@
   <sys:String x:Key="L.Replay.RecordingIndicator">Индикатор записи</sys:String>
   <sys:String x:Key="L.Replay.RecordingIndicatorHint">Маленький значок в выбранном углу экрана</sys:String>
   <sys:String x:Key="L.Replay.IndicatorPosition">Положение индикатора</sys:String>
+  <sys:String x:Key="L.Replay.BufferStorage">Buffer storage</sys:String>
+  <sys:String x:Key="L.Replay.StorageRam">Memory (RAM)</sys:String>
+  <sys:String x:Key="L.Replay.StorageDisk">Disk (Shadowplay)</sys:String>
+  <sys:String x:Key="L.Help.BufferStorage">Choose where the replay buffer is temporarily kept. System RAM produces zero SSD wear and zero disk I/O, ideal for 15s–10m clips. Disk buffer (Shadowplay mode) allows extended 15–30m replays without consuming system memory.</sys:String>
   <sys:String x:Key="L.Replay.BufferLength">Длина буфера</sys:String>
   <sys:String x:Key="L.Duration.15s">15с</sys:String>
   <sys:String x:Key="L.Duration.30s">30с</sys:String>
@@ -84,6 +88,8 @@
   <sys:String x:Key="L.Duration.5m">5м</sys:String>
   <sys:String x:Key="L.Duration.10m">10м</sys:String>
   <sys:String x:Key="L.Duration.15m">15м</sys:String>
+  <sys:String x:Key="L.Duration.20m">20m</sys:String>
+  <sys:String x:Key="L.Duration.30m">30m</sys:String>
   <sys:String x:Key="L.Replay.BufferLimit">Лимит буфера</sys:String>
   <sys:String x:Key="L.Replay.BufferLimitTip">Максимальный объём сжатых видео- и аудиопакетов в оперативной памяти</sys:String>
   <sys:String x:Key="L.Replay.BufferLimitHint">Ограничивает ОЗУ и длительность</sys:String>
@@ -152,6 +158,7 @@
   <sys:String x:Key="L.Help.AudioCodec">AAC сохраняется в MP4 и работает почти со всеми плеерами и редакторами. Opus эффективнее на низком битрейте, но использует MKV и может потребовать современный редактор.</sys:String>
 
   <sys:String x:Key="L.Storage.ReplayFolder">Папка повторов</sys:String>
+  <sys:String x:Key="L.Storage.DiskBufferFolder">Disk buffer folder</sys:String>
   <sys:String x:Key="L.Storage.Change">Изменить…</sys:String>
   <sys:String x:Key="L.Storage.FreeOn">{0} свободно на {1}</sys:String>
   <sys:String x:Key="L.Storage.Used">{0} занято</sys:String>

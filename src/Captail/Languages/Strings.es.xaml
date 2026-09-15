@@ -73,6 +73,10 @@
   <sys:String x:Key="L.Replay.RecordingIndicator">Indicador de grabación</sys:String>
   <sys:String x:Key="L.Replay.RecordingIndicatorHint">Pequeño icono de estado en la esquina de la pantalla seleccionada</sys:String>
   <sys:String x:Key="L.Replay.IndicatorPosition">Posición del indicador</sys:String>
+  <sys:String x:Key="L.Replay.BufferStorage">Buffer storage</sys:String>
+  <sys:String x:Key="L.Replay.StorageRam">Memory (RAM)</sys:String>
+  <sys:String x:Key="L.Replay.StorageDisk">Disk (Shadowplay)</sys:String>
+  <sys:String x:Key="L.Help.BufferStorage">Choose where the replay buffer is temporarily kept. System RAM produces zero SSD wear and zero disk I/O, ideal for 15s–10m clips. Disk buffer (Shadowplay mode) allows extended 15–30m replays without consuming system memory.</sys:String>
   <sys:String x:Key="L.Replay.BufferLength">Longitud del búfer</sys:String>
   <sys:String x:Key="L.Duration.15s">15 s</sys:String>
   <sys:String x:Key="L.Duration.30s">30 s</sys:String>
@@ -81,6 +85,8 @@
   <sys:String x:Key="L.Duration.5m">5 min</sys:String>
   <sys:String x:Key="L.Duration.10m">10 min</sys:String>
   <sys:String x:Key="L.Duration.15m">15 min</sys:String>
+  <sys:String x:Key="L.Duration.20m">20m</sys:String>
+  <sys:String x:Key="L.Duration.30m">30m</sys:String>
   <sys:String x:Key="L.Replay.BufferLimit">Límite de búfer</sys:String>
   <sys:String x:Key="L.Replay.BufferLimitTip">Memoria máxima de paquetes de audio y video comprimido</sys:String>
   <sys:String x:Key="L.Replay.BufferLimitHint">Limita el uso y la duración de la RAM</sys:String>
@@ -149,6 +155,7 @@
   <sys:String x:Key="L.Help.AudioCodec">AAC guarda como MP4 y funciona con casi todos los reproductores y editores. Opus es eficiente y suena bien a velocidades de bits más bajas, pero usa MKV y puede necesitar un editor moderno.</sys:String>
 
   <sys:String x:Key="L.Storage.ReplayFolder">Carpeta de repeticiones</sys:String>
+  <sys:String x:Key="L.Storage.DiskBufferFolder">Disk buffer folder</sys:String>
   <sys:String x:Key="L.Storage.Change">Cambiar…</sys:String>
   <sys:String x:Key="L.Storage.FreeOn">{0} libres en {1}</sys:String>
   <sys:String x:Key="L.Storage.Used">{0} usado</sys:String>

@@ -73,6 +73,10 @@
   <sys:String x:Key="L.Replay.RecordingIndicator">録画インジケーター</sys:String>
   <sys:String x:Key="L.Replay.RecordingIndicatorHint">選択した画面隅にある小さなステータス アイコン</sys:String>
   <sys:String x:Key="L.Replay.IndicatorPosition">インジケーターの位置</sys:String>
+  <sys:String x:Key="L.Replay.BufferStorage">Buffer storage</sys:String>
+  <sys:String x:Key="L.Replay.StorageRam">Memory (RAM)</sys:String>
+  <sys:String x:Key="L.Replay.StorageDisk">Disk (Shadowplay)</sys:String>
+  <sys:String x:Key="L.Help.BufferStorage">Choose where the replay buffer is temporarily kept. System RAM produces zero SSD wear and zero disk I/O, ideal for 15s–10m clips. Disk buffer (Shadowplay mode) allows extended 15–30m replays without consuming system memory.</sys:String>
   <sys:String x:Key="L.Replay.BufferLength">バッファ長</sys:String>
   <sys:String x:Key="L.Duration.15s">15秒</sys:String>
   <sys:String x:Key="L.Duration.30s">30秒</sys:String>
@@ -81,6 +85,8 @@
   <sys:String x:Key="L.Duration.5m">5分</sys:String>
   <sys:String x:Key="L.Duration.10m">10分</sys:String>
   <sys:String x:Key="L.Duration.15m">15分</sys:String>
+  <sys:String x:Key="L.Duration.20m">20m</sys:String>
+  <sys:String x:Key="L.Duration.30m">30m</sys:String>
   <sys:String x:Key="L.Replay.BufferLimit">バッファ制限</sys:String>
   <sys:String x:Key="L.Replay.BufferLimitTip">最大圧縮ビデオおよびオーディオ パケット メモリ</sys:String>
   <sys:String x:Key="L.Replay.BufferLimitHint">RAMの使用量と持続時間を制限します</sys:String>
@@ -149,6 +155,7 @@
   <sys:String x:Key="L.Help.AudioCodec">AAC は MP4 として保存され、ほぼすべてのプレーヤーやエディターで動作します。 Opus は効率的で、低ビットレートでも優れたサウンドを実現しますが、MKV を使用するため、最新のエディタが必要になる場合があります。</sys:String>
 
   <sys:String x:Key="L.Storage.ReplayFolder">リプレイフォルダー</sys:String>
+  <sys:String x:Key="L.Storage.DiskBufferFolder">Disk buffer folder</sys:String>
   <sys:String x:Key="L.Storage.Change">変更…</sys:String>
   <sys:String x:Key="L.Storage.FreeOn">{1} の空き容量: {0}</sys:String>
   <sys:String x:Key="L.Storage.Used">{0} が使用されました</sys:String>

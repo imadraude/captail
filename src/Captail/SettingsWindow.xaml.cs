@@ -38,6 +38,7 @@ public partial class SettingsWindow : Window
     private readonly CancellationTokenSource _lifetimeCts = new();
     private readonly ReplayLibrary _replayLibrary;
     private string _outputDirectory;
+    private string _diskBufferDirectory;
     private string _pendingSaveHotkey;
     private string _pendingToggleHotkey;
     private string _pendingRecordHotkey;
@@ -110,6 +111,7 @@ public partial class SettingsWindow : Window
         _checkForUpdates = checkForUpdates;
         _installUpdate = installUpdate;
         _outputDirectory = config.OutputDirectory;
+        _diskBufferDirectory = config.DiskBufferDirectory;
         _pendingSaveHotkey = config.Hotkey;
         _pendingToggleHotkey = config.ToggleReplayHotkey;
         _pendingRecordHotkey = config.RecordHotkey;
@@ -398,6 +400,7 @@ public partial class SettingsWindow : Window
         _updatingUi = true;
         try
         {
+            SelectRadioByTag(BufferStorageOptions, _config.ReplayBufferStorage);
             SelectRadioByTag(BufferOptions, _config.BufferSeconds.ToString());
             SelectByTag(ReplaySizeLimitBox, _config.MaxReplaySizeMb.ToString());
             SelectRadioByTag(FpsOptions, _config.FrameRate.ToString());
@@ -454,6 +457,8 @@ public partial class SettingsWindow : Window
 
             _outputDirectory = _config.OutputDirectory;
             OutputDirText.Text = _outputDirectory;
+            _diskBufferDirectory = _config.DiskBufferDirectory;
+            DiskBufferDirText.Text = AppDataPaths.ResolveDiskBufferDirectory(_diskBufferDirectory);
             UpdateAudioDeviceState();
             UpdateCaptureSourceState();
             UpdateAudioRoutingState();
@@ -1149,9 +1154,13 @@ public partial class SettingsWindow : Window
         candidate.RecordingIndicatorPosition = GetSelectedRadioTag(
             RecordingIndicatorPositionOptions,
             _config.RecordingIndicatorPosition);
+        candidate.ReplayBufferStorage = GetSelectedRadioTag(
+            BufferStorageOptions,
+            _config.ReplayBufferStorage);
         candidate.BufferSeconds = GetSelectedRadioInt(
             BufferOptions,
             _config.BufferSeconds);
+        candidate.DiskBufferDirectory = _diskBufferDirectory;
         candidate.MaxReplaySizeMb = GetSelectedInt(ReplaySizeLimitBox, 0);
         candidate.CaptureSource = GetSelectedTag(CaptureSourceBox, "desktop");
         candidate.Codec = GetSelectedTag(CodecBox, _config.Codec);
@@ -2110,6 +2119,18 @@ public partial class SettingsWindow : Window
         _outputDirectory = dialog.FolderName;
         OutputDirText.Text = _outputDirectory;
         _ = RefreshDiskAsync();
+        RefreshSettingsDirtyState();
+    }
+
+    private void BrowseDiskBuffer_Click(object sender, RoutedEventArgs e)
+    {
+        string currentDir = AppDataPaths.ResolveDiskBufferDirectory(_diskBufferDirectory);
+        var dialog = new Microsoft.Win32.OpenFolderDialog { InitialDirectory = currentDir };
+        if (dialog.ShowDialog() != true)
+            return;
+
+        _diskBufferDirectory = dialog.FolderName;
+        DiskBufferDirText.Text = _diskBufferDirectory;
         RefreshSettingsDirtyState();
     }
 

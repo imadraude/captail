@@ -13,6 +13,10 @@ public sealed class Config
 
     public string Language { get; set; } = "en";
     public int BufferSeconds { get; set; } = 300;
+    /// <summary>"ram" (in-memory circular buffer) or "disk" (Shadowplay-style rolling disk buffer).</summary>
+    public string ReplayBufferStorage { get; set; } = ReplayBufferStorageModes.Ram;
+    /// <summary>Directory for disk buffer storage; empty uses the default temporary buffer directory.</summary>
+    public string DiskBufferDirectory { get; set; } = "";
     /// <summary>0 = duration-only limit.</summary>
     public int MaxReplaySizeMb { get; set; }
     public int FrameRate { get; set; } = 60;
@@ -243,10 +247,14 @@ public sealed class Config
         OrganizeReplaysByGame = source.OrganizeReplaysByGame;
         SuspendReplayDuringRecording = source.SuspendReplayDuringRecording;
         KeepRecordingPipelineWarm = source.KeepRecordingPipelineWarm;
+        ReplayBufferStorage = source.ReplayBufferStorage;
+        DiskBufferDirectory = source.DiskBufferDirectory;
         Normalize();
     }
 
     public bool PipelineEquals(Config other) =>
+        string.Equals(ReplayBufferStorage, other.ReplayBufferStorage, StringComparison.Ordinal) &&
+        string.Equals(DiskBufferDirectory, other.DiskBufferDirectory, StringComparison.OrdinalIgnoreCase) &&
         BufferSeconds == other.BufferSeconds &&
         MaxReplaySizeMb == other.MaxReplaySizeMb &&
         FrameRate == other.FrameRate &&
@@ -306,7 +314,15 @@ public sealed class Config
     public void Normalize()
     {
         Language = NormalizeLanguage(Language);
-        BufferSeconds = AllowedValue(BufferSeconds, [15, 30, 60, 120, 300, 600, 900], 300);
+        ReplayBufferStorage = AllowedText(
+            ReplayBufferStorage,
+            [ReplayBufferStorageModes.Ram, ReplayBufferStorageModes.Disk],
+            ReplayBufferStorageModes.Ram);
+        DiskBufferDirectory = NormalizePath(DiskBufferDirectory, allowEmpty: true);
+        BufferSeconds = AllowedValue(
+            BufferSeconds,
+            [15, 30, 60, 120, 300, 600, 900, 1200, 1800],
+            300);
         MaxReplaySizeMb = AllowedValue(MaxReplaySizeMb, [0, 250, 500, 1000, 2000, 5000, 10000], 0);
         FrameRate = AllowedValue(FrameRate, [30, 60, 120, 144, 240], 60);
         BitrateMbps = BitrateMbps == 0 ? 0 : Math.Clamp(BitrateMbps, 2, 100);
@@ -513,6 +529,12 @@ internal static class NvencModes
 {
     internal const string Balanced = "balanced";
     internal const string LowOverhead = "low-overhead";
+}
+
+public static class ReplayBufferStorageModes
+{
+    public const string Ram = "ram";
+    public const string Disk = "disk";
 }
 
 public sealed class ProcessAudioRoute

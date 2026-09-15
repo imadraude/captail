@@ -27,6 +27,16 @@ internal static class AppDataPaths
         Path.Combine(CacheRoot, "obs-plugin-cache");
     internal static string ThumbnailDirectory =>
         Path.Combine(CacheRoot, "thumbnails");
+    internal static string DefaultDiskBufferDirectory =>
+        Path.Combine(CacheRoot, "buffer");
+
+    internal static string ResolveDiskBufferDirectory(string? configuredDirectory)
+    {
+        string candidate = configuredDirectory?.Trim() ?? "";
+        return string.IsNullOrWhiteSpace(candidate)
+            ? DefaultDiskBufferDirectory
+            : candidate;
+    }
 
     internal static void PrepareStoreData()
     {

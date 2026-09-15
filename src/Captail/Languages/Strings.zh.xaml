@@ -76,6 +76,10 @@
   <sys:String x:Key="L.Replay.RecordingIndicator">录制指示器</sys:String>
   <sys:String x:Key="L.Replay.RecordingIndicatorHint">在所选屏幕角落显示的小状态图标</sys:String>
   <sys:String x:Key="L.Replay.IndicatorPosition">指示器位置</sys:String>
+  <sys:String x:Key="L.Replay.BufferStorage">Buffer storage</sys:String>
+  <sys:String x:Key="L.Replay.StorageRam">Memory (RAM)</sys:String>
+  <sys:String x:Key="L.Replay.StorageDisk">Disk (Shadowplay)</sys:String>
+  <sys:String x:Key="L.Help.BufferStorage">Choose where the replay buffer is temporarily kept. System RAM produces zero SSD wear and zero disk I/O, ideal for 15s–10m clips. Disk buffer (Shadowplay mode) allows extended 15–30m replays without consuming system memory.</sys:String>
   <sys:String x:Key="L.Replay.BufferLength">缓冲时长</sys:String>
   <sys:String x:Key="L.Duration.15s">15 秒</sys:String>
   <sys:String x:Key="L.Duration.30s">30 秒</sys:String>
@@ -84,6 +88,8 @@
   <sys:String x:Key="L.Duration.5m">5 分钟</sys:String>
   <sys:String x:Key="L.Duration.10m">10 分钟</sys:String>
   <sys:String x:Key="L.Duration.15m">15 分钟</sys:String>
+  <sys:String x:Key="L.Duration.20m">20m</sys:String>
+  <sys:String x:Key="L.Duration.30m">30m</sys:String>
   <sys:String x:Key="L.Replay.BufferLimit">缓冲上限</sys:String>
   <sys:String x:Key="L.Replay.BufferLimitTip">压缩后视频和音频数据包的最大内存占用</sys:String>
   <sys:String x:Key="L.Replay.BufferLimitHint">限制内存占用和录制时长</sys:String>
@@ -152,6 +158,7 @@
   <sys:String x:Key="L.Help.AudioCodec">AAC 保存为 MP4，几乎兼容所有播放器和剪辑软件。Opus 效率更高，在较低码率下音质也很好，但使用 MKV 容器，可能需要较新的剪辑软件。</sys:String>
 
   <sys:String x:Key="L.Storage.ReplayFolder">回放文件夹</sys:String>
+  <sys:String x:Key="L.Storage.DiskBufferFolder">Disk buffer folder</sys:String>
   <sys:String x:Key="L.Storage.Change">更改…</sys:String>
   <sys:String x:Key="L.Storage.FreeOn">{1} 剩余 {0}</sys:String>
   <sys:String x:Key="L.Storage.Used">已用 {0}</sys:String>

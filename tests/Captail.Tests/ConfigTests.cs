@@ -265,4 +265,103 @@ public sealed class ConfigTests
         Assert.Equal(0, settings.BFrames);
         Assert.Equal(adaptiveQuantization, settings.AdaptiveQuantization);
     }
+
+    [Fact]
+    public void NewConfig_UsesRamStorageByDefault()
+    {
+        var config = new Config();
+        Assert.Equal(ReplayBufferStorageModes.Ram, config.ReplayBufferStorage);
+        Assert.Equal(string.Empty, config.DiskBufferDirectory);
+    }
+
+    [Fact]
+    public void Deserialize_ReplayBufferStorage_PreservesValues()
+    {
+        string json = """
+        {
+            "ReplayBufferStorage": "disk",
+            "DiskBufferDirectory": "C:\\CaptailBuffer"
+        }
+        """;
+
+        bool success = Config.TryDeserialize(json, out Config? config);
+
+        Assert.True(success);
+        Assert.NotNull(config);
+        Assert.Equal(ReplayBufferStorageModes.Disk, config.ReplayBufferStorage);
+        Assert.Equal("C:\\CaptailBuffer", config.DiskBufferDirectory);
+    }
+
+    [Fact]
+    public void ChangingReplayBufferStorageOrDirectory_ChangesPipelineEquals()
+    {
+        var original = new Config
+        {
+            ReplayBufferStorage = ReplayBufferStorageModes.Ram,
+            DiskBufferDirectory = "",
+        };
+
+        Config modified = original.Clone();
+        modified.ReplayBufferStorage = ReplayBufferStorageModes.Disk;
+
+        Assert.False(original.ValuesEqual(modified));
+        Assert.False(original.PipelineEquals(modified));
+
+        modified = original.Clone();
+        modified.DiskBufferDirectory = "D:\\Buffer";
+
+        Assert.False(original.ValuesEqual(modified));
+        Assert.False(original.PipelineEquals(modified));
+    }
+
+    [Fact]
+    public void Normalize_InvalidReplayBufferStorage_NormalizesToRam()
+    {
+        var config = new Config
+        {
+            ReplayBufferStorage = "unknown_mode",
+        };
+
+        config.Normalize();
+
+        Assert.Equal(ReplayBufferStorageModes.Ram, config.ReplayBufferStorage);
+    }
+
+    [Theory]
+    [InlineData(15, 15)]
+    [InlineData(30, 30)]
+    [InlineData(60, 60)]
+    [InlineData(120, 120)]
+    [InlineData(300, 300)]
+    [InlineData(600, 600)]
+    [InlineData(900, 900)]
+    [InlineData(1200, 1200)]
+    [InlineData(1800, 1800)]
+    [InlineData(400, 300)]
+    [InlineData(-1, 300)]
+    public void Normalize_BufferSeconds_ValidatesAllowedValues(int inputSeconds, int expectedSeconds)
+    {
+        var config = new Config
+        {
+            BufferSeconds = inputSeconds,
+        };
+
+        config.Normalize();
+
+        Assert.Equal(expectedSeconds, config.BufferSeconds);
+    }
+
+    [Fact]
+    public void ResolveDiskBufferDirectory_HandlesCustomAndFallback()
+    {
+        string custom = @"D:\MyBuffer";
+        Assert.Equal(custom, AppDataPaths.ResolveDiskBufferDirectory(custom));
+
+        string resolvedFallback = AppDataPaths.ResolveDiskBufferDirectory("");
+        Assert.Equal(AppDataPaths.DefaultDiskBufferDirectory, resolvedFallback);
+
+        string resolvedNullFallback = AppDataPaths.ResolveDiskBufferDirectory(null);
+        Assert.Equal(AppDataPaths.DefaultDiskBufferDirectory, resolvedNullFallback);
+    }
 }
+

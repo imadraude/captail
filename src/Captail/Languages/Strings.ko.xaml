@@ -73,6 +73,10 @@
   <sys:String x:Key="L.Replay.RecordingIndicator">녹화 표시</sys:String>
   <sys:String x:Key="L.Replay.RecordingIndicatorHint">선택한 화면 모서리에 있는 작은 상태 아이콘</sys:String>
   <sys:String x:Key="L.Replay.IndicatorPosition">표시기 위치</sys:String>
+  <sys:String x:Key="L.Replay.BufferStorage">Buffer storage</sys:String>
+  <sys:String x:Key="L.Replay.StorageRam">Memory (RAM)</sys:String>
+  <sys:String x:Key="L.Replay.StorageDisk">Disk (Shadowplay)</sys:String>
+  <sys:String x:Key="L.Help.BufferStorage">Choose where the replay buffer is temporarily kept. System RAM produces zero SSD wear and zero disk I/O, ideal for 15s–10m clips. Disk buffer (Shadowplay mode) allows extended 15–30m replays without consuming system memory.</sys:String>
   <sys:String x:Key="L.Replay.BufferLength">버퍼 길이</sys:String>
   <sys:String x:Key="L.Duration.15s">15초</sys:String>
   <sys:String x:Key="L.Duration.30s">30초</sys:String>
@@ -81,6 +85,8 @@
   <sys:String x:Key="L.Duration.5m">5분</sys:String>
   <sys:String x:Key="L.Duration.10m">10분</sys:String>
   <sys:String x:Key="L.Duration.15m">15분</sys:String>
+  <sys:String x:Key="L.Duration.20m">20m</sys:String>
+  <sys:String x:Key="L.Duration.30m">30m</sys:String>
   <sys:String x:Key="L.Replay.BufferLimit">버퍼 한도</sys:String>
   <sys:String x:Key="L.Replay.BufferLimitTip">최대 압축 비디오 및 오디오 패킷 메모리</sys:String>
   <sys:String x:Key="L.Replay.BufferLimitHint">RAM 사용 및 기간 제한</sys:String>
@@ -149,6 +155,7 @@
   <sys:String x:Key="L.Help.AudioCodec">AAC는 MP4로 저장되며 거의 모든 플레이어 및 편집자와 작동합니다. Opus는 효율적이고 낮은 비트 전송률에서도 좋은 소리를 내지만 MKV를 사용하므로 최신 편집기가 필요할 수 있습니다.</sys:String>
 
   <sys:String x:Key="L.Storage.ReplayFolder">리플레이 폴더</sys:String>
+  <sys:String x:Key="L.Storage.DiskBufferFolder">Disk buffer folder</sys:String>
   <sys:String x:Key="L.Storage.Change">변경…</sys:String>
   <sys:String x:Key="L.Storage.FreeOn">{1} 여유 공간 {0}</sys:String>
   <sys:String x:Key="L.Storage.Used">{0} 사용됨</sys:String>
